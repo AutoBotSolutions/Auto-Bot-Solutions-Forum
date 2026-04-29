@@ -22,19 +22,19 @@ Auto Bot Solutions Forum is a comprehensive, feature-rich discussion platform bu
 
 ### ✨ Key Features
 
-- **🔗 GitHub Integration** - Seamlessly link discussions to specific repositories
+- ** GitHub Integration** - Seamlessly link discussions to specific repositories
 - **🗳️ Voting System** - Upvote/downvote posts and comments with real-time counts
-- **📂 Categories & Tags** - Organize content with custom categories and tagging
+- ** Categories & Tags** - Organize content with custom categories and tagging
 - **🔍 Advanced Search** - Full-text search across posts and comments
-- **🔖 Bookmarking** - Save important posts for quick access
+- ** Bookmarking** - Save important posts for quick access
 - **✍️ Markdown Support** - Rich text formatting with syntax highlighting
-- **👤 User Profiles** - Comprehensive profiles with activity tracking
+- ** User Profiles** - Comprehensive profiles with activity tracking
 - **🏆 Badges & Achievements** - Gamification system to recognize contributions
-- **🔔 Notifications** - Real-time notifications for important updates
-- **💬 Private Messaging** - Direct communication between users
+- ** Notifications** - Real-time notifications for important updates
+- ** Private Messaging** - Direct communication between users
 - **📎 File Uploads** - Attach images, PDFs, and documents to posts
 - **🛡️ Security** - CSRF protection, rate limiting, XSS protection, and more
-- **🎨 Futuristic UI** - Sci-fi themed interface with neon colors and glowing effects
+- ** Futuristic UI** - Sci-fi themed interface with neon colors and glowing effects
 
 ---
 
@@ -145,7 +145,7 @@ repo-forum/
 
 ---
 
-## 🔧 Configuration
+## Configuration
 
 ### Environment Variables
 
@@ -174,7 +174,7 @@ MAIL_PASSWORD=your-email-password
 
 ---
 
-## 🚢 Deployment
+## Deployment
 
 ### Docker Deployment
 
@@ -221,7 +221,7 @@ Comprehensive documentation is available in the `app/docs/` directory:
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
 We welcome contributions! Please follow these steps:
 
@@ -236,7 +236,7 @@ See [CONTRIBUTING.md](app/docs/CONTRIBUTING.md) for detailed guidelines.
 
 ---
 
-## 📄 License
+## License
 
 This project is proprietary software owned by Auto Bot Solutions (Software Customs). All rights reserved.
 
@@ -257,7 +257,7 @@ For issues, questions, or support:
 
 ---
 
-## 🔮 Roadmap
+## Roadmap
 
 Future enhancements planned:
 
@@ -276,7 +276,7 @@ Future enhancements planned:
 
 ---
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - Built with [Flask](https://flask.palletsprojects.com/)
 - Database powered by [PostgreSQL](https://www.postgresql.org/)
