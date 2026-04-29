@@ -16,7 +16,7 @@
 
 ---
 
-## 🚀 Overview
+## Overview
 
 Auto Bot Solutions Forum is a comprehensive, feature-rich discussion platform built with Flask, PostgreSQL, and Docker. Designed with a futuristic sci-fi aesthetic, it provides a modern, engaging space for developers to discuss AutoBot Solutions projects, share knowledge, and collaborate effectively.
 
@@ -24,17 +24,17 @@ Auto Bot Solutions Forum is a comprehensive, feature-rich discussion platform bu
 
 - ** GitHub Integration** - Seamlessly link discussions to specific repositories
 - **🗳️ Voting System** - Upvote/downvote posts and comments with real-time counts
-- ** Categories & Tags** - Organize content with custom categories and tagging
+- **🛡️ Categories & Tags** - Organize content with custom categories and tagging
 - **🔍 Advanced Search** - Full-text search across posts and comments
-- ** Bookmarking** - Save important posts for quick access
+- **🛡️ Bookmarking** - Save important posts for quick access
 - **✍️ Markdown Support** - Rich text formatting with syntax highlighting
-- ** User Profiles** - Comprehensive profiles with activity tracking
+- **🛡️ User Profiles** - Comprehensive profiles with activity tracking
 - **🏆 Badges & Achievements** - Gamification system to recognize contributions
-- ** Notifications** - Real-time notifications for important updates
-- ** Private Messaging** - Direct communication between users
+- **🛡️ Notifications** - Real-time notifications for important updates
+- **🛡️ Private Messaging** - Direct communication between users
 - **📎 File Uploads** - Attach images, PDFs, and documents to posts
 - **🛡️ Security** - CSRF protection, rate limiting, XSS protection, and more
-- ** Futuristic UI** - Sci-fi themed interface with neon colors and glowing effects
+- **🛡️ Futuristic UI** - Sci-fi themed interface with neon colors and glowing effects
 
 ---
 
