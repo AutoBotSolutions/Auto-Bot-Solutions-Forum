@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}About - AutoBot Solutions Forum{% endblock %}
+
+{% block content %}
+<div class="hero" style="padding: 3rem 0;">
+    <h1 style="font-size: 2.5rem;">ABOUT THE SYSTEM</h1>
+    <p style="font-size: 1.2rem;">A next-generation discussion platform for AutoBot Solutions repositories</p>
+</div>
+
+<div class="form-container" style="max-width: 800px;">
+    <h2 style="font-family: 'Orbitron', sans-serif; font-size: 1.5rem; color: var(--neon-cyan); margin-bottom: 1.5rem;">MISSION</h2>
+    <p style="color: var(--text-secondary); line-height: 1.8; margin-bottom: 2rem;">
+        The AutoBot Solutions Forum serves as a centralized communication hub for developers, contributors, and users to discuss our open-source projects. Built with scalability and security in mind, this platform facilitates collaboration, knowledge sharing, and community growth.
+    </p>
+
+    <h2 style="font-family: 'Orbitron', sans-serif; font-size: 1.5rem; color: var(--neon-cyan); margin-bottom: 1.5rem;">FEATURES</h2>
+    <ul style="color: var(--text-secondary); line-height: 2; margin-bottom: 2rem; padding-left: 1.5rem;">
+        <li>Repository-specific discussions</li>
+        <li>Voting system for quality content</li>
+        <li>Real-time comment threads</li>
+        <li>GitHub repository integration</li>
+        <li>Secure user authentication</li>
+        <li>Futuristic sci-fi interface</li>
+    </ul>
+
+    <h2 style="font-family: 'Orbitron', sans-serif; font-size: 1.5rem; color: var(--neon-cyan); margin-bottom: 1.5rem;">TECHNOLOGY</h2>
+    <p style="color: var(--text-secondary); line-height: 1.8;">
+        Built with Flask, PostgreSQL, and modern web technologies. The system is designed for horizontal scaling and can be deployed using Docker containers for easy management and deployment.
+    </p>
+</div>
+{% endblock %}

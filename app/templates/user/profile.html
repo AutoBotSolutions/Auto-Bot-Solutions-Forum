@@ -1,0 +1,233 @@
+{% extends "base.html" %}
+
+{% block title %}{{ user.username }} - Profile{% endblock %}
+
+{% block content %}
+<div class="user-profile">
+    <div class="profile-header">
+        <div class="profile-avatar">
+            <div class="avatar-placeholder">{{ user.username[0]|upper }}</div>
+        </div>
+        <div class="profile-info">
+            <h1 class="profile-username">{{ user.username }}</h1>
+            <p class="profile-email">{{ user.email }}</p>
+            <div class="profile-stats">
+                <div class="stat">
+                    <span class="stat-value">{{ total_posts }}</span>
+                    <span class="stat-label">Posts</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-value">{{ total_comments }}</span>
+                    <span class="stat-label">Comments</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-value">{{ user.created_at.strftime('%b %Y') }}</span>
+                    <span class="stat-label">Joined</span>
+                </div>
+            </div>
+            
+            {% if user.badges %}
+            <div class="user-badges">
+                <h3 style="font-family: 'Orbitron', sans-serif; font-size: 1rem; color: var(--neon-cyan); margin-bottom: 1rem;">ACHIEVEMENTS</h3>
+                <div class="badges-list">
+                    {% for badge in user.badges %}
+                    <div class="user-badge" style="color: {{ badge.color }}; border-color: {{ badge.color }};">
+                        <span class="badge-icon">{{ badge.icon }}</span>
+                        <span class="badge-name">{{ badge.name }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+            
+            {% if current_user.is_authenticated and current_user.id == user.id %}
+            <a href="{{ url_for('user.edit_profile') }}" class="btn-primary" style="margin-top: 1rem;">Edit Profile</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="profile-content">
+        <div class="profile-section">
+            <h2 style="font-family: 'Orbitron', sans-serif; font-size: 1.5rem; color: var(--neon-cyan); margin-bottom: 1.5rem;">RECENT POSTS</h2>
+            {% for post in posts %}
+            <div class="post-card">
+                <h3 class="post-title">
+                    <a href="{{ url_for('forum.post', post_id=post.id) }}">{{ post.title }}</a>
+                </h3>
+                <p class="post-content">{{ post.content[:150] }}{% if post.content|length > 150 %}...{% endif %}</p>
+                <div class="post-meta">
+                    <span class="post-date">{{ post.created_at.strftime('%B %d, %Y') }}</span>
+                    <div class="vote-count">
+                        <span>▲ {{ post.upvotes }}</span>
+                        <span>▼ {{ post.downvotes }}</span>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div style="text-align: center; padding: 2rem; color: var(--text-secondary);">
+                <p>No posts yet.</p>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="profile-section">
+            <h2 style="font-family: 'Orbitron', sans-serif; font-size: 1.5rem; color: var(--neon-cyan); margin-bottom: 1.5rem;">RECENT COMMENTS</h2>
+            {% for comment in comments %}
+            <div class="post-card">
+                <p class="post-content">{{ comment.content[:150] }}{% if comment.content|length > 150 %}...{% endif %}</p>
+                <div class="post-meta">
+                    <a href="{{ url_for('forum.post', post_id=comment.post_id) }}" style="color: var(--neon-cyan);">View Post →</a>
+                    <span class="post-date">{{ comment.created_at.strftime('%B %d, %Y') }}</span>
+                    <div class="vote-count">
+                        <span>▲ {{ comment.upvotes }}</span>
+                        <span>▼ {{ comment.downvotes }}</span>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div style="text-align: center; padding: 2rem; color: var(--text-secondary);">
+                <p>No comments yet.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<style>
+.user-profile {
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.profile-header {
+    background: var(--dark-card);
+    border: 1px solid var(--border-glow);
+    border-radius: 8px;
+    padding: 3rem;
+    display: flex;
+    gap: 2rem;
+    align-items: center;
+    margin-bottom: 3rem;
+}
+
+.profile-avatar {
+    flex-shrink: 0;
+}
+
+.avatar-placeholder {
+    width: 120px;
+    height: 120px;
+    background: linear-gradient(135deg, var(--neon-purple), var(--neon-magenta));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 3rem;
+    font-weight: 900;
+    color: white;
+    box-shadow: 0 0 30px rgba(157, 0, 255, 0.5);
+}
+
+.profile-info {
+    flex-grow: 1;
+}
+
+.profile-username {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 2.5rem;
+    color: var(--neon-cyan);
+    margin-bottom: 0.5rem;
+    text-shadow: 0 0 20px rgba(0, 245, 255, 0.5);
+}
+
+.profile-email {
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+    margin-bottom: 1.5rem;
+}
+
+.profile-stats {
+    display: flex;
+    gap: 3rem;
+}
+
+.stat {
+    text-align: center;
+}
+
+.stat-value {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 2rem;
+    font-weight: 900;
+    color: var(--neon-magenta);
+    display: block;
+    margin-bottom: 0.25rem;
+}
+
+.stat-label {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.profile-content {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 2rem;
+}
+
+.profile-section {
+    background: var(--dark-card);
+    border: 1px solid var(--border-glow);
+    border-radius: 8px;
+    padding: 2rem;
+}
+
+@media (max-width: 768px) {
+    .profile-header {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .profile-stats {
+        justify-content: center;
+    }
+    
+    .profile-content {
+        grid-template-columns: 1fr;
+    }
+}
+
+.user-badges {
+    margin-top: 2rem;
+}
+
+.badges-list {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.user-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border: 1px solid;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    background: rgba(255, 0, 255, 0.1);
+}
+
+.badge-icon {
+    font-size: 1.2rem;
+}
+
+.badge-name {
+    font-family: 'Orbitron', sans-serif;
+}
+</style>
+{% endblock %}

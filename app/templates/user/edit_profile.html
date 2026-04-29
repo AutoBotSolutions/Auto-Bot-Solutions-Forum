@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Profile - AutoBot Solutions Forum{% endblock %}
+
+{% block content %}
+<div class="form-container" style="max-width: 600px;">
+    <h2>EDIT PROFILE</h2>
+    <form method="POST">
+        {{ form.hidden_tag() }}
+        
+        <div class="form-group">
+            {{ form.username.label }}
+            {{ form.username(class="form-control") }}
+        </div>
+        
+        <div class="form-group">
+            {{ form.email.label }}
+            {{ form.email(class="form-control") }}
+        </div>
+        
+        <button type="submit" class="btn-submit">UPDATE PROFILE</button>
+    </form>
+    
+    <div style="text-align: center; margin-top: 1.5rem;">
+        <a href="{{ url_for('user.profile', username=current_user.username) }}" style="color: var(--neon-cyan);">Cancel and return to profile</a>
+    </div>
+</div>
+{% endblock %}

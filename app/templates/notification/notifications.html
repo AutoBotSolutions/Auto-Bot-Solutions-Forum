@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block title %}Notifications - AutoBot Solutions Forum{% endblock %}
+
+{% block content %}
+<div class="hero" style="padding: 2rem 0;">
+    <h1 style="font-size: 2rem;">NOTIFICATIONS</h1>
+    <p style="font-size: 1rem;">{{ unread_count }} unread notifications</p>
+</div>
+
+<div class="notifications-container">
+    <div class="notifications-header">
+        <a href="{{ url_for('notification.mark_all_read') }}" class="btn-primary" style="font-size: 0.9rem; padding: 0.5rem 1.5rem;">Mark All Read</a>
+    </div>
+
+    {% for notification in notifications %}
+    <div class="notification-item {% if not notification.is_read %}unread{% endif %}">
+        <div class="notification-content">
+            {{ notification.content }}
+        </div>
+        <div class="notification-meta">
+            <span class="notification-date">{{ notification.created_at.strftime('%B %d, %Y at %I:%M %p') }}</span>
+            {% if notification.link %}
+            <a href="{{ url_for('notification.mark_read', notification_id=notification.id) }}" class="notification-link">View →</a>
+            {% else %}
+            <a href="{{ url_for('notification.mark_read', notification_id=notification.id) }}" class="notification-link">Mark Read</a>
+            {% endif %}
+        </div>
+    </div>
+    {% else %}
+    <div style="text-align: center; padding: 4rem; color: var(--text-secondary);">
+        <p style="font-size: 1.2rem;">No notifications yet.</p>
+    </div>
+    {% endfor %}
+</div>
+
+<style>
+.notifications-container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.notifications-header {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 2rem;
+}
+
+.notification-item {
+    background: var(--dark-card);
+    border: 1px solid var(--border-glow);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    transition: all 0.3s ease;
+}
+
+.notification-item.unread {
+    border-color: var(--neon-cyan);
+    box-shadow: 0 0 15px rgba(0, 245, 255, 0.2);
+    background: rgba(0, 245, 255, 0.05);
+}
+
+.notification-item:hover {
+    border-color: var(--neon-cyan);
+    transform: translateX(5px);
+}
+
+.notification-content {
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+}
+
+.notification-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.notification-date {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.notification-link {
+    color: var(--neon-cyan);
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.notification-link:hover {
+    text-shadow: 0 0 10px var(--neon-cyan);
+}
+</style>
+{% endblock %}

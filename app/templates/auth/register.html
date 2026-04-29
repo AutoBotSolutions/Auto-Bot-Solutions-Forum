@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %}Register - AutoBot Solutions Forum{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <h2>NEW USER REGISTRATION</h2>
+    <form method="POST">
+        {{ form.hidden_tag() }}
+        
+        <div class="form-group">
+            {{ form.username.label }}
+            {{ form.username(class="form-control") }}
+        </div>
+        
+        <div class="form-group">
+            {{ form.email.label }}
+            {{ form.email(class="form-control") }}
+        </div>
+        
+        <div class="form-group">
+            {{ form.password.label }}
+            {{ form.password(class="form-control") }}
+        </div>
+        
+        <div class="form-group">
+            {{ form.password2.label }}
+            {{ form.password2(class="form-control") }}
+        </div>
+        
+        <button type="submit" class="btn-submit">CREATE ACCOUNT</button>
+    </form>
+    
+    <p style="text-align: center; margin-top: 1.5rem; color: var(--text-secondary);">
+        Already registered? <a href="{{ url_for('auth.login') }}" style="color: var(--neon-cyan);">Access system</a>
+    </p>
+</div>
+{% endblock %}

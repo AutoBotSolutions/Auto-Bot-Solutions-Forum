@@ -1,0 +1,61 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: forum_db
+    environment:
+      POSTGRES_USER: forum_user
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-changeme_secure_password}
+      POSTGRES_DB: forum_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - forum_network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U forum_user -d forum_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build: .
+    container_name: forum_app
+    ports:
+      - "5000:5000"
+    environment:
+      SECRET_KEY: ${SECRET_KEY:-changeme_secret_key}
+      DATABASE_URL: postgresql://forum_user:${DB_PASSWORD:-changeme_secure_password}@db:5432/forum_db
+      GITHUB_TOKEN: ${GITHUB_TOKEN:-}
+      FLASK_ENV: production
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - forum_network
+    restart: unless-stopped
+    volumes:
+      - ./instance:/app/instance
+
+  nginx:
+    image: nginx:alpine
+    container_name: forum_nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - app
+    networks:
+      - forum_network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+
+networks:
+  forum_network:
+    driver: bridge

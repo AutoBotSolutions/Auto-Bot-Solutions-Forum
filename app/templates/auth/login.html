@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}Login - AutoBot Solutions Forum{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <h2>SYSTEM ACCESS</h2>
+    <form method="POST">
+        {{ form.hidden_tag() }}
+        
+        <div class="form-group">
+            {{ form.username.label }}
+            {{ form.username(class="form-control") }}
+        </div>
+        
+        <div class="form-group">
+            {{ form.password.label }}
+            {{ form.password(class="form-control") }}
+        </div>
+        
+        <div class="form-group">
+            {{ form.remember_me }}
+            {{ form.remember_me.label }}
+        </div>
+        
+        <button type="submit" class="btn-submit">AUTHENTICATE</button>
+    </form>
+    
+    <p style="text-align: center; margin-top: 1.5rem; color: var(--text-secondary);">
+        New user? <a href="{{ url_for('auth.register') }}" style="color: var(--neon-cyan);">Initialize account</a>
+    </p>
+    <p style="text-align: center; margin-top: 0.5rem; color: var(--text-secondary);">
+        <a href="{{ url_for('auth.reset_password_request') }}" style="color: var(--neon-cyan);">Forgot password?</a>
+    </p>
+    <p style="text-align: center; margin-top: 0.5rem; color: var(--text-secondary);">
+        <a href="{{ url_for('auth.resend_verification') }}" style="color: var(--neon-cyan);">Resend verification email</a>
+    </p>
+</div>
+{% endblock %}

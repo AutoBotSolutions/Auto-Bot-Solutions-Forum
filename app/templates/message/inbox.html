@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+
+{% block title %}Inbox - AutoBot Solutions Forum{% endblock %}
+
+{% block content %}
+<div class="hero" style="padding: 2rem 0;">
+    <h1 style="font-size: 2rem;">INBOX</h1>
+    <p style="font-size: 1rem;">{{ unread_count }} unread messages</p>
+</div>
+
+<div class="messages-container">
+    <div class="messages-header">
+        <a href="{{ url_for('message.new_message') }}" class="btn-primary" style="font-size: 0.9rem; padding: 0.5rem 1.5rem;">New Message</a>
+        <a href="{{ url_for('message.sent') }}" class="btn-primary" style="font-size: 0.9rem; padding: 0.5rem 1.5rem;">Sent</a>
+    </div>
+
+    {% for message in messages %}
+    <div class="message-item {% if not message.is_read %}unread{% endif %}">
+        <div class="message-sender">
+            <a href="{{ url_for('user.profile', username=message.sender.username) }}" class="message-sender-link">{{ message.sender.username }}</a>
+        </div>
+        <div class="message-content">
+            {{ message.content[:200] }}{% if message.content|length > 200 %}...{% endif %}
+        </div>
+        <div class="message-meta">
+            <span class="message-date">{{ message.created_at.strftime('%B %d, %Y at %I:%M %p') }}</span>
+            <div class="message-actions">
+                <a href="{{ url_for('message.read_message', message_id=message.id) }}" class="message-action">Read</a>
+                <a href="{{ url_for('message.delete_message', message_id=message.id) }}" class="message-action delete-action">Delete</a>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div style="text-align: center; padding: 4rem; color: var(--text-secondary);">
+        <p style="font-size: 1.2rem;">No messages yet.</p>
+        <a href="{{ url_for('message.new_message') }}" class="btn-primary" style="margin-top: 1rem;">Send a message</a>
+    </div>
+    {% endfor %}
+</div>
+
+<style>
+.messages-container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.messages-header {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.message-item {
+    background: var(--dark-card);
+    border: 1px solid var(--border-glow);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    transition: all 0.3s ease;
+}
+
+.message-item.unread {
+    border-color: var(--neon-cyan);
+    box-shadow: 0 0 15px rgba(0, 245, 255, 0.2);
+    background: rgba(0, 245, 255, 0.05);
+}
+
+.message-item:hover {
+    border-color: var(--neon-cyan);
+}
+
+.message-sender {
+    margin-bottom: 0.5rem;
+}
+
+.message-sender-link {
+    color: var(--neon-magenta);
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.message-sender-link:hover {
+    color: var(--neon-cyan);
+    text-shadow: 0 0 10px var(--neon-cyan);
+}
+
+.message-content {
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+}
+
+.message-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.message-date {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.message-actions {
+    display: flex;
+    gap: 1rem;
+}
+
+.message-action {
+    color: var(--neon-cyan);
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+.message-action:hover {
+    text-shadow: 0 0 10px var(--neon-cyan);
+}
+
+.message-action.delete-action:hover {
+    color: #ff0044;
+    text-shadow: 0 0 10px #ff0044;
+}
+</style>
+{% endblock %}

@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}500 Server Error - AutoBot Solutions Forum{% endblock %}
+
+{% block content %}
+<div class="error-page">
+    <div class="error-container">
+        <h1 class="error-code">500</h1>
+        <h2 class="error-title">CRITICAL SYSTEM FAILURE</h2>
+        <p class="error-message">A critical error has occurred in the system. Our automated repair units have been notified.</p>
+        <div class="error-actions">
+            <a href="{{ url_for('main.index') }}" class="btn-primary">RETURN TO BASE</a>
+        </div>
+        <p style="margin-top: 2rem; color: var(--text-secondary); font-size: 0.9rem;">
+            Error ID: {{ error_id or 'UNKNOWN' }}
+        </p>
+    </div>
+</div>
+
+<style>
+.error-page {
+    min-height: 60vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.error-container {
+    max-width: 600px;
+    padding: 3rem;
+}
+
+.error-code {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 8rem;
+    font-weight: 900;
+    color: #ff0044;
+    text-shadow: 0 0 30px #ff0044, 0 0 60px #ff0044;
+    margin-bottom: 1rem;
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+.error-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 2rem;
+    color: #ff0044;
+    margin-bottom: 1.5rem;
+    text-shadow: 0 0 20px #ff0044;
+}
+
+.error-message {
+    font-size: 1.2rem;
+    color: var(--text-secondary);
+    margin-bottom: 2.5rem;
+    line-height: 1.8;
+}
+
+.error-actions {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+}
+</style>
+{% endblock %}

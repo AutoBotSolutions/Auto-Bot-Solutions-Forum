@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Users - Admin Panel{% endblock %}
+
+{% block content %}
+<div class="admin-page">
+    <div class="hero" style="padding: 2rem 0;">
+        <h1 style="font-size: 2rem;">USER MANAGEMENT</h1>
+        <p style="font-size: 1rem;">Manage system users and permissions</p>
+    </div>
+
+    <div class="admin-content">
+        <div class="admin-header">
+            <a href="{{ url_for('admin.dashboard') }}" class="btn-primary" style="font-size: 0.9rem; padding: 0.5rem 1.5rem;">← Back to Dashboard</a>
+            <span class="admin-count">{{ users|length }} users</span>
+        </div>
+
+        <div class="admin-table">
+            <div class="table-header">
+                <div>Username</div>
+                <div>Email</div>
+                <div>Role</div>
+                <div>Joined</div>
+                <div>Actions</div>
+            </div>
+            {% for user in users %}
+            <div class="table-row">
+                <div class="table-cell">{{ user.username }}</div>
+                <div class="table-cell">{{ user.email }}</div>
+                <div class="table-cell">
+                    {% if user.is_admin %}
+                    <span class="badge admin-badge">ADMIN</span>
+                    {% else %}
+                    <span class="badge user-badge">USER</span>
+                    {% endif %}
+                </div>
+                <div class="table-cell">{{ user.created_at.strftime('%Y-%m-%d') }}</div>
+                <div class="table-cell actions">
+                    {% if user.id != current_user.id %}
+                    <a href="{{ url_for('admin.toggle_admin', user_id=user.id) }}" class="action-btn">Toggle Admin</a>
+                    <a href="{{ url_for('admin.delete_user', user_id=user.id) }}" class="action-btn delete-btn">Delete</a>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<style>
+.admin-page {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.admin-content {
+    background: var(--dark-card);
+    border: 1px solid var(--border-glow);
+    border-radius: 8px;
+    padding: 2rem;
+}
+
+.admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.admin-count {
+    color: var(--neon-cyan);
+    font-family: 'Orbitron', sans-serif;
+}
+
+.admin-table {
+    display: flex;
+    flex-direction: column;
+}
+
+.table-header {
+    display: grid;
+    grid-template-columns: 1fr 1.5fr 0.75fr 0.75fr 1fr;
+    gap: 1rem;
+    padding: 1rem;
+    background: rgba(0, 245, 255, 0.1);
+    border-radius: 4px;
+    font-weight: 700;
+    color: var(--neon-cyan);
+    font-family: 'Orbitron', sans-serif;
+}
+
+.table-row {
+    display: grid;
+    grid-template-columns: 1fr 1.5fr 0.75fr 0.75fr 1fr;
+    gap: 1rem;
+    padding: 1rem;
+    border-bottom: 1px solid rgba(0, 245, 255, 0.1);
+    transition: all 0.3s ease;
+}
+
+.table-row:hover {
+    background: rgba(0, 245, 255, 0.05);
+}
+
+.table-cell {
+    display: flex;
+    align-items: center;
+    color: var(--text-secondary);
+}
+
+.badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.admin-badge {
+    background: rgba(157, 0, 255, 0.3);
+    color: var(--neon-purple);
+    border: 1px solid var(--neon-purple);
+}
+
+.user-badge {
+    background: rgba(0, 245, 255, 0.1);
+    color: var(--neon-cyan);
+    border: 1px solid var(--neon-cyan);
+}
+
+.actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.action-btn {
+    padding: 0.25rem 0.75rem;
+    border: 1px solid var(--border-glow);
+    border-radius: 4px;
+    color: var(--text-primary);
+    text-decoration: none;
+    font-size: 0.85rem;
+    transition: all 0.3s ease;
+}
+
+.action-btn:hover {
+    border-color: var(--neon-cyan);
+    color: var(--neon-cyan);
+}
+
+.delete-btn:hover {
+    border-color: #ff0044;
+    color: #ff0044;
+}
+
+@media (max-width: 768px) {
+    .table-header, .table-row {
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
+    }
+    
+    .actions {
+        margin-top: 1rem;
+    }
+}
+</style>
+{% endblock %}

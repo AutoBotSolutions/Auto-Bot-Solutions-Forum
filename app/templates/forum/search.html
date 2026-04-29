@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block title %}Search Results - AutoBot Solutions Forum{% endblock %}
+
+{% block content %}
+<div class="hero" style="padding: 2rem 0;">
+    <h1 style="font-size: 2rem;">SEARCH RESULTS</h1>
+    <p style="font-size: 1rem;">Query: "{{ query }}"</p>
+</div>
+
+<div class="search-section">
+    <h2 style="font-family: 'Orbitron', sans-serif; font-size: 1.5rem; color: var(--neon-cyan); margin-bottom: 2rem;">POSTS ({{ posts|length }})</h2>
+    
+    {% for post in posts %}
+    <div class="post-card">
+        <h3 class="post-title">
+            <a href="{{ url_for('forum.post', post_id=post.id) }}">{{ post.title }}</a>
+        </h3>
+        <p class="post-content">{{ post.content[:200] }}{% if post.content|length > 200 %}...{% endif %}</p>
+        <div class="post-meta">
+            <div>
+                <a href="{{ url_for('user.profile', username=post.author.username) }}" class="post-author">{{ post.author.username }}</a>
+                {% if post.repository %}
+                <span style="color: var(--neon-purple); margin-left: 1rem;">{{ post.repository.name }}</span>
+                {% endif %}
+                <span class="post-date"> • {{ post.created_at.strftime('%B %d, %Y') }}</span>
+            </div>
+            <div class="vote-count">
+                <span>▲ {{ post.upvotes }}</span>
+                <span>▼ {{ post.downvotes }}</span>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div style="text-align: center; padding: 2rem; color: var(--text-secondary);">
+        <p>No posts found matching your query.</p>
+    </div>
+    {% endfor %}
+</div>
+
+<div class="search-section" style="margin-top: 3rem;">
+    <h2 style="font-family: 'Orbitron', sans-serif; font-size: 1.5rem; color: var(--neon-cyan); margin-bottom: 2rem;">COMMENTS ({{ comments|length }})</h2>
+    
+    {% for comment in comments %}
+    <div class="post-card">
+        <p class="post-content">{{ comment.content[:200] }}{% if comment.content|length > 200 %}...{% endif %}</p>
+        <div class="post-meta">
+            <div>
+                <a href="{{ url_for('user.profile', username=comment.author.username) }}" class="post-author">{{ comment.author.username }}</a>
+                <a href="{{ url_for('forum.post', post_id=comment.post_id) }}" style="color: var(--neon-cyan); margin-left: 1rem;">View Post →</a>
+                <span class="post-date"> • {{ comment.created_at.strftime('%B %d, %Y') }}</span>
+            </div>
+            <div class="vote-count">
+                <span>▲ {{ comment.upvotes }}</span>
+                <span>▼ {{ comment.downvotes }}</span>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div style="text-align: center; padding: 2rem; color: var(--text-secondary);">
+        <p>No comments found matching your query.</p>
+    </div>
+    {% endfor %}
+</div>
+
+{% if not posts and not comments %}
+<div style="text-align: center; padding: 4rem;">
+    <p style="font-size: 1.2rem; color: var(--text-secondary);">No results found for "{{ query }}"</p>
+    <a href="{{ url_for('forum.index') }}" class="btn-primary" style="margin-top: 1rem;">Return to Forum</a>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,185 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Repositories - Admin Panel{% endblock %}
+
+{% block content %}
+<div class="admin-page">
+    <div class="hero" style="padding: 2rem 0;">
+        <h1 style="font-size: 2rem;">REPOSITORY MANAGEMENT</h1>
+        <p style="font-size: 1rem;">Manage linked GitHub repositories</p>
+    </div>
+
+    <div class="admin-content">
+        <div class="admin-header">
+            <a href="{{ url_for('admin.dashboard') }}" class="btn-primary" style="font-size: 0.9rem; padding: 0.5rem 1.5rem;">← Back to Dashboard</a>
+            <button onclick="syncRepos()" class="btn-primary" style="font-size: 0.9rem; padding: 0.5rem 1.5rem; margin-left: 1rem;">Sync from GitHub</button>
+            <span class="admin-count">{{ repos|length }} repositories</span>
+        </div>
+
+        <div class="admin-table">
+            <div class="table-header">
+                <div>Name</div>
+                <div>Description</div>
+                <div>Language</div>
+                <div>Stars</div>
+                <div>Updated</div>
+                <div>Actions</div>
+            </div>
+            {% for repo in repos %}
+            <div class="table-row">
+                <div class="table-cell">
+                    <a href="{{ repo.github_url }}" target="_blank" style="color: var(--neon-cyan); text-decoration: none;">
+                        {{ repo.name }}
+                    </a>
+                </div>
+                <div class="table-cell">{{ repo.description[:40] }}{% if repo.description and repo.description|length > 40 %}...{% endif %}</div>
+                <div class="table-cell">
+                    {% if repo.language %}
+                    <span class="badge lang-badge">{{ repo.language }}</span>
+                    {% else %}
+                    <span style="color: var(--text-secondary);">-</span>
+                    {% endif %}
+                </div>
+                <div class="table-cell">★ {{ repo.stars }}</div>
+                <div class="table-cell">{{ repo.updated_at.strftime('%Y-%m-%d') }}</div>
+                <div class="table-cell actions">
+                    <a href="{{ repo.github_url }}" target="_blank" class="action-btn">GitHub</a>
+                    <a href="{{ url_for('forum.repository_posts', repo_id=repo.id) }}" class="action-btn">Posts</a>
+                    <a href="{{ url_for('admin.delete_repository', repo_id=repo.id) }}" class="action-btn delete-btn">Delete</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<style>
+.admin-page {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.admin-content {
+    background: var(--dark-card);
+    border: 1px solid var(--border-glow);
+    border-radius: 8px;
+    padding: 2rem;
+}
+
+.admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.admin-count {
+    color: var(--neon-cyan);
+    font-family: 'Orbitron', sans-serif;
+}
+
+.admin-table {
+    display: flex;
+    flex-direction: column;
+}
+
+.table-header {
+    display: grid;
+    grid-template-columns: 1.5fr 2fr 1fr 0.75fr 0.75fr 1.5fr;
+    gap: 1rem;
+    padding: 1rem;
+    background: rgba(0, 245, 255, 0.1);
+    border-radius: 4px;
+    font-weight: 700;
+    color: var(--neon-cyan);
+    font-family: 'Orbitron', sans-serif;
+}
+
+.table-row {
+    display: grid;
+    grid-template-columns: 1.5fr 2fr 1fr 0.75fr 0.75fr 1.5fr;
+    gap: 1rem;
+    padding: 1rem;
+    border-bottom: 1px solid rgba(0, 245, 255, 0.1);
+    transition: all 0.3s ease;
+}
+
+.table-row:hover {
+    background: rgba(0, 245, 255, 0.05);
+}
+
+.table-cell {
+    display: flex;
+    align-items: center;
+    color: var(--text-secondary);
+}
+
+.badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.lang-badge {
+    background: rgba(0, 245, 255, 0.1);
+    color: var(--neon-cyan);
+    border: 1px solid var(--neon-cyan);
+}
+
+.actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.action-btn {
+    padding: 0.25rem 0.75rem;
+    border: 1px solid var(--border-glow);
+    border-radius: 4px;
+    color: var(--text-primary);
+    text-decoration: none;
+    font-size: 0.85rem;
+    transition: all 0.3s ease;
+}
+
+.action-btn:hover {
+    border-color: var(--neon-cyan);
+    color: var(--neon-cyan);
+}
+
+.delete-btn:hover {
+    border-color: #ff0044;
+    color: #ff0044;
+}
+
+@media (max-width: 768px) {
+    .table-header, .table-row {
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
+    }
+    
+    .actions {
+        margin-top: 1rem;
+    }
+}
+</style>
+
+<script>
+async function syncRepos() {
+    try {
+        const response = await fetch('/api/sync-repositories', {
+            method: 'POST'
+        });
+        const data = await response.json();
+        if (data.success) {
+            alert(`Synced ${data.synced} repositories successfully!`);
+            location.reload();
+        } else {
+            alert('Error syncing repositories: ' + data.error);
+        }
+    } catch (error) {
+        alert('Error syncing repositories: ' + error.message);
+    }
+}
+</script>
+{% endblock %}

@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}My Bookmarks - AutoBot Solutions Forum{% endblock %}
+
+{% block content %}
+<div class="hero" style="padding: 2rem 0;">
+    <h1 style="font-size: 2rem;">SAVED TRANSMISSIONS</h1>
+    <p style="font-size: 1rem;">Your bookmarked posts</p>
+</div>
+
+{% for bookmark in bookmarks %}
+<div class="post-card">
+    <h3 class="post-title">
+        <a href="{{ url_for('forum.post', post_id=bookmark.post.id) }}">{{ bookmark.post.title }}</a>
+    </h3>
+    <p class="post-content">{{ bookmark.post.content[:200] }}{% if bookmark.post.content|length > 200 %}...{% endif %}</p>
+    <div class="post-meta">
+        <div>
+            <a href="{{ url_for('user.profile', username=bookmark.post.author.username) }}" class="post-author">{{ bookmark.post.author.username }}</a>
+            <span class="post-date"> • {{ bookmark.post.created_at.strftime('%B %d, %Y') }}</span>
+            <span style="color: var(--text-secondary); margin-left: 1rem;">Saved {{ bookmark.created_at.strftime('%B %d, %Y') }}</span>
+        </div>
+        <div class="vote-count">
+            <span>▲ {{ bookmark.post.upvotes }}</span>
+            <span>▼ {{ bookmark.post.downvotes }}</span>
+        </div>
+    </div>
+</div>
+{% else %}
+<div style="text-align: center; padding: 4rem; color: var(--text-secondary);">
+    <p style="font-size: 1.2rem;">No bookmarks yet.</p>
+    <a href="{{ url_for('forum.index') }}" class="btn-primary" style="margin-top: 1rem;">Browse Forum</a>
+</div>
+{% endfor %}
+{% endblock %}

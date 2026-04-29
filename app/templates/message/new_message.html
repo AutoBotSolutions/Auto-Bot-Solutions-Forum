@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}New Message - AutoBot Solutions Forum{% endblock %}
+
+{% block content %}
+<div class="form-container" style="max-width: 600px;">
+    <h2>SEND MESSAGE</h2>
+    <form method="POST">
+        {{ form.hidden_tag() }}
+        
+        <div class="form-group">
+            {{ form.receiver_id.label }}
+            {{ form.receiver_id(class="form-control") }}
+        </div>
+        
+        <div class="form-group">
+            {{ form.content.label }}
+            {{ form.content(class="form-control", placeholder="Type your message...") }}
+        </div>
+        
+        <button type="submit" class="btn-submit">SEND MESSAGE</button>
+    </form>
+    
+    <div style="text-align: center; margin-top: 1.5rem;">
+        <a href="{{ url_for('message.inbox') }}" style="color: var(--neon-cyan);">Cancel and return to inbox</a>
+    </div>
+</div>
+{% endblock %}

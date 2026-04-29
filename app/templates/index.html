@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}Home - AutoBot Solutions Forum{% endblock %}
+
+{% block content %}
+<div class="hero">
+    <h1>WELCOME TO AUTOBOT FORUM</h1>
+    <p>The central hub for discussing AutoBot Solutions repositories. Connect, collaborate, and innovate with our community.</p>
+    <a href="{{ url_for('forum.index') }}" class="btn-primary">ENTER FORUM</a>
+</div>
+
+<div class="section">
+    <h2 style="font-family: 'Orbitron', sans-serif; font-size: 2rem; color: var(--neon-cyan); margin-bottom: 2rem; text-align: center;">OUR REPOSITORIES</h2>
+    <div class="card-grid">
+        {% for repo in repositories %}
+        <div class="card">
+            <h3>{{ repo.name }}</h3>
+            <p>{{ repo.description or 'No description available' }}</p>
+            <div class="card-meta">
+                <div class="repo-stars">
+                    <span>★</span>
+                    <span>{{ repo.stars }}</span>
+                </div>
+                {% if repo.language %}
+                <span class="repo-language">{{ repo.language }}</span>
+                {% endif %}
+            </div>
+            <a href="{{ url_for('forum.repository_posts', repo_id=repo.id) }}" class="btn-primary" style="display: block; text-align: center; margin-top: 1rem; font-size: 0.9rem; padding: 0.5rem 1rem;">View Discussions</a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<div class="section" style="margin-top: 4rem;">
+    <h2 style="font-family: 'Orbitron', sans-serif; font-size: 2rem; color: var(--neon-cyan); margin-bottom: 2rem; text-align: center;">RECENT DISCUSSIONS</h2>
+    {% for post in posts %}
+    <div class="post-card">
+        <h3 class="post-title">
+            <a href="{{ url_for('forum.post', post_id=post.id) }}">{{ post.title }}</a>
+        </h3>
+        <p class="post-content">{{ post.content[:200] }}{% if post.content|length > 200 %}...{% endif %}</p>
+        <div class="post-meta">
+            <div>
+                <span class="post-author">by {{ post.author.username }}</span>
+                <span class="post-date"> • {{ post.created_at.strftime('%B %d, %Y') }}</span>
+            </div>
+            <div class="vote-count">
+                <span>▲ {{ post.upvotes }}</span>
+                <span>▼ {{ post.downvotes }}</span>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

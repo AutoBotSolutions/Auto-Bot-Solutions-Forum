@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}Resend Verification - AutoBot Solutions Forum{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <h2>RESEND VERIFICATION</h2>
+    <form method="POST">
+        {{ form.hidden_tag() }}
+        
+        <div class="form-group">
+            {{ form.email.label }}
+            {{ form.email(class="form-control", placeholder="Enter your email address") }}
+        </div>
+        
+        <button type="submit" class="btn-submit">SEND VERIFICATION EMAIL</button>
+    </form>
+    
+    <div style="text-align: center; margin-top: 1.5rem;">
+        <a href="{{ url_for('auth.login') }}" style="color: var(--neon-cyan);">Return to login</a>
+    </div>
+</div>
+{% endblock %}

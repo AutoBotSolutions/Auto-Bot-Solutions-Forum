@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block title %}404 Not Found - AutoBot Solutions Forum{% endblock %}
+
+{% block content %}
+<div class="error-page">
+    <div class="error-container">
+        <h1 class="error-code">404</h1>
+        <h2 class="error-title">SYSTEM ERROR</h2>
+        <p class="error-message">The requested data fragment could not be located in the database.</p>
+        <div class="error-actions">
+            <a href="{{ url_for('main.index') }}" class="btn-primary">RETURN TO BASE</a>
+            <a href="{{ url_for('forum.index') }}" class="btn-primary" style="margin-left: 1rem;">ACCESS FORUM</a>
+        </div>
+    </div>
+</div>
+
+<style>
+.error-page {
+    min-height: 60vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.error-container {
+    max-width: 600px;
+    padding: 3rem;
+}
+
+.error-code {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 8rem;
+    font-weight: 900;
+    color: var(--neon-cyan);
+    text-shadow: 0 0 30px var(--neon-cyan), 0 0 60px var(--neon-cyan);
+    margin-bottom: 1rem;
+    animation: glitch 2s infinite;
+}
+
+@keyframes glitch {
+    0%, 90%, 100% {
+        transform: translate(0);
+    }
+    92% {
+        transform: translate(-5px, 0);
+    }
+    94% {
+        transform: translate(5px, 0);
+    }
+    96% {
+        transform: translate(-5px, 0);
+    }
+    98% {
+        transform: translate(5px, 0);
+    }
+}
+
+.error-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 2rem;
+    color: var(--neon-magenta);
+    margin-bottom: 1.5rem;
+    text-shadow: 0 0 20px var(--neon-magenta);
+}
+
+.error-message {
+    font-size: 1.2rem;
+    color: var(--text-secondary);
+    margin-bottom: 2.5rem;
+    line-height: 1.8;
+}
+
+.error-actions {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+}
+</style>
+{% endblock %}

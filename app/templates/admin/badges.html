@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Badges - Admin Panel{% endblock %}
+
+{% block content %}
+<div class="admin-page">
+    <div class="hero" style="padding: 2rem 0;">
+        <h1 style="font-size: 2rem;">BADGE MANAGEMENT</h1>
+        <p style="font-size: 1rem;">Manage user achievement badges</p>
+    </div>
+
+    <div class="admin-content">
+        <div class="admin-header">
+            <a href="{{ url_for('admin.dashboard') }}" class="btn-primary" style="font-size: 0.9rem; padding: 0.5rem 1.5rem;">← Back to Dashboard</a>
+            <a href="{{ url_for('admin.create_badge') }}" class="btn-primary" style="font-size: 0.9rem; padding: 0.5rem 1.5rem;">Create Badge</a>
+            <span class="admin-count">{{ badges|length }} badges</span>
+        </div>
+
+        <div class="badges-grid">
+            {% for badge in badges %}
+            <div class="badge-card">
+                <div class="badge-icon" style="color: {{ badge.color }};">{{ badge.icon }}</div>
+                <div class="badge-name">{{ badge.name }}</div>
+                <div class="badge-description">{{ badge.description or 'No description' }}</div>
+                <div class="badge-users">{{ badge.users|length }} users</div>
+                <div class="badge-actions">
+                    <a href="{{ url_for('admin.delete_badge', badge_id=badge.id) }}" class="action-btn delete-btn">Delete</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<style>
+.admin-page {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.admin-content {
+    background: var(--dark-card);
+    border: 1px solid var(--border-glow);
+    border-radius: 8px;
+    padding: 2rem;
+}
+
+.admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.admin-count {
+    color: var(--neon-cyan);
+    font-family: 'Orbitron', sans-serif;
+}
+
+.badges-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+
+.badge-card {
+    background: var(--dark-surface);
+    border: 1px solid var(--border-glow);
+    border-radius: 8px;
+    padding: 2rem;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.badge-card:hover {
+    border-color: var(--neon-cyan);
+    box-shadow: 0 0 20px rgba(0, 245, 255, 0.3);
+    transform: translateY(-5px);
+}
+
+.badge-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    text-shadow: 0 0 20px currentColor;
+}
+
+.badge-name {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--neon-cyan);
+    margin-bottom: 0.5rem;
+}
+
+.badge-description {
+    color: var(--text-secondary);
+    margin-bottom: 1rem;
+    min-height: 3rem;
+}
+
+.badge-users {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+}
+
+.badge-actions {
+    display: flex;
+    justify-content: center;
+}
+
+.action-btn {
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--border-glow);
+    border-radius: 4px;
+    color: var(--text-primary);
+    text-decoration: none;
+    font-size: 0.85rem;
+    transition: all 0.3s ease;
+}
+
+.action-btn:hover {
+    border-color: var(--neon-cyan);
+    color: var(--neon-cyan);
+}
+
+.delete-btn:hover {
+    border-color: #ff0044;
+    color: #ff0044;
+}
+</style>
+{% endblock %}

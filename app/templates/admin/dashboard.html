@@ -1,0 +1,201 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard - AutoBot Solutions Forum{% endblock %}
+
+{% block content %}
+<div class="admin-dashboard">
+    <div class="hero" style="padding: 2rem 0;">
+        <h1 style="font-size: 2rem;">ADMIN CONTROL PANEL</h1>
+        <p style="font-size: 1rem;">System management interface</p>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon">👥</div>
+            <div class="stat-value">{{ total_users }}</div>
+            <div class="stat-label">Total Users</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">📝</div>
+            <div class="stat-value">{{ total_posts }}</div>
+            <div class="stat-label">Total Posts</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">💬</div>
+            <div class="stat-value">{{ total_comments }}</div>
+            <div class="stat-label">Total Comments</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">📦</div>
+            <div class="stat-value">{{ total_repos }}</div>
+            <div class="stat-label">Repositories</div>
+        </div>
+    </div>
+
+    <div class="admin-sections">
+        <div class="admin-section">
+            <h2 style="font-family: 'Orbitron', sans-serif; font-size: 1.5rem; color: var(--neon-cyan); margin-bottom: 1.5rem;">RECENT USERS</h2>
+            <div class="admin-list">
+                {% for user in recent_users %}
+                <div class="admin-list-item">
+                    <span class="item-name">{{ user.username }}</span>
+                    <span class="item-meta">{{ user.created_at.strftime('%Y-%m-%d') }}</span>
+                    {% if user.is_admin %}
+                    <span class="item-badge admin-badge">ADMIN</span>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+            <a href="{{ url_for('admin.users') }}" class="btn-primary" style="margin-top: 1rem; font-size: 0.9rem; padding: 0.5rem 1.5rem;">Manage Users</a>
+        </div>
+
+        <div class="admin-section">
+            <h2 style="font-family: 'Orbitron', sans-serif; font-size: 1.5rem; color: var(--neon-cyan); margin-bottom: 1.5rem;">RECENT POSTS</h2>
+            <div class="admin-list">
+                {% for post in recent_posts %}
+                <div class="admin-list-item">
+                    <span class="item-name">{{ post.title[:30] }}{% if post.title|length > 30 %}...{% endif %}</span>
+                    <span class="item-meta">{{ post.created_at.strftime('%Y-%m-%d') }}</span>
+                    <span class="item-meta">▲ {{ post.upvotes }}</span>
+                </div>
+                {% endfor %}
+            </div>
+            <a href="{{ url_for('admin.posts') }}" class="btn-primary" style="margin-top: 1rem; font-size: 0.9rem; padding: 0.5rem 1.5rem;">Manage Posts</a>
+        </div>
+    </div>
+
+    <div class="admin-nav">
+        <a href="{{ url_for('admin.users') }}" class="admin-nav-link">Users</a>
+        <a href="{{ url_for('admin.posts') }}" class="admin-nav-link">Posts</a>
+        <a href="{{ url_for('admin.comments') }}" class="admin-nav-link">Comments</a>
+        <a href="{{ url_for('admin.repositories') }}" class="admin-nav-link">Repositories</a>
+        <a href="{{ url_for('admin.categories') }}" class="admin-nav-link">Categories</a>
+        <a href="{{ url_for('admin.badges') }}" class="admin-nav-link">Badges</a>
+    </div>
+</div>
+
+<style>
+.admin-dashboard {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+}
+
+.stat-card {
+    background: var(--dark-card);
+    border: 1px solid var(--border-glow);
+    border-radius: 8px;
+    padding: 2rem;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 245, 255, 0.2);
+    border-color: var(--neon-cyan);
+}
+
+.stat-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.stat-value {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 2.5rem;
+    font-weight: 900;
+    color: var(--neon-cyan);
+    margin-bottom: 0.5rem;
+}
+
+.stat-label {
+    color: var(--text-secondary);
+    font-size: 1rem;
+}
+
+.admin-sections {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 2rem;
+    margin-bottom: 3rem;
+}
+
+.admin-section {
+    background: var(--dark-card);
+    border: 1px solid var(--border-glow);
+    border-radius: 8px;
+    padding: 2rem;
+}
+
+.admin-list {
+    margin-bottom: 1rem;
+}
+
+.admin-list-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    border-bottom: 1px solid rgba(0, 245, 255, 0.1);
+    transition: all 0.3s ease;
+}
+
+.admin-list-item:hover {
+    background: rgba(0, 245, 255, 0.05);
+}
+
+.item-name {
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+.item-meta {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.item-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.admin-badge {
+    background: rgba(157, 0, 255, 0.3);
+    color: var(--neon-purple);
+    border: 1px solid var(--neon-purple);
+}
+
+.admin-nav {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.admin-nav-link {
+    background: var(--dark-card);
+    border: 1px solid var(--border-glow);
+    color: var(--text-primary);
+    padding: 1rem 2rem;
+    text-decoration: none;
+    border-radius: 4px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.admin-nav-link:hover {
+    border-color: var(--neon-cyan);
+    color: var(--neon-cyan);
+    box-shadow: 0 0 15px rgba(0, 245, 255, 0.3);
+}
+</style>
+{% endblock %}

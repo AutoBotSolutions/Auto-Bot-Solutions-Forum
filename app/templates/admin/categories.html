@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Categories - Admin Panel{% endblock %}
+
+{% block content %}
+<div class="admin-page">
+    <div class="hero" style="padding: 2rem 0;">
+        <h1 style="font-size: 2rem;">CATEGORY MANAGEMENT</h1>
+        <p style="font-size: 1rem;">Manage forum categories</p>
+    </div>
+
+    <div class="admin-content">
+        <div class="admin-header">
+            <a href="{{ url_for('admin.dashboard') }}" class="btn-primary" style="font-size: 0.9rem; padding: 0.5rem 1.5rem;">← Back to Dashboard</a>
+            <a href="{{ url_for('admin.create_category') }}" class="btn-primary" style="font-size: 0.9rem; padding: 0.5rem 1.5rem;">Create Category</a>
+            <span class="admin-count">{{ categories|length }} categories</span>
+        </div>
+
+        <div class="admin-table">
+            <div class="table-header">
+                <div>Name</div>
+                <div>Description</div>
+                <div>Color</div>
+                <div>Posts</div>
+                <div>Actions</div>
+            </div>
+            {% for category in categories %}
+            <div class="table-row">
+                <div class="table-cell">
+                    <span class="category-badge" style="background-color: {{ category.color }}33; border-color: {{ category.color }}; color: {{ category.color }};">{{ category.name }}</span>
+                </div>
+                <div class="table-cell">{{ category.description[:50] }}{% if category.description and category.description|length > 50 %}...{% endif %}</div>
+                <div class="table-cell">
+                    <span style="color: {{ category.color }};">{{ category.color }}</span>
+                </div>
+                <div class="table-cell">{{ category.posts.count() }}</div>
+                <div class="table-cell actions">
+                    <a href="{{ url_for('forum.index', category=category.id) }}" class="action-btn">View Posts</a>
+                    <a href="{{ url_for('admin.delete_category', category_id=category.id) }}" class="action-btn delete-btn">Delete</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<style>
+.admin-page {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.admin-content {
+    background: var(--dark-card);
+    border: 1px solid var(--border-glow);
+    border-radius: 8px;
+    padding: 2rem;
+}
+
+.admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.admin-count {
+    color: var(--neon-cyan);
+    font-family: 'Orbitron', sans-serif;
+}
+
+.admin-table {
+    display: flex;
+    flex-direction: column;
+}
+
+.table-header {
+    display: grid;
+    grid-template-columns: 1.5fr 2fr 1fr 0.75fr 1.5fr;
+    gap: 1rem;
+    padding: 1rem;
+    background: rgba(0, 245, 255, 0.1);
+    border-radius: 4px;
+    font-weight: 700;
+    color: var(--neon-cyan);
+    font-family: 'Orbitron', sans-serif;
+}
+
+.table-row {
+    display: grid;
+    grid-template-columns: 1.5fr 2fr 1fr 0.75fr 1.5fr;
+    gap: 1rem;
+    padding: 1rem;
+    border-bottom: 1px solid rgba(0, 245, 255, 0.1);
+    transition: all 0.3s ease;
+}
+
+.table-row:hover {
+    background: rgba(0, 245, 255, 0.05);
+}
+
+.table-cell {
+    display: flex;
+    align-items: center;
+    color: var(--text-secondary);
+}
+
+.category-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    border: 1px solid;
+}
+
+.actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.action-btn {
+    padding: 0.25rem 0.75rem;
+    border: 1px solid var(--border-glow);
+    border-radius: 4px;
+    color: var(--text-primary);
+    text-decoration: none;
+    font-size: 0.85rem;
+    transition: all 0.3s ease;
+}
+
+.action-btn:hover {
+    border-color: var(--neon-cyan);
+    color: var(--neon-cyan);
+}
+
+.delete-btn:hover {
+    border-color: #ff0044;
+    color: #ff0044;
+}
+
+@media (max-width: 768px) {
+    .table-header, .table-row {
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
+    }
+    
+    .actions {
+        margin-top: 1rem;
+    }
+}
+</style>
+{% endblock %}
