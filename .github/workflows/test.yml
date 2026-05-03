@@ -60,6 +60,7 @@ jobs:
         echo "SECRET_KEY=test-secret-key-for-ci" >> $GITHUB_ENV
         echo "DATABASE_URL=postgresql://postgres:testpassword@localhost:5432/test_repo_forum" >> $GITHUB_ENV
         echo "WTF_CSRF_ENABLED=false" >> $GITHUB_ENV
+        echo "PYTHONPATH=$GITHUB_WORKSPACE" >> $GITHUB_ENV
     
     - name: Create test database
       run: |
@@ -71,11 +72,13 @@ jobs:
     
     - name: Run comprehensive test suite
       run: |
+        cd $GITHUB_WORKSPACE
         python app/test/run_tests.py --verbose --coverage
     
     - name: Generate test report
       if: always()
       run: |
+        cd $GITHUB_WORKSPACE
         python app/test/run_tests.py --output json
     
     - name: Upload coverage reports

@@ -8,6 +8,7 @@ import json
 import yaml
 from pathlib import Path
 from typing import Dict, Any, Optional, Union
+from dataclasses import field
 from dataclasses import dataclass, asdict
 
 @dataclass
@@ -63,11 +64,11 @@ class TestIntegrationConfig:
 @dataclass
 class TestConfig:
     """Main test configuration"""
-    database: TestDatabaseConfig = TestDatabaseConfig()
-    security: TestSecurityConfig = TestSecurityConfig()
-    performance: TestPerformanceConfig = TestPerformanceConfig()
-    reporting: TestReportingConfig = TestReportingConfig()
-    integration: TestIntegrationConfig = TestIntegrationConfig()
+    database: TestDatabaseConfig = field(default_factory=TestDatabaseConfig)
+    security: TestSecurityConfig = field(default_factory=TestSecurityConfig)
+    performance: TestPerformanceConfig = field(default_factory=TestPerformanceConfig)
+    reporting: TestReportingConfig = field(default_factory=TestReportingConfig)
+    integration: TestIntegrationConfig = field(default_factory=TestIntegrationConfig)
     
     # General settings
     debug: bool = False
