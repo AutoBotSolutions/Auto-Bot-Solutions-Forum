@@ -48,16 +48,9 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-python-${{ matrix.python-version }}-pip-
     
-    - name: Install system dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y postgresql postgresql-contrib libpq-dev
-    
     - name: Install Python dependencies
       run: |
         python -m pip install --upgrade pip setuptools wheel
-        # Clear any existing cache to ensure clean install
-        pip cache purge
         # Install Flask explicitly first
         pip install Flask==3.0.0
         # Install other dependencies
