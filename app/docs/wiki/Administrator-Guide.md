@@ -275,6 +275,14 @@ Complete guide for administrators managing the AutoBot Solutions Forum.
 - Ensure session is valid
 - Contact system admin
 
+### User Management Options Not Visible
+- **Problem**: No management options visible on user management page
+- **Cause**: Only one admin user exists in database
+- **Solution**: Create test users to demonstrate functionality
+- **Note**: Template prevents self-management for security
+- **Fix**: Use test user creation script to add sample users
+- **Script Location**: `create_test_users.py` in project root
+
 ### Actions Not Working
 - Check CSRF token
 - Verify database connection

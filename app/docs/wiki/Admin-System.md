@@ -377,6 +377,13 @@ The dashboard displays:
   - Check authentication status
   - Ensure session is valid
 
+### User Management Options Not Visible
+- **Problem**: No management options visible on user management page
+  - **Cause**: Only one admin user exists in database
+  - **Solution**: Create test users to demonstrate functionality
+  - **Note**: Template prevents self-management for security
+  - **Fix**: Use test user creation script to add sample users
+
 ### Actions Not Working
 - **Problem**: Delete/toggle not working
   - Check CSRF token
