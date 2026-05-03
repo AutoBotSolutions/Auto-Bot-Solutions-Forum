@@ -31,6 +31,21 @@ This guide covers common issues and their solutions for the AutoBot Solutions Fo
    - **Solution**: Updated all GitHub links to correct repository
    - **Files**: `site/index.html`
 
+6. **Messages Inbox AttributeError**
+   - **Problem**: `AttributeError: 'InstrumentedList' object has no attribute 'order_by'`
+   - **Solution**: Changed to use proper Message.query for received/sent messages
+   - **Files**: `app/message/routes.py`
+
+7. **Admin Dashboard Icon Issues**
+   - **Problem**: Emoji icons not displaying correctly
+   - **Solution**: Replaced with professional SVG icons and sci-fi styling
+   - **Files**: `app/templates/admin/dashboard.html`
+
+8. **Navigation Icon Enhancement**
+   - **Problem**: Basic emoji notification icon
+   - **Solution**: Replaced with SVG icon and added hover effects
+   - **Files**: `app/templates/base.html`, `app/static/css/style.css`
+
 ## Error Monitoring System
 
 ### New Error Tracking Features

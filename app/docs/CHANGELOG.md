@@ -31,6 +31,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Added `|safe` filter to post template
   - Simplified markdown filter configuration
   - Fixed content display issues
+- **Critical**: Messages inbox AttributeError
+  - Fixed `InstrumentedList` order_by AttributeError
+  - Changed to use proper Message.query for received/sent messages
+  - Resolved messages functionality and unread counting
+- **Critical**: Admin dashboard icon rendering issues
+  - Replaced emoji icons with professional SVG icons
+  - Added sci-fi themed styling with neon effects
+  - Fixed icon display for users, posts, comments, repositories
+- **Enhancement**: Navigation notification icon improvement
+  - Replaced bell emoji with SVG icon
+  - Added hover effects and neon glow styling
+  - Improved accessibility and visual consistency
 - Updated all GitHub repository links to correct URL
 - Fixed license link to point to proper repository file
 
