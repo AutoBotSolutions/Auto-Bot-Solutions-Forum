@@ -91,9 +91,9 @@ def add_comment(post_id):
         db.session.add(comment)
         
         # Create notification for post author if commenter is not the author
-        if post.author_id != current_user.id:
+        if post.user_id != current_user.id:
             notification = Notification(
-                user_id=post.author_id,
+                user_id=post.user_id,
                 content=f'{current_user.username} commented on your post "{post.title}"',
                 link=url_for('forum.post', post_id=post.id)
             )
