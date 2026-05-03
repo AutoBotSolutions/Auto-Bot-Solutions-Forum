@@ -1,0 +1,14 @@
+{
+  "test_session": {
+    "timestamp": "2026-05-03T02:12:29.949482",
+    "category": "auth",
+    "description": "Authentication and authorization",
+    "total_tests": 0,
+    "passed": 0,
+    "failed": 0,
+    "skipped": 0,
+    "errors": 0
+  },
+  "results": [],
+  "recommendations": []
+}

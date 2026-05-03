@@ -3,7 +3,9 @@
 {% block title %}Manage Users - Admin Panel{% endblock %}
 
 {% block content %}
-<div class="admin-page">
+<!-- Admin Protected Page - Requires admin authentication and login -->
+<!-- CSRF Protection Enabled via Flask-WTF -->
+<div class="admin-page" role="main" aria-label="User Management Dashboard">
     <div class="hero" style="padding: 2rem 0;">
         <h1 style="font-size: 2rem;">USER MANAGEMENT</h1>
         <p style="font-size: 1rem;">Manage system users and permissions</p>
@@ -19,26 +21,118 @@
             <div class="table-header">
                 <div>Username</div>
                 <div>Email</div>
+                <div>Status</div>
                 <div>Role</div>
-                <div>Joined</div>
+                <div>Activity</div>
                 <div>Actions</div>
             </div>
             {% for user in users %}
             <div class="table-row">
-                <div class="table-cell">{{ user.username }}</div>
+                <div class="table-cell">
+                    <strong>{{ user.username }}</strong>
+                    {% if user.location %}
+                    <div class="user-location">{{ user.location }}</div>
+                    {% endif %}
+                </div>
                 <div class="table-cell">{{ user.email }}</div>
+                <div class="table-cell">
+                    {% set status = user.get_account_status() %}
+                    {% set status_class = 'active' if status == 'Active' else 'suspended' if status.startswith('Suspended') else 'banned' if status == 'Banned' else 'inactive' if status == 'Inactive' else 'locked' if status.startswith('Locked') else 'active' %}
+                    <span class="badge status-badge {{ status_class }}-badge">{{ status }}</span>
+                </div>
                 <div class="table-cell">
                     {% if user.is_admin %}
                     <span class="badge admin-badge">ADMIN</span>
                     {% else %}
                     <span class="badge user-badge">USER</span>
                     {% endif %}
+                    {% if user.is_verified %}
+                    <span class="badge verified-badge">✓</span>
+                    {% endif %}
                 </div>
-                <div class="table-cell">{{ user.created_at.strftime('%Y-%m-%d') }}</div>
+                <div class="table-cell">
+                    <div class="activity-info">
+                        {% if user.last_login %}
+                        <div class="last-login">Last: {{ user.last_login.strftime('%m/%d %H:%M') if user.last_login else 'Never' }}</div>
+                        {% endif %}
+                        <div class="login-count">Logins: {{ user.login_count or 0 }}</div>
+                        {% if user.failed_login_attempts and user.failed_login_attempts > 0 %}
+                        <div class="failed-attempts">Failed: {{ user.failed_login_attempts }}</div>
+                        {% endif %}
+                    </div>
+                </div>
                 <div class="table-cell actions">
                     {% if user.id != current_user.id %}
-                    <a href="{{ url_for('admin.toggle_admin', user_id=user.id) }}" class="action-btn">Toggle Admin</a>
-                    <a href="{{ url_for('admin.delete_user', user_id=user.id) }}" class="action-btn delete-btn">Delete</a>
+                    <a href="{{ url_for('admin.toggle_admin', user_id=user.id) }}" class="action-btn toggle-btn" title="Toggle Admin Status">
+                        {% if user.is_admin %}👑{% else %}👤{% endif %}
+                    </a>
+                    {% endif %}
+                    <!-- Self-protection: Admins cannot modify their own accounts -->
+                    <!-- SELF-PROTECTION LOGIC: user.id != current_user.id -->
+                    {% if user.id != current_user.id %}
+                    <div class="action-dropdown" role="group" aria-label="User actions">
+                        <button type="button" class="action-btn dropdown-btn" role="button"
+                                onclick="toggleDropdown(this)" 
+                                title="Actions for {{ user.username }}"
+                                aria-label="Toggle actions menu for {{ user.username }}"
+                                aria-expanded="false"
+                                aria-haspopup="true">⋮</button>
+                        <div class="dropdown-menu" role="menu" aria-label="User management actions">
+                            <a href="{{ url_for('admin.view_user', user_id=user.id) }}" 
+                               class="dropdown-item" 
+                               role="menuitem"
+                               aria-label="View details for {{ user.username }}"
+                               title="View user details">👁 View Details</a>
+                            <a href="{{ url_for('admin.edit_user', user_id=user.id) }}" 
+                               class="dropdown-item" 
+                               role="menuitem"
+                               aria-label="Edit profile for {{ user.username }}"
+                               title="Edit user profile">✏️ Edit Profile</a>
+                            <a href="{{ url_for('admin.reset_user_password', user_id=user.id) }}" 
+                               class="dropdown-item" 
+                               role="menuitem"
+                               aria-label="Reset password for {{ user.username }}"
+                               title="Reset user password">🔑 Reset Password</a>
+                            {% if user.id != current_user.id %}
+                            {% if user.is_suspended %}
+                            <a href="{{ url_for('admin.unsuspend_user', user_id=user.id) }}" 
+                               class="dropdown-item" 
+                               role="menuitem"
+                               aria-label="Unsuspend {{ user.username }}"
+                               title="Unsuspend user account">↩️ Unsuspend</a>
+                            {% else %}
+                            <a href="{{ url_for('admin.suspend_user', user_id=user.id) }}" 
+                               class="dropdown-item" 
+                               role="menuitem"
+                               aria-label="Suspend {{ user.username }}"
+                               title="Suspend user account">⚠️ Suspend</a>
+                            {% endif %}
+                            {% if user.is_banned %}
+                            <a href="{{ url_for('admin.unban_user', user_id=user.id) }}" 
+                               class="dropdown-item" 
+                               role="menuitem"
+                               aria-label="Unban {{ user.username }}"
+                               title="Unban user account">↩️ Unban</a>
+                            {% else %}
+                            <a href="{{ url_for('admin.ban_user', user_id=user.id) }}" 
+                               class="dropdown-item" 
+                               role="menuitem"
+                               aria-label="Ban {{ user.username }}"
+                               title="Ban user account">🚫 Ban</a>
+                            {% endif %}
+                            <a href="{{ url_for('admin.toggle_admin', user_id=user.id) }}" 
+                               class="dropdown-item" 
+                               role="menuitem"
+                               aria-label="Toggle admin status for {{ user.username }}"
+                               title="Toggle admin status">👑 Toggle Admin</a>
+                            <a href="{{ url_for('admin.delete_user', user_id=user.id) }}" 
+                               class="dropdown-item delete-item" 
+                               role="menuitem"
+                               aria-label="Delete {{ user.username }}"
+                               title="Delete user account">🗑️ Delete</a>
+                            {% endif %}
+                        </div>
+                    </div>
                     {% endif %}
                 </div>
             </div>
@@ -79,7 +173,7 @@
 
 .table-header {
     display: grid;
-    grid-template-columns: 1fr 1.5fr 0.75fr 0.75fr 1fr;
+    grid-template-columns: 1.2fr 1.5fr 1fr 0.8fr 1.2fr 0.8fr;
     gap: 1rem;
     padding: 1rem;
     background: rgba(0, 245, 255, 0.1);
@@ -91,7 +185,7 @@
 
 .table-row {
     display: grid;
-    grid-template-columns: 1fr 1.5fr 0.75fr 0.75fr 1fr;
+    grid-template-columns: 1.2fr 1.5fr 1fr 0.8fr 1.2fr 0.8fr;
     gap: 1rem;
     padding: 1rem;
     border-bottom: 1px solid rgba(0, 245, 255, 0.1);
@@ -147,9 +241,178 @@
     color: var(--neon-cyan);
 }
 
+.edit-btn:hover {
+    border-color: #00ff88;
+    color: #00ff88;
+}
+
+.toggle-btn:hover {
+    border-color: #9d00ff;
+    color: var(--neon-purple);
+    transform: scale(1.1);
+}
+
 .delete-btn:hover {
     border-color: #ff0044;
     color: #ff0044;
+}
+
+.user-location {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin-top: 0.25rem;
+}
+
+.status-badge {
+    font-size: 0.7rem;
+    padding: 0.2rem 0.5rem;
+}
+
+.active-badge {
+    background: rgba(0, 255, 0, 0.2);
+    color: #00ff00;
+    border: 1px solid #00ff00;
+}
+
+.suspended-badge {
+    background: rgba(255, 165, 0, 0.2);
+    color: #ffa500;
+    border: 1px solid #ffa500;
+}
+
+.banned-badge {
+    background: rgba(255, 0, 68, 0.2);
+    color: #ff0044;
+    border: 1px solid #ff0044;
+}
+
+.inactive-badge {
+    background: rgba(128, 128, 128, 0.2);
+    color: #808080;
+    border: 1px solid #808080;
+}
+
+.locked-badge {
+    background: rgba(255, 0, 0, 0.2);
+    color: #ff0000;
+    border: 1px solid #ff0000;
+}
+
+.verified-badge {
+    background: rgba(0, 245, 255, 0.2);
+    color: var(--neon-cyan);
+    border: 1px solid var(--neon-cyan);
+    font-size: 0.6rem;
+    padding: 0.1rem 0.3rem;
+    margin-left: 0.25rem;
+}
+
+.activity-info {
+    font-size: 0.8rem;
+    line-height: 1.3;
+}
+
+.last-login, .login-count, .failed-attempts {
+    color: var(--text-secondary);
+    margin-bottom: 0.1rem;
+}
+
+.failed-attempts {
+    color: #ff0044;
+}
+
+.action-dropdown {
+    position: relative;
+}
+
+.dropdown-btn {
+    background: rgba(0, 245, 255, 0.1);
+    border: 1px solid var(--border-glow);
+    color: var(--neon-cyan);
+    padding: 0.3rem 0.6rem;
+    cursor: pointer;
+    font-size: 1.3rem;
+    font-weight: bold;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+    min-width: 35px;
+    min-height: 35px;
+    text-align: center;
+    user-select: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.dropdown-btn:hover {
+    background: rgba(0, 245, 255, 0.2);
+    border-color: var(--neon-cyan);
+    color: var(--neon-cyan);
+    transform: scale(1.05);
+    box-shadow: 0 4px 8px rgba(0, 245, 255, 0.3);
+}
+
+.dropdown-btn:active {
+    transform: scale(0.95);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.dropdown-menu {
+    position: absolute;
+    right: 0;
+    top: 100%;
+    background: var(--dark-card);
+    border: 1px solid var(--border-glow);
+    border-radius: 6px;
+    min-width: 200px;
+    max-width: 250px;
+    z-index: 1000;
+    display: none;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(10px);
+    margin-top: 4px;
+    overflow: hidden;
+}
+
+/* Remove hover to avoid conflicts with JavaScript */
+
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    color: var(--text-primary);
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    border-bottom: 1px solid rgba(0, 245, 255, 0.1);
+    cursor: pointer;
+    gap: 0.75rem;
+}
+
+.dropdown-item:last-child {
+    border-bottom: none;
+}
+
+.dropdown-item:hover {
+    background: rgba(0, 245, 255, 0.15);
+    color: var(--neon-cyan);
+    transform: translateX(4px);
+}
+
+.dropdown-item:active {
+    transform: translateX(2px);
+    background: rgba(0, 245, 255, 0.2);
+}
+
+.delete-item:hover {
+    background: rgba(255, 0, 68, 0.15);
+    color: #ff0044;
+}
+
+.delete-item:active {
+    background: rgba(255, 0, 68, 0.2);
 }
 
 @media (max-width: 768px) {
@@ -163,4 +426,166 @@
     }
 }
 </style>
+
+<script>
+// Global dropdown management
+let activeDropdown = null;
+
+function toggleDropdown(button) {
+    try {
+        console.log('Toggle dropdown called');
+        
+        const dropdown = button.parentElement;
+        if (!dropdown) {
+            console.error('Could not find dropdown parent');
+            return;
+        }
+        
+        const menu = dropdown.querySelector('.dropdown-menu');
+        if (!menu) {
+            console.error('Could not find dropdown menu');
+            return;
+        }
+        
+        // Close all other dropdowns and reset their ARIA attributes
+        document.querySelectorAll('.dropdown-menu').forEach(otherMenu => {
+            if (otherMenu !== menu && otherMenu.style) {
+                otherMenu.style.display = 'none';
+                // Reset ARIA attributes for other dropdowns
+                const otherButton = otherMenu.parentElement.querySelector('.dropdown-btn');
+                if (otherButton) {
+                    otherButton.setAttribute('aria-expanded', 'false');
+                }
+            }
+        });
+        
+        // Toggle current dropdown
+        const isVisible = menu.style.display === 'block';
+        menu.style.display = isVisible ? 'none' : 'block';
+        
+        // Update ARIA attributes for accessibility
+        button.setAttribute('aria-expanded', !isVisible ? 'true' : 'false');
+        
+        // Update active dropdown tracking
+        activeDropdown = isVisible ? null : menu;
+        
+        console.log('Dropdown toggled:', !isVisible);
+        
+        // Prevent event bubbling
+        event.stopPropagation();
+        
+    } catch (error) {
+        console.error('Error toggling dropdown:', error);
+    }
+}
+
+// Close dropdowns when clicking outside
+document.addEventListener('click', function(e) {
+    try {
+        if (!e.target.closest('.action-dropdown')) {
+            document.querySelectorAll('.dropdown-menu').forEach(menu => {
+                if (menu.style) {
+                    menu.style.display = 'none';
+                    // Reset ARIA attributes when closing
+                    const button = menu.parentElement.querySelector('.dropdown-btn');
+                    if (button) {
+                        button.setAttribute('aria-expanded', 'false');
+                    }
+                }
+            });
+            activeDropdown = null;
+        }
+    } catch (error) {
+        console.error('Error closing dropdowns:', error);
+    }
+});
+
+// Initialize dropdowns when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    try {
+        console.log('Initializing dropdown functionality...');
+        
+        // Initialize all dropdown menus
+        const dropdownMenus = document.querySelectorAll('.dropdown-menu');
+        console.log('Found dropdown menus:', dropdownMenus.length);
+        
+        dropdownMenus.forEach(menu => {
+            if (menu.style) {
+                menu.style.display = 'none';
+            }
+        });
+        
+        // Add click listeners to dropdown buttons
+        const dropdownButtons = document.querySelectorAll('.dropdown-btn');
+        console.log('Found dropdown buttons:', dropdownButtons.length);
+        
+        dropdownButtons.forEach(button => {
+            // Remove any existing listeners
+            button.removeEventListener('click', toggleDropdown);
+            // Add new listener
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                toggleDropdown(this);
+            });
+            
+            // Make button more obvious
+            button.style.cursor = 'pointer';
+            button.style.userSelect = 'none';
+        });
+        
+        // Handle dropdown item clicks
+        const dropdownItems = document.querySelectorAll('.dropdown-item');
+        console.log('Found dropdown items:', dropdownItems.length);
+        
+        dropdownItems.forEach(item => {
+            item.addEventListener('click', function(e) {
+                try {
+                    const href = this.getAttribute('href');
+                    console.log('Dropdown item clicked:', href);
+                    
+                    if (href && href.includes('toggle-admin')) {
+                        const originalText = this.innerHTML;
+                        this.innerHTML = '⏳ Toggling...';
+                        this.style.pointerEvents = 'none';
+                        
+                        setTimeout(() => {
+                            this.innerHTML = originalText;
+                            this.style.pointerEvents = 'auto';
+                        }, 3000);
+                    }
+                } catch (error) {
+                    console.error('Error handling dropdown item click:', error);
+                }
+            });
+        });
+        
+        console.log('Dropdown script loaded successfully');
+        
+    } catch (error) {
+        console.error('Error initializing dropdowns:', error);
+    }
+});
+
+// Add keyboard support
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        try {
+            document.querySelectorAll('.dropdown-menu').forEach(menu => {
+                if (menu.style) {
+                    menu.style.display = 'none';
+                    // Reset ARIA attributes when closing with Escape
+                    const button = menu.parentElement.querySelector('.dropdown-btn');
+                    if (button) {
+                        button.setAttribute('aria-expanded', 'false');
+                    }
+                }
+            });
+            activeDropdown = null;
+        } catch (error) {
+            console.error('Error closing dropdowns on Escape:', error);
+        }
+    }
+});
+</script>
 {% endblock %}

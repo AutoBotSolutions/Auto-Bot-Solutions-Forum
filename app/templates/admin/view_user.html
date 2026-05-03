@@ -1,0 +1,544 @@
+{% extends "base.html" %}
+
+{% block title %}User Details - Admin Panel{% endblock %}
+
+{% block content %}
+<div class="admin-page">
+    <div class="hero" style="padding: 2rem 0;">
+        <h1 style="font-size: 2rem;">USER DETAILS</h1>
+        <p style="font-size: 1rem;">Comprehensive user information and activity overview</p>
+    </div>
+
+    <div class="admin-content">
+        <div class="admin-header">
+            <a href="{{ url_for('admin.users') }}" class="btn-primary" style="font-size: 0.9rem; padding: 0.5rem 1.5rem;">← Back to Users</a>
+            <div class="user-actions">
+                <a href="{{ url_for('admin.edit_user', user_id=user.id) }}" class="btn-primary">✏️ Edit</a>
+                <a href="{{ url_for('admin.reset_user_password', user_id=user.id) }}" class="btn-primary">🔑 Reset Password</a>
+            </div>
+        </div>
+
+        <div class="user-overview">
+            <div class="user-profile-card">
+                <div class="user-header">
+                    <div class="user-avatar">
+                        {% if user.avatar_url %}
+                        <img src="{{ user.avatar_url }}" alt="{{ user.username }}">
+                        {% else %}
+                        <div class="avatar-placeholder">{{ user.username[0]|upper }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="user-info">
+                        <h2>{{ user.username }}</h2>
+                        <p class="user-email">{{ user.email }}</p>
+                        <div class="user-badges">
+                            <span class="badge status-badge {{ user.get_account_status().lower()|replace(' ', '-') }}-badge">{{ user.get_account_status() }}</span>
+                            {% if user.is_admin %}
+                            <span class="badge admin-badge">ADMIN</span>
+                            {% endif %}
+                            {% if user.is_verified %}
+                            <span class="badge verified-badge">✓ Verified</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                {% if user.bio or user.location or user.website %}
+                <div class="user-details">
+                    {% if user.bio %}
+                    <div class="detail-item">
+                        <strong>Bio:</strong> {{ user.bio }}
+                    </div>
+                    {% endif %}
+                    {% if user.location %}
+                    <div class="detail-item">
+                        <strong>Location:</strong> {{ user.location }}
+                    </div>
+                    {% endif %}
+                    {% if user.website %}
+                    <div class="detail-item">
+                        <strong>Website:</strong> <a href="{{ user.website }}" target="_blank">{{ user.website }}</a>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                        </svg>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-number">{{ stats.posts_count }}</div>
+                        <div class="stat-label">Posts</div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+                        </svg>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-number">{{ stats.comments_count }}</div>
+                        <div class="stat-label">Comments</div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                        </svg>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-number">{{ stats.badges_count }}</div>
+                        <div class="stat-label">Badges</div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="9" cy="7" r="4"></circle>
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                        </svg>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-number">{{ stats.login_count }}</div>
+                        <div class="stat-label">Logins</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="activity-section">
+            <h3>Activity Overview</h3>
+            <div class="activity-grid">
+                <div class="activity-item">
+                    <strong>Account Age:</strong> {{ stats.account_age_days }} days
+                </div>
+                <div class="activity-item">
+                    <strong>Last Login:</strong> 
+                    {% if stats.last_login %}
+                        {{ stats.last_login.strftime('%Y-%m-%d %H:%M') }}
+                    {% else %}
+                        Never
+                    {% endif %}
+                </div>
+                <div class="activity-item">
+                    <strong>Last Activity:</strong>
+                    {% if stats.last_activity %}
+                        {{ stats.last_activity.strftime('%Y-%m-%d %H:%M') }}
+                    {% else %}
+                        Never
+                    {% endif %}
+                </div>
+                <div class="activity-item">
+                    <strong>Failed Attempts:</strong> 
+                    <span class="{% if stats.failed_attempts > 0 %}failed-attempts{% endif %}">{{ stats.failed_attempts }}</span>
+                </div>
+                <div class="activity-item">
+                    <strong>Member Since:</strong> {{ user.created_at.strftime('%Y-%m-%d') }}
+                </div>
+                <div class="activity-item">
+                    <strong>Last Updated:</strong> {{ user.updated_at.strftime('%Y-%m-%d %H:%M') }}
+                </div>
+            </div>
+        </div>
+
+        {% if user.suspension_reason %}
+        <div class="restriction-notice">
+            <h3>Account Restrictions</h3>
+            <div class="restriction-details">
+                <p><strong>Reason:</strong> {{ user.suspension_reason }}</p>
+                {% if user.suspension_expires %}
+                <p><strong>Suspension Expires:</strong> {{ user.suspension_expires.strftime('%Y-%m-%d %H:%M') }}</p>
+                {% endif %}
+                {% if user.banned_at %}
+                <p><strong>Banned On:</strong> {{ user.banned_at.strftime('%Y-%m-%d %H:%M') }}</p>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="recent-content">
+            <div class="content-section">
+                <h3>Recent Posts ({{ recent_posts|length }})</h3>
+                {% if recent_posts %}
+                <div class="content-list">
+                    {% for post in recent_posts %}
+                    <div class="content-item">
+                        <a href="{{ url_for('forum.post', post_id=post.id) }}" class="content-title">{{ post.title }}</a>
+                        <div class="content-meta">
+                            {{ post.created_at.strftime('%Y-%m-%d %H:%M') }} • 
+                            {{ post.comments.count() }} comments • 
+                            {{ post.votes|length }} votes
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="no-content">No posts yet</p>
+                {% endif %}
+            </div>
+
+            <div class="content-section">
+                <h3>Recent Comments ({{ recent_comments|length }})</h3>
+                {% if recent_comments %}
+                <div class="content-list">
+                    {% for comment in recent_comments %}
+                    <div class="content-item">
+                        <div class="comment-preview">{{ comment.content[:100] }}{% if comment.content|length > 100 %}...{% endif %}</div>
+                        <div class="content-meta">
+                            {{ comment.created_at.strftime('%Y-%m-%d %H:%M') }} • 
+                            on <a href="{{ url_for('forum.post', post_id=comment.post.id) }}">{{ comment.post.title }}</a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="no-content">No comments yet</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.admin-page {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.admin-content {
+    background: var(--dark-card);
+    border: 1px solid var(--border-glow);
+    border-radius: 8px;
+    padding: 2rem;
+}
+
+.admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.user-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.user-overview {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+@media (max-width: 768px) {
+    .user-overview {
+        grid-template-columns: 1fr;
+    }
+}
+
+.user-profile-card {
+    background: rgba(0, 245, 255, 0.05);
+    border: 1px solid rgba(0, 245, 255, 0.2);
+    border-radius: 8px;
+    padding: 1.5rem;
+}
+
+.user-header {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.user-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.user-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.avatar-placeholder {
+    width: 100%;
+    height: 100%;
+    background: var(--neon-cyan);
+    color: var(--dark-bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    font-weight: bold;
+    font-family: 'Orbitron', sans-serif;
+}
+
+.user-info h2 {
+    color: var(--neon-cyan);
+    margin-bottom: 0.5rem;
+    font-family: 'Orbitron', sans-serif;
+}
+
+.user-email {
+    color: var(--text-secondary);
+    margin-bottom: 1rem;
+}
+
+.user-badges {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.status-badge {
+    font-size: 0.7rem;
+}
+
+.active-badge {
+    background: rgba(0, 255, 0, 0.2);
+    color: #00ff00;
+    border: 1px solid #00ff00;
+}
+
+.suspended-badge {
+    background: rgba(255, 165, 0, 0.2);
+    color: #ffa500;
+    border: 1px solid #ffa500;
+}
+
+.banned-badge {
+    background: rgba(255, 0, 68, 0.2);
+    color: #ff0044;
+    border: 1px solid #ff0044;
+}
+
+.admin-badge {
+    background: rgba(157, 0, 255, 0.3);
+    color: var(--neon-purple);
+    border: 1px solid var(--neon-purple);
+}
+
+.verified-badge {
+    background: rgba(0, 245, 255, 0.2);
+    color: var(--neon-cyan);
+    border: 1px solid var(--neon-cyan);
+}
+
+.user-details {
+    border-top: 1px solid rgba(0, 245, 255, 0.1);
+    padding-top: 1rem;
+}
+
+.detail-item {
+    margin-bottom: 0.5rem;
+    color: var(--text-secondary);
+}
+
+.detail-item a {
+    color: var(--neon-cyan);
+    text-decoration: none;
+}
+
+.detail-item a:hover {
+    text-decoration: underline;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+}
+
+.stat-card {
+    background: var(--dark-surface);
+    border: 1px solid var(--border-glow);
+    border-radius: 8px;
+    padding: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.stat-icon {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--neon-cyan);
+}
+
+.stat-icon svg {
+    width: 24px;
+    height: 24px;
+}
+
+.stat-number {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--text-primary);
+    font-family: 'Orbitron', sans-serif;
+}
+
+.stat-label {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.activity-section, .restriction-notice {
+    background: rgba(0, 245, 255, 0.05);
+    border: 1px solid rgba(0, 245, 255, 0.2);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.activity-section h3, .restriction-notice h3 {
+    color: var(--neon-cyan);
+    margin-bottom: 1rem;
+    font-family: 'Orbitron', sans-serif;
+}
+
+.activity-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.activity-item {
+    color: var(--text-secondary);
+}
+
+.failed-attempts {
+    color: #ff0044;
+    font-weight: bold;
+}
+
+.restriction-details {
+    color: var(--text-secondary);
+}
+
+.restriction-details p {
+    margin-bottom: 0.5rem;
+}
+
+.recent-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+}
+
+@media (max-width: 768px) {
+    .recent-content {
+        grid-template-columns: 1fr;
+    }
+}
+
+.content-section {
+    background: var(--dark-surface);
+    border: 1px solid var(--border-glow);
+    border-radius: 8px;
+    padding: 1.5rem;
+}
+
+.content-section h3 {
+    color: var(--neon-cyan);
+    margin-bottom: 1rem;
+    font-family: 'Orbitron', sans-serif;
+}
+
+.content-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.content-item {
+    padding: 0.75rem;
+    background: rgba(0, 245, 255, 0.05);
+    border-radius: 4px;
+    border-left: 3px solid var(--neon-cyan);
+}
+
+.content-title {
+    color: var(--text-primary);
+    text-decoration: none;
+    font-weight: 500;
+    display: block;
+    margin-bottom: 0.25rem;
+}
+
+.content-title:hover {
+    color: var(--neon-cyan);
+}
+
+.comment-preview {
+    color: var(--text-primary);
+    margin-bottom: 0.25rem;
+}
+
+.content-meta {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+.content-meta a {
+    color: var(--neon-cyan);
+    text-decoration: none;
+}
+
+.content-meta a:hover {
+    text-decoration: underline;
+}
+
+.no-content {
+    color: var(--text-secondary);
+    font-style: italic;
+}
+
+.btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: rgba(0, 245, 255, 0.1);
+    color: var(--neon-cyan);
+    border: 1px solid var(--neon-cyan);
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    background: rgba(0, 245, 255, 0.2);
+    box-shadow: 0 0 10px rgba(0, 245, 255, 0.3);
+}
+</style>
+{% endblock %}

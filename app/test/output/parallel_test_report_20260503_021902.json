@@ -1,0 +1,660 @@
+{
+  "execution_type": "parallel",
+  "timestamp": "2026-05-03T02:19:02.942020",
+  "max_workers": 4,
+  "summary": {
+    "total_categories": 12,
+    "total_tests": 21,
+    "total_passed": 21,
+    "total_failed": 0,
+    "total_errors": 0,
+    "success_rate": 100.0,
+    "total_execution_time": 3.520225,
+    "max_workers": 4,
+    "start_time": "2026-05-03T06:19:02.877351",
+    "end_time": "2026-05-03T06:19:02.941762",
+    "category_stats": {
+      "admin": {
+        "total_tests": 2,
+        "passed": 2,
+        "failed": 0,
+        "errors": 0,
+        "execution_time": 0.526943
+      },
+      "auth": {
+        "total_tests": 2,
+        "passed": 2,
+        "failed": 0,
+        "errors": 0,
+        "execution_time": 0.504082
+      },
+      "forum": {
+        "total_tests": 3,
+        "passed": 3,
+        "failed": 0,
+        "errors": 0,
+        "execution_time": 0.220489
+      },
+      "api": {
+        "total_tests": 2,
+        "passed": 2,
+        "failed": 0,
+        "errors": 0,
+        "execution_time": 0.123834
+      },
+      "user": {
+        "total_tests": 2,
+        "passed": 2,
+        "failed": 0,
+        "errors": 0,
+        "execution_time": 0.191424
+      },
+      "message": {
+        "total_tests": 1,
+        "passed": 1,
+        "failed": 0,
+        "errors": 0,
+        "execution_time": 0.04963
+      },
+      "notification": {
+        "total_tests": 1,
+        "passed": 1,
+        "failed": 0,
+        "errors": 0,
+        "execution_time": 0.036838
+      },
+      "database": {
+        "total_tests": 2,
+        "passed": 2,
+        "failed": 0,
+        "errors": 0,
+        "execution_time": 1.096809
+      },
+      "security": {
+        "total_tests": 2,
+        "passed": 2,
+        "failed": 0,
+        "errors": 0,
+        "execution_time": 0.524087
+      },
+      "templates": {
+        "total_tests": 2,
+        "passed": 2,
+        "failed": 0,
+        "errors": 0,
+        "execution_time": 0.132782
+      },
+      "integration": {
+        "total_tests": 1,
+        "passed": 1,
+        "failed": 0,
+        "errors": 0,
+        "execution_time": 0.048896
+      },
+      "performance": {
+        "total_tests": 1,
+        "passed": 1,
+        "failed": 0,
+        "errors": 0,
+        "execution_time": 0.064411
+      }
+    }
+  },
+  "results_by_category": {
+    "admin": [
+      {
+        "test_name": "AdminFormsTest",
+        "category": "admin",
+        "status": "passed",
+        "message": "Passed: 0, Failed: 0, Errors: 0",
+        "details": {
+          "results": [],
+          "total_tests": 0
+        },
+        "timestamp": "2026-05-03T06:18:59.593471",
+        "execution_time": 0.17236995697021484,
+        "worker_id": 1
+      },
+      {
+        "test_name": "AdminRoutesTest",
+        "category": "admin",
+        "status": "passed",
+        "message": "Passed: 7, Failed: 0, Errors: 0",
+        "details": {
+          "results": [
+            {
+              "test_name": "app_initialization",
+              "category": "admin_routes",
+              "status": "passed",
+              "message": "Flask app created successfully",
+              "details": null,
+              "timestamp": "2026-05-03T02:18:59.566135"
+            },
+            {
+              "test_name": "blueprint_registration",
+              "category": "admin_routes",
+              "status": "passed",
+              "message": "Admin blueprint registered with 28 deferred functions",
+              "details": null,
+              "timestamp": "2026-05-03T02:18:59.566490"
+            },
+            {
+              "test_name": "route_registration",
+              "category": "admin_routes",
+              "status": "passed",
+              "message": "Found 13 admin/users routes",
+              "details": {
+                "routes": [
+                  "/admin/users -> admin.users [{'HEAD', 'GET', 'OPTIONS'}]",
+                  "/admin/users/<int:user_id>/toggle-admin -> admin.toggle_admin [{'HEAD', 'GET', 'OPTIONS'}]",
+                  "/admin/users/<int:user_id>/delete -> admin.delete_user [{'HEAD', 'GET', 'OPTIONS'}]",
+                  "/admin/users/<int:user_id>/edit -> admin.edit_user [{'HEAD', 'GET', 'OPTIONS', 'POST'}]",
+                  "/admin/users/<int:user_id>/suspend -> admin.suspend_user [{'HEAD', 'GET', 'OPTIONS', 'POST'}]",
+                  "/admin/users/<int:user_id>/unsuspend -> admin.unsuspend_user [{'HEAD', 'GET', 'OPTIONS'}]",
+                  "/admin/users/<int:user_id>/ban -> admin.ban_user [{'HEAD', 'GET', 'OPTIONS', 'POST'}]",
+                  "/admin/users/<int:user_id>/unban -> admin.unban_user [{'HEAD', 'GET', 'OPTIONS'}]",
+                  "/admin/users/<int:user_id>/view -> admin.view_user [{'HEAD', 'GET', 'OPTIONS'}]",
+                  "/admin/users/<int:user_id>/reset-password -> admin.reset_user_password [{'HEAD', 'GET', 'OPTIONS'}]",
+                  "/admin/users/bulk-action -> admin.bulk_user_action [{'OPTIONS', 'POST'}]",
+                  "/admin/users/<int:user_id>/add_badge/<int:badge_id> -> admin.add_badge_to_user [{'HEAD', 'GET', 'OPTIONS'}]",
+                  "/admin/users/<int:user_id>/remove_badge/<int:badge_id> -> admin.remove_badge_from_user [{'HEAD', 'GET', 'OPTIONS'}]"
+                ]
+              },
+              "timestamp": "2026-05-03T02:18:59.566912"
+            },
+            {
+              "test_name": "users_route_function",
+              "category": "admin_routes",
+              "status": "passed",
+              "message": "Users route returns HTML content (37106 characters)",
+              "details": null,
+              "timestamp": "2026-05-03T02:18:59.690816"
+            },
+            {
+              "test_name": "user_management_routes",
+              "category": "admin_routes",
+              "status": "passed",
+              "message": "All 6 user management routes work correctly",
+              "details": null,
+              "timestamp": "2026-05-03T02:18:59.943363"
+            },
+            {
+              "test_name": "template_rendering",
+              "category": "admin_routes",
+              "status": "passed",
+              "message": "Template renders successfully (15837 characters)",
+              "details": null,
+              "timestamp": "2026-05-03T02:18:59.944102"
+            },
+            {
+              "test_name": "database_connection",
+              "category": "admin_routes",
+              "status": "passed",
+              "message": "Database connection successful: 5 users, admin: admin",
+              "details": null,
+              "timestamp": "2026-05-03T02:18:59.947142"
+            }
+          ],
+          "total_tests": 7
+        },
+        "timestamp": "2026-05-03T06:18:59.947347",
+        "execution_time": 0.5264368057250977,
+        "worker_id": 0
+      }
+    ],
+    "auth": [
+      {
+        "test_name": "SessionTest",
+        "category": "auth",
+        "status": "passed",
+        "message": "Passed: 0, Failed: 0, Errors: 0",
+        "details": {
+          "results": [],
+          "total_tests": 0
+        },
+        "timestamp": "2026-05-03T06:19:00.056151",
+        "execution_time": 0.10819602012634277,
+        "worker_id": 1
+      },
+      {
+        "test_name": "AuthTest",
+        "category": "auth",
+        "status": "passed",
+        "message": "Passed: 0, Failed: 0, Errors: 0",
+        "details": {
+          "results": [],
+          "total_tests": 0
+        },
+        "timestamp": "2026-05-03T06:19:00.451497",
+        "execution_time": 0.5036959648132324,
+        "worker_id": 0
+      }
+    ],
+    "forum": [
+      {
+        "test_name": "ForumTest",
+        "category": "forum",
+        "status": "passed",
+        "message": "Passed: 0, Failed: 0, Errors: 0",
+        "details": {
+          "results": [],
+          "total_tests": 0
+        },
+        "timestamp": "2026-05-03T06:19:00.661972",
+        "execution_time": 0.20999455451965332,
+        "worker_id": 0
+      },
+      {
+        "test_name": "PostTest",
+        "category": "forum",
+        "status": "passed",
+        "message": "Passed: 0, Failed: 0, Errors: 0",
+        "details": {
+          "results": [],
+          "total_tests": 0
+        },
+        "timestamp": "2026-05-03T06:19:00.667703",
+        "execution_time": 0.21558380126953125,
+        "worker_id": 1
+      },
+      {
+        "test_name": "CommentTest",
+        "category": "forum",
+        "status": "passed",
+        "message": "Passed: 0, Failed: 0, Errors: 0",
+        "details": {
+          "results": [],
+          "total_tests": 0
+        },
+        "timestamp": "2026-05-03T06:19:00.671968",
+        "execution_time": 0.21959781646728516,
+        "worker_id": 2
+      }
+    ],
+    "api": [
+      {
+        "test_name": "APISecurityTest",
+        "category": "api",
+        "status": "passed",
+        "message": "Passed: 0, Failed: 0, Errors: 0",
+        "details": {
+          "results": [],
+          "total_tests": 0
+        },
+        "timestamp": "2026-05-03T06:19:00.764611",
+        "execution_time": 0.09161591529846191,
+        "worker_id": 1
+      },
+      {
+        "test_name": "APITest",
+        "category": "api",
+        "status": "passed",
+        "message": "Passed: 0, Failed: 0, Errors: 0",
+        "details": {
+          "results": [],
+          "total_tests": 0
+        },
+        "timestamp": "2026-05-03T06:19:00.796052",
+        "execution_time": 0.12337946891784668,
+        "worker_id": 0
+      }
+    ],
+    "user": [
+      {
+        "test_name": "ProfileTest",
+        "category": "user",
+        "status": "passed",
+        "message": "Passed: 0, Failed: 0, Errors: 0",
+        "details": {
+          "results": [],
+          "total_tests": 0
+        },
+        "timestamp": "2026-05-03T06:19:00.880934",
+        "execution_time": 0.08428692817687988,
+        "worker_id": 1
+      },
+      {
+        "test_name": "UserTest",
+        "category": "user",
+        "status": "passed",
+        "message": "Passed: 0, Failed: 0, Errors: 0",
+        "details": {
+          "results": [],
+          "total_tests": 0
+        },
+        "timestamp": "2026-05-03T06:19:00.987545",
+        "execution_time": 0.19104981422424316,
+        "worker_id": 0
+      }
+    ],
+    "message": [
+      {
+        "test_name": "MessageTest",
+        "category": "message",
+        "status": "passed",
+        "message": "Passed: 0, Failed: 0, Errors: 0",
+        "details": {
+          "results": [],
+          "total_tests": 0
+        },
+        "timestamp": "2026-05-03T06:19:01.037250",
+        "execution_time": 0.04927420616149902,
+        "worker_id": 0
+      }
+    ],
+    "notification": [
+      {
+        "test_name": "NotificationTest",
+        "category": "notification",
+        "status": "passed",
+        "message": "Passed: 0, Failed: 0, Errors: 0",
+        "details": {
+          "results": [],
+          "total_tests": 0
+        },
+        "timestamp": "2026-05-03T06:19:01.074230",
+        "execution_time": 0.0364992618560791,
+        "worker_id": 0
+      }
+    ],
+    "database": [
+      {
+        "test_name": "DatabaseTest",
+        "category": "database",
+        "status": "passed",
+        "message": "Passed: 0, Failed: 0, Errors: 0",
+        "details": {
+          "results": [],
+          "total_tests": 0
+        },
+        "timestamp": "2026-05-03T06:19:01.950767",
+        "execution_time": 0.8761894702911377,
+        "worker_id": 0
+      },
+      {
+        "test_name": "ModelTest",
+        "category": "database",
+        "status": "passed",
+        "message": "Passed: 0, Failed: 0, Errors: 0",
+        "details": {
+          "results": [],
+          "total_tests": 0
+        },
+        "timestamp": "2026-05-03T06:19:02.171014",
+        "execution_time": 1.096308708190918,
+        "worker_id": 1
+      }
+    ],
+    "security": [
+      {
+        "test_name": "CSRFTest",
+        "category": "security",
+        "status": "passed",
+        "message": "Passed: 0, Failed: 0, Errors: 0",
+        "details": {
+          "results": [],
+          "total_tests": 0
+        },
+        "timestamp": "2026-05-03T06:19:02.250834",
+        "execution_time": 0.07923126220703125,
+        "worker_id": 1
+      },
+      {
+        "test_name": "SecurityTest",
+        "category": "security",
+        "status": "passed",
+        "message": "Passed: 0, Failed: 0, Errors: 0",
+        "details": {
+          "results": [],
+          "total_tests": 0
+        },
+        "timestamp": "2026-05-03T06:19:02.694894",
+        "execution_time": 0.5234248638153076,
+        "worker_id": 0
+      }
+    ],
+    "templates": [
+      {
+        "test_name": "UITest",
+        "category": "templates",
+        "status": "passed",
+        "message": "Passed: 0, Failed: 0, Errors: 0",
+        "details": {
+          "results": [],
+          "total_tests": 0
+        },
+        "timestamp": "2026-05-03T06:19:02.822904",
+        "execution_time": 0.12697744369506836,
+        "worker_id": 1
+      },
+      {
+        "test_name": "TemplateTest",
+        "category": "templates",
+        "status": "passed",
+        "message": "Passed: 0, Failed: 0, Errors: 0",
+        "details": {
+          "results": [],
+          "total_tests": 0
+        },
+        "timestamp": "2026-05-03T06:19:02.828048",
+        "execution_time": 0.13238048553466797,
+        "worker_id": 0
+      }
+    ],
+    "integration": [
+      {
+        "test_name": "IntegrationTest",
+        "category": "integration",
+        "status": "passed",
+        "message": "Passed: 0, Failed: 0, Errors: 0",
+        "details": {
+          "results": [],
+          "total_tests": 0
+        },
+        "timestamp": "2026-05-03T06:19:02.876953",
+        "execution_time": 0.04848527908325195,
+        "worker_id": 0
+      }
+    ],
+    "performance": [
+      {
+        "test_name": "PerformanceTest",
+        "category": "performance",
+        "status": "passed",
+        "message": "Passed: 0, Failed: 0, Errors: 0",
+        "details": {
+          "results": [],
+          "total_tests": 0
+        },
+        "timestamp": "2026-05-03T06:19:02.941553",
+        "execution_time": 0.06391191482543945,
+        "worker_id": 0
+      }
+    ]
+  },
+  "performance_analysis": {
+    "slowest_tests": [
+      {
+        "test_name": "ModelTest",
+        "execution_time": 1.096308708190918,
+        "worker_id": 1
+      },
+      {
+        "test_name": "DatabaseTest",
+        "execution_time": 0.8761894702911377,
+        "worker_id": 0
+      },
+      {
+        "test_name": "AdminRoutesTest",
+        "execution_time": 0.5264368057250977,
+        "worker_id": 0
+      },
+      {
+        "test_name": "SecurityTest",
+        "execution_time": 0.5234248638153076,
+        "worker_id": 0
+      },
+      {
+        "test_name": "AuthTest",
+        "execution_time": 0.5036959648132324,
+        "worker_id": 0
+      },
+      {
+        "test_name": "CommentTest",
+        "execution_time": 0.21959781646728516,
+        "worker_id": 2
+      },
+      {
+        "test_name": "PostTest",
+        "execution_time": 0.21558380126953125,
+        "worker_id": 1
+      },
+      {
+        "test_name": "ForumTest",
+        "execution_time": 0.20999455451965332,
+        "worker_id": 0
+      },
+      {
+        "test_name": "UserTest",
+        "execution_time": 0.19104981422424316,
+        "worker_id": 0
+      },
+      {
+        "test_name": "AdminFormsTest",
+        "execution_time": 0.17236995697021484,
+        "worker_id": 1
+      }
+    ],
+    "fastest_tests": [
+      {
+        "test_name": "UITest",
+        "execution_time": 0.12697744369506836,
+        "worker_id": 1
+      },
+      {
+        "test_name": "APITest",
+        "execution_time": 0.12337946891784668,
+        "worker_id": 0
+      },
+      {
+        "test_name": "SessionTest",
+        "execution_time": 0.10819602012634277,
+        "worker_id": 1
+      },
+      {
+        "test_name": "APISecurityTest",
+        "execution_time": 0.09161591529846191,
+        "worker_id": 1
+      },
+      {
+        "test_name": "ProfileTest",
+        "execution_time": 0.08428692817687988,
+        "worker_id": 1
+      },
+      {
+        "test_name": "CSRFTest",
+        "execution_time": 0.07923126220703125,
+        "worker_id": 1
+      },
+      {
+        "test_name": "PerformanceTest",
+        "execution_time": 0.06391191482543945,
+        "worker_id": 0
+      },
+      {
+        "test_name": "MessageTest",
+        "execution_time": 0.04927420616149902,
+        "worker_id": 0
+      },
+      {
+        "test_name": "IntegrationTest",
+        "execution_time": 0.04848527908325195,
+        "worker_id": 0
+      },
+      {
+        "test_name": "NotificationTest",
+        "execution_time": 0.0364992618560791,
+        "worker_id": 0
+      }
+    ],
+    "worker_distribution": {
+      "1": 8,
+      "0": 12,
+      "2": 1
+    },
+    "category_performance": {
+      "admin": {
+        "avg_time": 0.34940338134765625,
+        "max_time": 0.5264368057250977,
+        "min_time": 0.17236995697021484,
+        "total_tests": 2
+      },
+      "auth": {
+        "avg_time": 0.3059459924697876,
+        "max_time": 0.5036959648132324,
+        "min_time": 0.10819602012634277,
+        "total_tests": 2
+      },
+      "forum": {
+        "avg_time": 0.2150587240854899,
+        "max_time": 0.21959781646728516,
+        "min_time": 0.20999455451965332,
+        "total_tests": 3
+      },
+      "api": {
+        "avg_time": 0.1074976921081543,
+        "max_time": 0.12337946891784668,
+        "min_time": 0.09161591529846191,
+        "total_tests": 2
+      },
+      "user": {
+        "avg_time": 0.13766837120056152,
+        "max_time": 0.19104981422424316,
+        "min_time": 0.08428692817687988,
+        "total_tests": 2
+      },
+      "message": {
+        "avg_time": 0.04927420616149902,
+        "max_time": 0.04927420616149902,
+        "min_time": 0.04927420616149902,
+        "total_tests": 1
+      },
+      "notification": {
+        "avg_time": 0.0364992618560791,
+        "max_time": 0.0364992618560791,
+        "min_time": 0.0364992618560791,
+        "total_tests": 1
+      },
+      "database": {
+        "avg_time": 0.9862490892410278,
+        "max_time": 1.096308708190918,
+        "min_time": 0.8761894702911377,
+        "total_tests": 2
+      },
+      "security": {
+        "avg_time": 0.30132806301116943,
+        "max_time": 0.5234248638153076,
+        "min_time": 0.07923126220703125,
+        "total_tests": 2
+      },
+      "templates": {
+        "avg_time": 0.12967896461486816,
+        "max_time": 0.13238048553466797,
+        "min_time": 0.12697744369506836,
+        "total_tests": 2
+      },
+      "integration": {
+        "avg_time": 0.04848527908325195,
+        "max_time": 0.04848527908325195,
+        "min_time": 0.04848527908325195,
+        "total_tests": 1
+      },
+      "performance": {
+        "avg_time": 0.06391191482543945,
+        "max_time": 0.06391191482543945,
+        "min_time": 0.06391191482543945,
+        "total_tests": 1
+      }
+    }
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "test_session": {
+    "timestamp": "2026-05-03T02:12:08.379718",
+    "category": "database",
+    "description": "Database models and relationships",
+    "total_tests": 0,
+    "passed": 0,
+    "failed": 0,
+    "skipped": 0,
+    "errors": 0
+  },
+  "results": [],
+  "recommendations": []
+}

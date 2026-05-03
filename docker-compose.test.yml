@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_ENV=testing
+      - SECRET_KEY=test-secret-key-for-ci
+      - DATABASE_URL=postgresql://postgres:testpassword@db:5432/test_repo_forum
+      - WTF_CSRF_ENABLED=false
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./app:/app/app
+      - ./app/test:/app/app/test
+      - ./config.py:/app/config.py
+      - ./run.py:/app/run.py
+    command: python app/test/run_tests.py --verbose --coverage
+
+  db:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_PASSWORD=testpassword
+      - POSTGRES_DB=test_repo_forum
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:

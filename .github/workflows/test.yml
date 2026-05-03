@@ -1,0 +1,140 @@
+name: Test Suite
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  schedule:
+    # Run tests daily at 2 AM UTC
+    - cron: '0 2 * * *'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        python-version: [3.9, 3.10, 3.11, 3.12]
+    
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: testpassword
+          POSTGRES_DB: test_repo_forum
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+    
+    - name: Cache dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pytest pytest-cov pytest-html
+    
+    - name: Set up environment variables
+      run: |
+        echo "FLASK_ENV=testing" >> $GITHUB_ENV
+        echo "SECRET_KEY=test-secret-key-for-ci" >> $GITHUB_ENV
+        echo "DATABASE_URL=postgresql://postgres:testpassword@localhost:5432/test_repo_forum" >> $GITHUB_ENV
+        echo "WTF_CSRF_ENABLED=false" >> $GITHUB_ENV
+    
+    - name: Create test database
+      run: |
+        psql -h localhost -U postgres -c "CREATE DATABASE test_repo_forum;"
+    
+    - name: Run database migrations
+      run: |
+        python init_db.py
+    
+    - name: Run comprehensive test suite
+      run: |
+        python app/test/run_tests.py --verbose --coverage
+    
+    - name: Generate test report
+      if: always()
+      run: |
+        python app/test/run_tests.py --output json
+    
+    - name: Upload coverage reports
+      if: always()
+      uses: actions/upload-artifact@v3
+      with:
+        name: coverage-reports-python${{ matrix.python-version }}
+        path: |
+          app/test/output/
+          coverage.xml
+        retention-days: 30
+    
+    - name: Upload test results
+      if: always()
+      uses: actions/upload-artifact@v3
+      with:
+        name: test-results-python${{ matrix.python-version }}
+        path: app/test/output/reports/
+        retention-days: 30
+    
+    - name: Comment PR with results
+      if: github.event_name == 'pull_request'
+      uses: actions/github-script@v6
+      with:
+        script: |
+          const fs = require('fs');
+          const path = 'app/test/output/reports/';
+          
+          // Find the latest report file
+          const files = fs.readdirSync(path);
+          const reportFiles = files.filter(f => f.includes('full_project_test_report'));
+          
+          if (reportFiles.length > 0) {
+            const latestReport = reportFiles.sort().pop();
+            const reportData = JSON.parse(fs.readFileSync(path + latestReport, 'utf8'));
+            
+            const session = reportData.test_session;
+            const successRate = (session.passed / session.total_tests * 100).toFixed(1);
+            
+            const comment = `
+            ## 🧪 Test Results
+            
+            **Python ${{ matrix.python-version }}**
+            
+            - ✅ **Passed:** ${session.passed}
+            - ❌ **Failed:** ${session.failed}
+            - ⚠️ **Skipped:** ${session.skipped}
+            - 🚫 **Errors:** ${session.errors}
+            - 📊 **Success Rate:** ${successRate}%
+            - 📈 **Total Tests:** ${session.total_tests}
+            
+            ---
+            📊 [View detailed reports](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+            `;
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
+          }

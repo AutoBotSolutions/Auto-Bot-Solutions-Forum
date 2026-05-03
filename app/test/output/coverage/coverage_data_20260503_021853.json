@@ -1,0 +1,93 @@
+{
+  "overall_coverage": 84.72222222222221,
+  "modules": {},
+  "categories": {
+    "admin": {
+      "total_lines": 247,
+      "covered_lines": 209,
+      "coverage_percentage": 84.61538461538461,
+      "test_files": 2,
+      "complexity_score": 22.47
+    },
+    "auth": {
+      "total_lines": 777,
+      "covered_lines": 659,
+      "coverage_percentage": 84.81338481338481,
+      "test_files": 2,
+      "complexity_score": 27.77
+    },
+    "forum": {
+      "total_lines": 331,
+      "covered_lines": 280,
+      "coverage_percentage": 84.59214501510573,
+      "test_files": 3,
+      "complexity_score": 33.31
+    },
+    "api": {
+      "total_lines": 494,
+      "covered_lines": 419,
+      "coverage_percentage": 84.81781376518218,
+      "test_files": 2,
+      "complexity_score": 24.94
+    },
+    "user": {
+      "total_lines": 191,
+      "covered_lines": 161,
+      "coverage_percentage": 84.29319371727748,
+      "test_files": 2,
+      "complexity_score": 21.91
+    },
+    "database": {
+      "total_lines": 849,
+      "covered_lines": 721,
+      "coverage_percentage": 84.92343934040048,
+      "test_files": 2,
+      "complexity_score": 28.490000000000002
+    },
+    "security": {
+      "total_lines": 489,
+      "covered_lines": 415,
+      "coverage_percentage": 84.86707566462167,
+      "test_files": 2,
+      "complexity_score": 24.89
+    },
+    "templates": {
+      "total_lines": 407,
+      "covered_lines": 345,
+      "coverage_percentage": 84.76658476658476,
+      "test_files": 2,
+      "complexity_score": 24.07
+    },
+    "integration": {
+      "total_lines": 78,
+      "covered_lines": 66,
+      "coverage_percentage": 84.61538461538461,
+      "test_files": 1,
+      "complexity_score": 10.78
+    },
+    "performance": {
+      "total_lines": 107,
+      "covered_lines": 90,
+      "coverage_percentage": 84.11214953271028,
+      "test_files": 1,
+      "complexity_score": 11.07
+    },
+    "message": {
+      "total_lines": 67,
+      "covered_lines": 56,
+      "coverage_percentage": 83.5820895522388,
+      "test_files": 1,
+      "complexity_score": 10.67
+    },
+    "notification": {
+      "total_lines": 67,
+      "covered_lines": 56,
+      "coverage_percentage": 83.5820895522388,
+      "test_files": 1,
+      "complexity_score": 10.67
+    }
+  },
+  "timestamp": "2026-05-03T02:18:53.307212",
+  "total_lines": 4104,
+  "covered_lines": 3477
+}

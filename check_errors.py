@@ -7,30 +7,50 @@ This script allows checking errors from the forum application
 import os
 import sys
 from datetime import datetime
+from pathlib import Path
 
 def check_latest_error():
     """Check the latest error file"""
-    error_file = 'logs/latest_error.txt'
-    if os.path.exists(error_file):
+    # Use absolute path to ensure file is found regardless of script location
+    script_dir = Path(__file__).parent
+    error_file = script_dir / 'logs' / 'latest_error.txt'
+    
+    if error_file.exists():
         print("=== LATEST FORUM ERROR ===")
-        with open(error_file, 'r') as f:
-            print(f.read())
+        try:
+            with open(error_file, 'r', encoding='utf-8') as f:
+                content = f.read().strip()
+                if content:
+                    print(content)
+                else:
+                    print("Latest error file is empty")
+        except Exception as e:
+            print(f"Error reading latest error file: {e}")
         print("=" * 30)
     else:
-        print("No error file found at logs/latest_error.txt")
+        print(f"No error file found at: {error_file}")
 
 def check_error_log():
     """Check the main error log file"""
-    log_file = 'logs/forum_errors.log'
-    if os.path.exists(log_file):
+    # Use absolute path to ensure file is found regardless of script location
+    script_dir = Path(__file__).parent
+    log_file = script_dir / 'logs' / 'forum_errors.log'
+    
+    if log_file.exists():
         print("=== FORUM ERROR LOG (Last 20 lines) ===")
-        with open(log_file, 'r') as f:
-            lines = f.readlines()
-            for line in lines[-20:]:
-                print(line.strip())
+        try:
+            with open(log_file, 'r', encoding='utf-8') as f:
+                lines = f.readlines()
+                if lines:
+                    for line in lines[-20:]:
+                        print(line.strip())
+                else:
+                    print("Error log file is empty")
+        except Exception as e:
+            print(f"Error reading error log file: {e}")
         print("=" * 40)
     else:
-        print("No error log file found at logs/forum_errors.log")
+        print(f"No error log file found at: {log_file}")
 
 def check_terminal_output():
     """Check if we can access terminal output from running Flask app"""
@@ -46,10 +66,18 @@ def main():
     print(f"AutoBot Forum Error Monitor - {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     print()
     
+    # Use absolute path for logs directory
+    script_dir = Path(__file__).parent
+    logs_dir = script_dir / 'logs'
+    
     # Check if logs directory exists
-    if not os.path.exists('logs'):
+    if not logs_dir.exists():
         print("Creating logs directory...")
-        os.makedirs('logs')
+        try:
+            logs_dir.mkdir(exist_ok=True)
+        except Exception as e:
+            print(f"Error creating logs directory: {e}")
+            return
     
     # Check different error sources
     check_latest_error()

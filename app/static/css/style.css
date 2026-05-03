@@ -156,6 +156,11 @@ body {
     box-shadow: 0 0 10px rgba(0, 245, 255, 0.3);
 }
 
+.search-btn svg {
+    width: 1rem;
+    height: 1rem;
+}
+
 .nav-link {
     color: var(--text-primary);
     text-decoration: none;
@@ -403,8 +408,18 @@ body {
 }
 
 .flash-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.2rem;
+    height: 1.2rem;
+    margin-right: 0.5rem;
     font-weight: bold;
-    font-size: 1.2rem;
+}
+
+.flash-icon svg {
+    width: 100%;
+    height: 100%;
 }
 
 .hero {

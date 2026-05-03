@@ -1,0 +1,390 @@
+{% extends "base.html" %}
+
+{% block title %}Ban User - Admin Panel{% endblock %}
+
+{% block content %}
+<div class="admin-page">
+    <div class="hero" style="padding: 2rem 0;">
+        <h1 style="font-size: 2rem;">BAN USER</h1>
+        <p style="font-size: 1rem;">Permanently restrict user access to the forum</p>
+    </div>
+
+    <div class="admin-content">
+        <div class="admin-header">
+            <a href="{{ url_for('admin.users') }}" class="btn-primary" style="font-size: 0.9rem; padding: 0.5rem 1.5rem;">← Back to Users</a>
+            <div class="user-info">
+                <span class="user-target">{{ user.username }}</span>
+                <span class="user-email">{{ user.email }}</span>
+            </div>
+        </div>
+
+        <div class="ban-form-container">
+            <div class="danger-box">
+                <div class="danger-icon">🚫</div>
+                <div class="danger-content">
+                    <h3>Permanent Ban Warning</h3>
+                    <p>You are about to <strong>permanently ban</strong> <strong>{{ user.username }}</strong>. This is an irreversible action that will:</p>
+                    <ul>
+                        <li>Permanently block the user from accessing the forum</li>
+                        <li>Mark the account as banned in the system</li>
+                        <li>Require admin intervention to restore access</li>
+                        <li>Log the ban action with your admin credentials</li>
+                    </ul>
+                    <p><strong>This action cannot be undone without manual intervention.</strong></p>
+                </div>
+            </div>
+
+            <form method="POST" class="admin-form">
+                {{ form.hidden_tag() }}
+                
+                <div class="form-section">
+                    <h3>Ban Details</h3>
+                    
+                    <div class="form-group">
+                        {{ form.reason.label(class="form-label") }}
+                        {{ form.reason(class="form-control", rows="4") }}
+                        {% if form.reason.errors %}
+                            <div class="error-messages">
+                                {% for error in form.reason.errors %}
+                                    <span class="error">{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        <small class="form-help">Provide a detailed reason for the permanent ban. This will be logged and visible to other admins.</small>
+                    </div>
+
+                    <div class="ban-confirmation">
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="confirm_ban" required>
+                            <span class="checkmark"></span>
+                            I understand that this action is permanent and cannot be undone without manual intervention
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary danger-btn">
+                        <span class="btn-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="15" y1="9" x2="9" y2="15"></line>
+                                <line x1="9" y1="9" x2="15" y2="15"></line>
+                            </svg>
+                        </span>
+                        Permanently Ban User
+                    </button>
+                    <a href="{{ url_for('admin.users') }}" class="btn-secondary">
+                        <span class="btn-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                            </svg>
+                        </span>
+                        Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for category, message in messages %}
+                        <div class="flash-message flash-{{ category }}">
+                            <span class="flash-icon">
+                                {% if category == 'success' %}
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="20 6 9 17 4 12"></polyline>
+                                    </svg>
+                                {% else %}
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <circle cx="12" cy="12" r="10"></circle>
+                                        <line x1="15" y1="9" x2="9" y2="15"></line>
+                                        <line x1="9" y1="9" x2="15" y2="15"></line>
+                                    </svg>
+                                {% endif %}
+                            </span>
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+    </div>
+</div>
+
+<style>
+.admin-page {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.admin-content {
+    background: var(--dark-card);
+    border: 1px solid var(--border-glow);
+    border-radius: 8px;
+    padding: 2rem;
+}
+
+.admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.user-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.25rem;
+}
+
+.user-target {
+    color: var(--neon-cyan);
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+
+.user-email {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.ban-form-container {
+    max-width: 600px;
+}
+
+.danger-box {
+    background: rgba(255, 0, 68, 0.1);
+    border: 1px solid rgba(255, 0, 68, 0.3);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+}
+
+.danger-icon {
+    font-size: 2rem;
+    flex-shrink: 0;
+}
+
+.danger-content h3 {
+    color: #ff0044;
+    margin-bottom: 0.5rem;
+    font-family: 'Orbitron', sans-serif;
+}
+
+.danger-content p {
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+}
+
+.danger-content ul {
+    color: var(--text-secondary);
+    margin-left: 1.5rem;
+}
+
+.danger-content li {
+    margin-bottom: 0.25rem;
+}
+
+.admin-form {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.form-section {
+    background: rgba(0, 245, 255, 0.05);
+    border: 1px solid rgba(0, 245, 255, 0.2);
+    border-radius: 8px;
+    padding: 1.5rem;
+}
+
+.form-section h3 {
+    color: var(--neon-cyan);
+    margin-bottom: 1rem;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.1rem;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-label {
+    display: block;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+.form-control {
+    width: 100%;
+    padding: 0.75rem;
+    background: var(--dark-bg);
+    border: 1px solid var(--border-glow);
+    border-radius: 4px;
+    color: var(--text-primary);
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    resize: vertical;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: var(--neon-cyan);
+    box-shadow: 0 0 10px rgba(0, 245, 255, 0.3);
+}
+
+.error-messages {
+    margin-top: 0.5rem;
+}
+
+.error {
+    display: block;
+    color: #ff0044;
+    font-size: 0.85rem;
+}
+
+.form-help {
+    display: block;
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    margin-top: 0.25rem;
+}
+
+.ban-confirmation {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    background: rgba(255, 0, 68, 0.05);
+    border: 1px solid rgba(255, 0, 68, 0.2);
+    border-radius: 4px;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-primary);
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.checkbox-label input[type="checkbox"] {
+    width: auto;
+    margin: 0;
+}
+
+.form-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-start;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(0, 245, 255, 0.1);
+}
+
+.btn-primary, .btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    border: 1px solid var(--border-glow);
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-primary {
+    background: rgba(0, 245, 255, 0.1);
+    color: var(--neon-cyan);
+    border-color: var(--neon-cyan);
+}
+
+.btn-primary:hover {
+    background: rgba(0, 245, 255, 0.2);
+    box-shadow: 0 0 15px rgba(0, 245, 255, 0.5);
+}
+
+.danger-btn {
+    background: rgba(255, 0, 68, 0.1);
+    color: #ff0044;
+    border-color: #ff0044;
+}
+
+.danger-btn:hover {
+    background: rgba(255, 0, 68, 0.2);
+    box-shadow: 0 0 15px rgba(255, 0, 68, 0.5);
+}
+
+.btn-secondary {
+    background: transparent;
+    color: var(--text-secondary);
+    border-color: var(--text-secondary);
+}
+
+.btn-secondary:hover {
+    color: var(--text-primary);
+    border-color: var(--text-primary);
+}
+
+.btn-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.2rem;
+    height: 1.2rem;
+}
+
+.btn-icon svg {
+    width: 100%;
+    height: 100%;
+}
+
+.flash-messages {
+    margin-top: 2rem;
+}
+
+.flash-message {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1rem;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+}
+
+.flash-success {
+    background: rgba(0, 255, 0, 0.1);
+    border: 1px solid rgba(0, 255, 0, 0.3);
+    color: #00ff00;
+}
+
+.flash-error {
+    background: rgba(255, 0, 68, 0.1);
+    border: 1px solid rgba(255, 0, 68, 0.3);
+    color: #ff0044;
+}
+
+.flash-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.2rem;
+    height: 1.2rem;
+}
+
+.flash-icon svg {
+    width: 100%;
+    height: 100%;
+}
+</style>
+{% endblock %}

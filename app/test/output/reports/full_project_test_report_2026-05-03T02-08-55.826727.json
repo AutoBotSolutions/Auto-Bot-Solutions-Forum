@@ -1,0 +1,180 @@
+{
+  "test_session": {
+    "timestamp": "2026-05-03T02:08:59.807832",
+    "project": "repo-forum",
+    "total_tests": 7,
+    "passed": 7,
+    "failed": 0,
+    "skipped": 0,
+    "errors": 0,
+    "categories_tested": 1
+  },
+  "results": [
+    {
+      "test_name": "app_initialization",
+      "category": "admin_routes",
+      "status": "passed",
+      "message": "Flask app created successfully",
+      "details": null,
+      "timestamp": "2026-05-03T02:08:55.966204"
+    },
+    {
+      "test_name": "blueprint_registration",
+      "category": "admin_routes",
+      "status": "passed",
+      "message": "Admin blueprint registered with 28 deferred functions",
+      "details": null,
+      "timestamp": "2026-05-03T02:08:55.966251"
+    },
+    {
+      "test_name": "route_registration",
+      "category": "admin_routes",
+      "status": "passed",
+      "message": "Found 13 admin/users routes",
+      "details": {
+        "routes": [
+          "/admin/users -> admin.users [{'GET', 'OPTIONS', 'HEAD'}]",
+          "/admin/users/<int:user_id>/toggle-admin -> admin.toggle_admin [{'GET', 'OPTIONS', 'HEAD'}]",
+          "/admin/users/<int:user_id>/delete -> admin.delete_user [{'GET', 'OPTIONS', 'HEAD'}]",
+          "/admin/users/<int:user_id>/edit -> admin.edit_user [{'GET', 'OPTIONS', 'HEAD', 'POST'}]",
+          "/admin/users/<int:user_id>/suspend -> admin.suspend_user [{'GET', 'OPTIONS', 'HEAD', 'POST'}]",
+          "/admin/users/<int:user_id>/unsuspend -> admin.unsuspend_user [{'GET', 'OPTIONS', 'HEAD'}]",
+          "/admin/users/<int:user_id>/ban -> admin.ban_user [{'GET', 'OPTIONS', 'HEAD', 'POST'}]",
+          "/admin/users/<int:user_id>/unban -> admin.unban_user [{'GET', 'OPTIONS', 'HEAD'}]",
+          "/admin/users/<int:user_id>/view -> admin.view_user [{'GET', 'OPTIONS', 'HEAD'}]",
+          "/admin/users/<int:user_id>/reset-password -> admin.reset_user_password [{'GET', 'OPTIONS', 'HEAD'}]",
+          "/admin/users/bulk-action -> admin.bulk_user_action [{'OPTIONS', 'POST'}]",
+          "/admin/users/<int:user_id>/add_badge/<int:badge_id> -> admin.add_badge_to_user [{'GET', 'OPTIONS', 'HEAD'}]",
+          "/admin/users/<int:user_id>/remove_badge/<int:badge_id> -> admin.remove_badge_from_user [{'GET', 'OPTIONS', 'HEAD'}]"
+        ]
+      },
+      "timestamp": "2026-05-03T02:08:55.966423"
+    },
+    {
+      "test_name": "users_route_function",
+      "category": "admin_routes",
+      "status": "passed",
+      "message": "Users route returns HTML content (37106 characters)",
+      "details": null,
+      "timestamp": "2026-05-03T02:08:56.046716"
+    },
+    {
+      "test_name": "user_management_routes",
+      "category": "admin_routes",
+      "status": "passed",
+      "message": "All 6 user management routes work correctly",
+      "details": null,
+      "timestamp": "2026-05-03T02:08:56.238902"
+    },
+    {
+      "test_name": "template_rendering",
+      "category": "admin_routes",
+      "status": "passed",
+      "message": "Template renders successfully (15837 characters)",
+      "details": null,
+      "timestamp": "2026-05-03T02:08:56.239637"
+    },
+    {
+      "test_name": "database_connection",
+      "category": "admin_routes",
+      "status": "passed",
+      "message": "Database connection successful: 5 users, admin: admin",
+      "details": null,
+      "timestamp": "2026-05-03T02:08:56.242985"
+    }
+  ],
+  "categories": {
+    "admin_routes": [
+      {
+        "test_name": "app_initialization",
+        "category": "admin_routes",
+        "status": "passed",
+        "message": "Flask app created successfully",
+        "details": null,
+        "timestamp": "2026-05-03T02:08:55.966204"
+      },
+      {
+        "test_name": "blueprint_registration",
+        "category": "admin_routes",
+        "status": "passed",
+        "message": "Admin blueprint registered with 28 deferred functions",
+        "details": null,
+        "timestamp": "2026-05-03T02:08:55.966251"
+      },
+      {
+        "test_name": "route_registration",
+        "category": "admin_routes",
+        "status": "passed",
+        "message": "Found 13 admin/users routes",
+        "details": {
+          "routes": [
+            "/admin/users -> admin.users [{'GET', 'OPTIONS', 'HEAD'}]",
+            "/admin/users/<int:user_id>/toggle-admin -> admin.toggle_admin [{'GET', 'OPTIONS', 'HEAD'}]",
+            "/admin/users/<int:user_id>/delete -> admin.delete_user [{'GET', 'OPTIONS', 'HEAD'}]",
+            "/admin/users/<int:user_id>/edit -> admin.edit_user [{'GET', 'OPTIONS', 'HEAD', 'POST'}]",
+            "/admin/users/<int:user_id>/suspend -> admin.suspend_user [{'GET', 'OPTIONS', 'HEAD', 'POST'}]",
+            "/admin/users/<int:user_id>/unsuspend -> admin.unsuspend_user [{'GET', 'OPTIONS', 'HEAD'}]",
+            "/admin/users/<int:user_id>/ban -> admin.ban_user [{'GET', 'OPTIONS', 'HEAD', 'POST'}]",
+            "/admin/users/<int:user_id>/unban -> admin.unban_user [{'GET', 'OPTIONS', 'HEAD'}]",
+            "/admin/users/<int:user_id>/view -> admin.view_user [{'GET', 'OPTIONS', 'HEAD'}]",
+            "/admin/users/<int:user_id>/reset-password -> admin.reset_user_password [{'GET', 'OPTIONS', 'HEAD'}]",
+            "/admin/users/bulk-action -> admin.bulk_user_action [{'OPTIONS', 'POST'}]",
+            "/admin/users/<int:user_id>/add_badge/<int:badge_id> -> admin.add_badge_to_user [{'GET', 'OPTIONS', 'HEAD'}]",
+            "/admin/users/<int:user_id>/remove_badge/<int:badge_id> -> admin.remove_badge_from_user [{'GET', 'OPTIONS', 'HEAD'}]"
+          ]
+        },
+        "timestamp": "2026-05-03T02:08:55.966423"
+      },
+      {
+        "test_name": "users_route_function",
+        "category": "admin_routes",
+        "status": "passed",
+        "message": "Users route returns HTML content (37106 characters)",
+        "details": null,
+        "timestamp": "2026-05-03T02:08:56.046716"
+      },
+      {
+        "test_name": "user_management_routes",
+        "category": "admin_routes",
+        "status": "passed",
+        "message": "All 6 user management routes work correctly",
+        "details": null,
+        "timestamp": "2026-05-03T02:08:56.238902"
+      },
+      {
+        "test_name": "template_rendering",
+        "category": "admin_routes",
+        "status": "passed",
+        "message": "Template renders successfully (15837 characters)",
+        "details": null,
+        "timestamp": "2026-05-03T02:08:56.239637"
+      },
+      {
+        "test_name": "database_connection",
+        "category": "admin_routes",
+        "status": "passed",
+        "message": "Database connection successful: 5 users, admin: admin",
+        "details": null,
+        "timestamp": "2026-05-03T02:08:56.242985"
+      }
+    ]
+  },
+  "recommendations": [],
+  "coverage": {
+    "overall": 100.0,
+    "by_category": {
+      "admin_routes": {
+        "total": 7,
+        "passed": 7,
+        "coverage": 100.0
+      }
+    }
+  },
+  "category_stats": {
+    "admin_routes": {
+      "passed": 7,
+      "total": 7,
+      "success_rate": 100.0
+    }
+  }
+}
