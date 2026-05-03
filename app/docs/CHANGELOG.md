@@ -8,22 +8,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- Notification system for post comments
-- Private messaging system with inbox/sent folders
-- File upload support for posts (images, PDFs, documents)
-- Bookmarking system for saving posts
-- Badge and achievement system
-- Category filtering on forum index
-- Markdown rendering with syntax highlighting
-- Email verification system
-- Password reset with token-based recovery
-- Rate limiting on sensitive endpoints
-- Initial categories (5) and badges (5) on database initialization
-- Uploads directory for file storage
-- Preconnect hints for Google Fonts (performance optimization)
-- Deployment readiness checklist
-- Comprehensive wiki documentation (30+ pages)
-- Non-free open-source licenses (6 licenses)
+- Comprehensive error monitoring system with detailed logging
+- Error tracking script for quick debugging access
+- Enhanced error handlers with request context
+- Automatic error file creation and management
+- Troubleshooting documentation with recent fixes
+- Error monitoring guide for developers
+
+### Fixed
+- **Critical**: Jinja2 template error causing login crashes
+  - Fixed `InstrumentedList` filter_by AttributeError
+  - Updated notification and message badge counting
+  - Resolved user login functionality
+- **Critical**: Create post form submission not working
+  - Added missing enctype for file uploads
+  - Fixed missing form fields (category, attachment)
+  - Resolved submit button functionality
+- **Critical**: Comment submission AttributeError
+  - Fixed `post.author_id` to `post.user_id` reference
+  - Resolved comment posting and notifications
+- **Critical**: Markdown rendering displaying raw HTML tags
+  - Added `|safe` filter to post template
+  - Simplified markdown filter configuration
+  - Fixed content display issues
+- Updated all GitHub repository links to correct URL
+- Fixed license link to point to proper repository file
+
+### Changed
+- Enhanced error handling throughout the application
+- Improved template filter registration and usage
+- Updated documentation with troubleshooting guides
+- Added error monitoring capabilities for debugging
 
 ### Changed
 - Updated README.md to reflect current features

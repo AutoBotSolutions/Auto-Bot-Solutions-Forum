@@ -302,6 +302,21 @@ docker-compose logs -f db
 - Check rate limits on GitHub API
 - Verify organization name in config.py
 
+**Jinja2 template errors**
+- Ensure all template filters are properly registered
+- Check for missing `|safe` filter on HTML content
+- Verify template syntax and variable names
+
+**Comment submission errors**
+- Check that Post model uses `user_id` not `author_id`
+- Verify form validation and CSRF tokens
+- Ensure database relationships are properly defined
+
+**Markdown rendering issues**
+- Check that markdown filter is registered in app initialization
+- Verify `|safe` filter is used for HTML output
+- Check markdown package installation and extensions
+
 ## Development
 
 ### Running in Development Mode
