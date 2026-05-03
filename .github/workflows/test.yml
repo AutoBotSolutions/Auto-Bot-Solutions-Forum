@@ -56,14 +56,13 @@ jobs:
         # Install other dependencies
         pip install -r requirements.txt
         pip install pytest pytest-cov pytest-html
-        # Verify Flask installation
-        python -c "import flask; print('Flask version:', flask.__version__)"
+        # Verify Flask installation and show path
+        python -c "import sys; print('Python executable:', sys.executable); print('Python path:'); [print(f'  {p}') for p in sys.path]"
+        python -c "import flask; print('Flask version:', flask.__version__); print('Flask location:', flask.__file__)"
         # Verify all required modules
         python -c "import yaml, psutil; print('Core dependencies installed successfully')"
         # List installed packages for debugging
         pip list | grep -i flask
-        # Show Python path
-        python -c "import sys; print('Python path:'); [print(f'  {p}') for p in sys.path]"
     
     - name: Set up environment variables
       run: |
@@ -85,8 +84,8 @@ jobs:
       run: |
         cd $GITHUB_WORKSPACE
         export PYTHONPATH=$GITHUB_WORKSPACE:$PYTHONPATH
-        python -c "import sys; print('Python path:', sys.path)"
-        python -c "import flask; print('Flask imported successfully')"
+        python -c "import sys; print('Python path before test:', sys.path)"
+        python -c "import flask; print('Flask imported successfully in test runner')"
         python app/test/run_tests.py --verbose --coverage
     
     - name: Generate test report
@@ -94,6 +93,7 @@ jobs:
       run: |
         cd $GITHUB_WORKSPACE
         export PYTHONPATH=$GITHUB_WORKSPACE:$PYTHONPATH
+        python -c "import flask; print('Flask available for report generation')"
         python app/test/run_tests.py --output json
     
     - name: Upload coverage reports
