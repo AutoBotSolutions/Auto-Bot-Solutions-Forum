@@ -9,14 +9,14 @@ message_bp = Blueprint('message', __name__, url_prefix='/messages')
 @message_bp.route('/')
 @login_required
 def inbox():
-    messages = current_user.received_messages.order_by(Message.created_at.desc()).all()
-    unread_count = current_user.received_messages.filter_by(is_read=False).count()
+    messages = Message.query.filter_by(receiver_id=current_user.id).order_by(Message.created_at.desc()).all()
+    unread_count = Message.query.filter_by(receiver_id=current_user.id, is_read=False).count()
     return render_template('message/inbox.html', messages=messages, unread_count=unread_count)
 
 @message_bp.route('/sent')
 @login_required
 def sent():
-    messages = current_user.sent_messages.order_by(Message.created_at.desc()).all()
+    messages = Message.query.filter_by(sender_id=current_user.id).order_by(Message.created_at.desc()).all()
     return render_template('message/sent.html', messages=messages)
 
 @message_bp.route('/new', methods=['GET', 'POST'])

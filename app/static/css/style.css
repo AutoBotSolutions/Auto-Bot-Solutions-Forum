@@ -177,6 +177,18 @@ body {
     text-shadow: 0 0 10px var(--neon-cyan);
 }
 
+.nav-icon {
+    width: 20px;
+    height: 20px;
+    stroke: var(--text-primary);
+    transition: all 0.3s ease;
+}
+
+.nav-link:hover .nav-icon {
+    stroke: var(--neon-cyan);
+    filter: drop-shadow(0 0 5px var(--neon-cyan));
+}
+
 .btn-glow {
     background: linear-gradient(135deg, var(--neon-purple), var(--neon-magenta));
     border: none;
