@@ -5,12 +5,19 @@
 {% block content %}
 <div class="form-container" style="max-width: 700px;">
     <h2>INITIATE DISCUSSION</h2>
-    <form method="POST">
+    <form method="POST" enctype="multipart/form-data">
         {{ form.hidden_tag() }}
         
         <div class="form-group">
             {{ form.title.label }}
             {{ form.title(class="form-control") }}
+            {% if form.title.errors %}
+                <div class="error-message">
+                    {% for error in form.title.errors %}
+                        <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+            {% endif %}
         </div>
         
         <div class="form-group">
@@ -19,11 +26,31 @@
         </div>
         
         <div class="form-group">
-            {{ form.content.label }}
-            {{ form.content(class="form-control") }}
+            {{ form.category_id.label }}
+            {{ form.category_id(class="form-control") }}
         </div>
         
-        <button type="submit" class="btn-submit">TRANSMIT POST</button>
+        <div class="form-group">
+            {{ form.content.label }}
+            {{ form.content(class="form-control", rows="8") }}
+            {% if form.content.errors %}
+                <div class="error-message">
+                    {% for error in form.content.errors %}
+                        <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+        
+        <div class="form-group">
+            {{ form.attachment.label }}
+            {{ form.attachment(class="form-control") }}
+            <small>Allowed formats: PNG, JPG, JPEG, GIF, PDF, TXT, MD</small>
+        </div>
+        
+        <div class="form-group">
+            {{ form.submit(class="btn-submit") }}
+        </div>
     </form>
     
     <div style="text-align: center; margin-top: 1.5rem;">

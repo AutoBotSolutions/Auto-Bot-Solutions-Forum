@@ -5,7 +5,7 @@
 {% block content %}
 <div class="post-card">
     <h1 class="post-title" style="font-size: 2rem;">{{ post.title }}</h1>
-    <div class="post-content markdown-content" style="font-size: 1.1rem;">{{ post.content|markdown }}</div>
+    <div class="post-content markdown-content" style="font-size: 1.1rem;">{{ post.content|markdown|safe }}</div>
     {% if post.attachment %}
     <div class="post-attachment">
         <span class="attachment-label">📎 Attachment:</span>

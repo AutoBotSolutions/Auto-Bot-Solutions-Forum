@@ -31,14 +31,14 @@
                     <a href="{{ url_for('forum.create_post') }}" class="nav-link btn-glow">New Post</a>
                     <a href="{{ url_for('notification.notifications') }}" class="nav-link">
                         🔔
-                        {% set unread_count = current_user.notifications.filter_by(is_read=False).count() %}
+                        {% set unread_count = current_user.notifications | selectattr('is_read', 'equalto', false) | list | length %}
                         {% if unread_count > 0 %}
                         <span class="notification-badge">{{ unread_count }}</span>
                         {% endif %}
                     </a>
                     <a href="{{ url_for('message.inbox') }}" class="nav-link">
                         ✉️
-                        {% set unread_messages = current_user.received_messages.filter_by(is_read=False).count() %}
+                        {% set unread_messages = current_user.received_messages | selectattr('is_read', 'equalto', false) | list | length %}
                         {% if unread_messages > 0 %}
                         <span class="notification-badge">{{ unread_messages }}</span>
                         {% endif %}
