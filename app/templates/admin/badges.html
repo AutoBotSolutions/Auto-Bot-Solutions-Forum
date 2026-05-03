@@ -19,7 +19,61 @@
         <div class="badges-grid">
             {% for badge in badges %}
             <div class="badge-card">
-                <div class="badge-icon" style="color: {{ badge.color }};">{{ badge.icon }}</div>
+                <div class="badge-icon" style="color: {{ badge.color }};">
+                    {% if badge.icon == '🎯' %}
+                        <svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <circle cx="12" cy="12" r="6"></circle>
+                            <circle cx="12" cy="12" r="2"></circle>
+                        </svg>
+                    {% elif badge.icon == '🏆' %}
+                        <svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2">
+                            <path d="M6 9H4.5a.5.5 0 0 0-.5.5v4a.5.5 0 0 0 .5.5H6"></path>
+                            <path d="M18 9h1.5a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-.5.5H18"></path>
+                            <path d="M12 3v18"></path>
+                            <path d="M8 7h8"></path>
+                            <path d="M8 11h8"></path>
+                        </svg>
+                    {% elif badge.icon == '⭐' %}
+                        <svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2">
+                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                        </svg>
+                    {% elif badge.icon == '🔥' %}
+                        <svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"></path>
+                            <path d="M12 6v6l4 2"></path>
+                        </svg>
+                    {% elif badge.icon == '💎' %}
+                        <svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2">
+                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                        </svg>
+                    {% elif badge.icon == '🚀' %}
+                        <svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2">
+                            <path d="M4.5 16.5c0 1.93 1.57 3.5 3.5 3.5s3.5-1.57 3.5-3.5c0-1.93-1.57-3.5-3.5-3.5s-3.5 1.57-3.5 3.5z"></path>
+                            <path d="M12 2L12 12"></path>
+                            <path d="M12 12L16 16"></path>
+                            <path d="M12 12L8 16"></path>
+                        </svg>
+                    {% elif badge.icon == '🎨' %}
+                        <svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2">
+                            <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z"></path>
+                        </svg>
+                    {% elif badge.icon == '📚' %}
+                        <svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2">
+                            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                        </svg>
+                    {% elif badge.icon == '🌟' %}
+                        <svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2">
+                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                        </svg>
+                    {% else %}
+                        <svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <path d="M12 6v6l4 2"></path>
+                        </svg>
+                    {% endif %}
+                </div>
                 <div class="badge-name">{{ badge.name }}</div>
                 <div class="badge-description">{{ badge.description or 'No description' }}</div>
                 <div class="badge-users">{{ badge.users|length }} users</div>
@@ -79,9 +133,19 @@
 }
 
 .badge-icon {
-    font-size: 4rem;
     margin-bottom: 1rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     text-shadow: 0 0 20px currentColor;
+}
+
+.badge-icon svg {
+    width: 4rem;
+    height: 4rem;
+    fill: currentColor;
+    stroke: currentColor;
+    filter: drop-shadow(0 0 10px currentColor);
 }
 
 .badge-name {

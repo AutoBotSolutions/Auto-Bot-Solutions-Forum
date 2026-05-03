@@ -40,7 +40,12 @@
                         {% endif %}
                     </a>
                     <a href="{{ url_for('message.inbox') }}" class="nav-link">
-                        ✉️
+                        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                            <path d="M8 10h.01"></path>
+                            <path d="M12 10h.01"></path>
+                            <path d="M16 10h.01"></path>
+                        </svg>
                         {% set unread_messages = current_user.received_messages | selectattr('is_read', 'equalto', false) | list | length %}
                         {% if unread_messages > 0 %}
                         <span class="notification-badge">{{ unread_messages }}</span>
@@ -49,9 +54,28 @@
                     <a href="{{ url_for('forum.bookmarks') }}" class="nav-link">Bookmarks</a>
                     <a href="{{ url_for('user.profile', username=current_user.username) }}" class="nav-link">Profile</a>
                     {% if current_user.is_admin %}
-                    <a href="{{ url_for('admin.dashboard') }}" class="nav-link">Admin</a>
-                    {% endif %}
+                    <div class="nav-dropdown">
+                        <button class="nav-link dropdown-toggle" onclick="toggleDropdown('adminDropdown')">
+                            Admin
+                            <svg class="dropdown-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                        </button>
+                        <div id="adminDropdown" class="dropdown-menu">
+                            <a href="{{ url_for('admin.dashboard') }}" class="dropdown-item">Dashboard</a>
+                            <a href="{{ url_for('admin.users') }}" class="dropdown-item">Users</a>
+                            <a href="{{ url_for('admin.posts') }}" class="dropdown-item">Posts</a>
+                            <a href="{{ url_for('admin.comments') }}" class="dropdown-item">Comments</a>
+                            <a href="{{ url_for('admin.repositories') }}" class="dropdown-item">Repositories</a>
+                            <a href="{{ url_for('admin.categories') }}" class="dropdown-item">Categories</a>
+                            <a href="{{ url_for('admin.badges') }}" class="dropdown-item">Badges</a>
+                            <div class="dropdown-divider"></div>
+                            <a href="{{ url_for('auth.logout') }}" class="dropdown-item logout-item">Logout</a>
+                        </div>
+                    </div>
+                    {% else %}
                     <a href="{{ url_for('auth.logout') }}" class="nav-link">Logout</a>
+                    {% endif %}
                 {% else %}
                     <a href="{{ url_for('auth.login') }}" class="nav-link btn-glow">Login</a>
                     <a href="{{ url_for('auth.register') }}" class="nav-link btn-glow">Register</a>
@@ -80,10 +104,43 @@
     <footer class="footer">
         <div class="footer-content">
             <p>&copy; 2024 AutoBot Solutions Forum. All rights reserved.</p>
-            <p class="footer-tech">Powered by Advanced Neural Networks</p>
+            <p>
+                <a href="https://github.com/AutoBotSolutions/Auto-Bot-Solutions-Forum" target="_blank">GitHub</a> | 
+                <a href="https://github.com/AutoBotSolutions/Auto-Bot-Solutions-Forum/wiki" target="_blank">Documentation</a>
+            </p>
         </div>
     </footer>
 
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <script>
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', function(event) {
+            const dropdowns = document.querySelectorAll('.dropdown-menu');
+            dropdowns.forEach(function(dropdown) {
+                if (!dropdown.previousElementSibling.contains(event.target)) {
+                    dropdown.classList.remove('show');
+                }
+            });
+        });
+
+        // Toggle dropdown function
+        function toggleDropdown(dropdownId) {
+            const dropdown = document.getElementById(dropdownId);
+            const allDropdowns = document.querySelectorAll('.dropdown-menu');
+            
+            // Close all other dropdowns
+            allDropdowns.forEach(function(otherDropdown) {
+                if (otherDropdown.id !== dropdownId) {
+                    otherDropdown.classList.remove('show');
+                }
+            });
+            
+            // Toggle current dropdown
+            dropdown.classList.toggle('show');
+            
+            // Prevent event propagation
+            event.stopPropagation();
+        }
+    </script>
 </body>
 </html>
