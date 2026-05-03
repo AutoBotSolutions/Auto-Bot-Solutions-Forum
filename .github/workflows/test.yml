@@ -53,6 +53,10 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
         pip install pytest pytest-cov pytest-html
+        # Verify Flask installation
+        python -c "import flask; print('Flask version:', flask.__version__)"
+        # Verify all required modules
+        python -c "import yaml, psutil, psycopg2; print('All dependencies installed successfully')"
     
     - name: Set up environment variables
       run: |
@@ -73,12 +77,16 @@ jobs:
     - name: Run comprehensive test suite
       run: |
         cd $GITHUB_WORKSPACE
+        export PYTHONPATH=$GITHUB_WORKSPACE:$PYTHONPATH
+        python -c "import sys; print('Python path:', sys.path)"
+        python -c "import flask; print('Flask imported successfully')"
         python app/test/run_tests.py --verbose --coverage
     
     - name: Generate test report
       if: always()
       run: |
         cd $GITHUB_WORKSPACE
+        export PYTHONPATH=$GITHUB_WORKSPACE:$PYTHONPATH
         python app/test/run_tests.py --output json
     
     - name: Upload coverage reports
