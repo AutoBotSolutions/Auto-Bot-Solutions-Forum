@@ -38,6 +38,18 @@ def main():
     
     # Import and initialize the test framework
     try:
+        # First verify critical dependencies are available
+        try:
+            import flask
+            import flask_sqlalchemy
+            import flask_login
+            print("✅ Flask dependencies verified")
+        except ImportError as e:
+            print(f"❌ Critical dependency missing: {e}")
+            print("🔧 Please ensure all Flask extensions are installed:")
+            print("   pip install -r requirements.txt")
+            return 1
+        
         from app.test import TestFramework
         test_framework = TestFramework()
         
