@@ -1,0 +1,209 @@
+{% extends "base.html" %}
+
+{% block title %}Content Dashboard{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="mb-4">
+                <i class="fas fa-tachometer-alt"></i>
+                Content Dashboard
+            </h1>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Total Posts</h5>
+                    <h2 class="display-4">{{ total_posts }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Published</h5>
+                    <h2 class="display-4">{{ published_posts }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Drafts</h5>
+                    <h2 class="display-4">{{ draft_posts }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Scheduled</h5>
+                    <h2 class="display-4">{{ scheduled_posts }}</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Quick Actions</h5>
+                </div>
+                <div class="card-body">
+                    <a href="{{ url_for('content.create_post') }}" class="btn btn-primary me-2">
+                        <i class="fas fa-plus"></i> Create New Post
+                    </a>
+                    <a href="{{ url_for('content.drafts') }}" class="btn btn-warning me-2">
+                        <i class="fas fa-file-alt"></i> Manage Drafts
+                    </a>
+                    <a href="{{ url_for('content.scheduled') }}" class="btn btn-info me-2">
+                        <i class="fas fa-clock"></i> Scheduled Posts
+                    </a>
+                    <a href="{{ url_for('content.import_content') }}" class="btn btn-secondary">
+                        <i class="fas fa-file-import"></i> Import Content
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Recent Posts</h5>
+                </div>
+                <div class="card-body">
+                    {% if recent_posts %}
+                        <div class="list-group list-group-flush">
+                            {% for post in recent_posts %}
+                            <div class="list-group-item">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h6 class="mb-1">
+                                        <a href="{{ url_for('forum.post', post_id=post.id) }}">{{ post.title }}</a>
+                                    </h6>
+                                    <small>{{ post.updated_at.strftime('%Y-%m-%d %H:%M') }}</small>
+                                </div>
+                                <p class="mb-1 text-muted">{{ post.content[:100] }}...</p>
+                                <div>
+                                    {% if post.is_draft %}
+                                        <span class="badge bg-warning">Draft</span>
+                                    {% endif %}
+                                    {% if post.is_scheduled %}
+                                        <span class="badge bg-info">Scheduled</span>
+                                    {% endif %}
+                                    {% if post.is_archived %}
+                                        <span class="badge bg-secondary">Archived</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted">No recent posts found.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Recent Versions</h5>
+                </div>
+                <div class="card-body">
+                    {% if recent_versions %}
+                        <div class="list-group list-group-flush">
+                            {% for version in recent_versions %}
+                            <div class="list-group-item">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h6 class="mb-1">
+                                        <a href="{{ url_for('forum.post', post_id=version.post.id) }}">{{ version.title }}</a>
+                                    </h6>
+                                    <small>v{{ version.version_number }}</small>
+                                </div>
+                                <p class="mb-1 text-muted">{{ version.change_summary or 'No summary' }}</p>
+                                <small>Edited {{ version.created_at.strftime('%Y-%m-%d %H:%M') }}</small>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted">No recent versions found.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alerts -->
+    {% if upcoming_scheduled %}
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card border-info">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        Upcoming Scheduled Posts
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group list-group-flush">
+                        {% for post in upcoming_scheduled %}
+                        <div class="list-group-item">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">
+                                    <a href="{{ url_for('forum.post', post_id=post.id) }}">{{ post.title }}</a>
+                                </h6>
+                                <small class="text-info">
+                                    Scheduled for {{ post.scheduled_publish_at.strftime('%Y-%m-%d %H:%M') }}
+                                </small>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if expiring_posts %}
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card border-warning">
+                <div class="card-header bg-warning text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-clock"></i>
+                        Expiring Posts
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group list-group-flush">
+                        {% for post in expiring_posts %}
+                        <div class="list-group-item">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">
+                                    <a href="{{ url_for('forum.post', post_id=post.id) }}">{{ post.title }}</a>
+                                </h6>
+                                <small class="text-warning">
+                                    Expires {{ post.expires_at.strftime('%Y-%m-%d %H:%M') }}
+                                </small>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

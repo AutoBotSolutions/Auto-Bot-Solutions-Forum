@@ -1,0 +1,59 @@
+# Production Dockerfile for Auto Bot Solutions Forum
+FROM python:3.11-slim
+
+# Set environment variables
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+ENV FLASK_APP=app
+ENV FLASK_ENV=production
+
+# Set work directory
+WORKDIR /var/www/autobot
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    gcc \
+    g++ \
+    libpq-dev \
+    libffi-dev \
+    libssl-dev \
+    libjpeg-dev \
+    libpng-dev \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create non-root user
+RUN groupadd -r autobot && useradd -r -g autobot autobot
+
+# Copy requirements and install Python dependencies
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy application code
+COPY . .
+
+# Create necessary directories
+RUN mkdir -p /var/www/autobot/uploads /var/www/autobot/logs /var/www/autobot/static /var/www/autobot/models
+RUN chown -R autobot:autobot /var/www/autobot
+
+# Set permissions
+RUN chmod +x /var/www/autobot/scripts/*.sh
+
+# Install gunicorn
+RUN pip install gunicorn
+
+# Switch to non-root user
+USER autobot
+
+# Collect static files
+RUN python -c "from app import create_app; app = create_app(); from flask import url_for; app.app_context().push(); from flask_script import Manager; manager = Manager(app); manager.run('collectstatic')"
+
+# Expose port
+EXPOSE 5000
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+    CMD curl -f http://localhost:5000/health || exit 1
+
+# Start command
+CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--workers", "4", "--timeout", "120", "--access-logfile", "-", "--error-logfile", "-", "app:app"]

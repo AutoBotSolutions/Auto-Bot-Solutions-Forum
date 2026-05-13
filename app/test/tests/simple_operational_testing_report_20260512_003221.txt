@@ -1,0 +1,62 @@
+Admin Systems Simple Operational Testing Report
+Generated: 2026-05-12 00:32:21.467764
+============================================================
+
+FILE_STRUCTURE:
+  analytics_file___init__.py: SUCCESS: File exists
+  analytics_file_models.py: SUCCESS: File exists
+  analytics_file_service.py: SUCCESS: File exists
+  analytics_file_forms.py: SUCCESS: File exists
+  analytics_file_routes.py: SUCCESS: File exists
+  notifications_file___init__.py: SUCCESS: File exists
+  notifications_file_models.py: SUCCESS: File exists
+  notifications_file_service.py: SUCCESS: File exists
+  notifications_file_forms.py: SUCCESS: File exists
+  notifications_file_routes.py: SUCCESS: File exists
+  moderation_file___init__.py: SUCCESS: File exists
+  moderation_file_models.py: SUCCESS: File exists
+  moderation_file_service.py: SUCCESS: File exists
+  moderation_file_forms.py: SUCCESS: File exists
+  moderation_file_routes.py: SUCCESS: File exists
+  admin_file_models.py: SUCCESS: File exists
+  admin_file_service.py: SUCCESS: File exists
+  admin_file_forms.py: SUCCESS: File exists
+  admin_file_routes.py: SUCCESS: File exists
+
+ANALYTICS_MODELS:
+  analytics_models: FAILED: No module named 'email.utils'
+
+NOTIFICATIONS_MODELS:
+  notifications_models: FAILED: No module named 'email.utils'
+
+MODERATION_MODELS:
+  moderation_models: FAILED: No module named 'email.utils'
+
+ADMIN_MODELS:
+  admin_models: FAILED: No module named 'email.utils'
+
+SERVICE_IMPORTS:
+  analytics_service_import: FAILED: No module named 'email.utils'
+  analytics_service_class: FAILED: No module named 'email.utils'
+  notifications_service_import: FAILED: No module named 'email.utils'
+  notification_service_class: FAILED: No module named 'email.utils'
+  moderation_service_import: FAILED: No module named 'email.utils'
+  content_analysis_service_class: FAILED: No module named 'email.utils'
+  admin_service_import: FAILED: No module named 'email.utils'
+  permission_service_class: FAILED: No module named 'email.utils'
+
+FORM_IMPORTS:
+  analytics_forms_import: FAILED: No module named 'email.utils'
+  analytics_filter_form: FAILED: No module named 'email.utils'
+  notifications_forms_import: FAILED: No module named 'email.utils'
+  notification_filter_form: FAILED: No module named 'email.utils'
+  moderation_forms_import: FAILED: No module named 'email.utils'
+  moderation_queue_filter_form: FAILED: No module named 'email.utils'
+  admin_forms_import: FAILED: No module named 'email.utils'
+  permission_form: FAILED: No module named 'email.utils'
+
+============================================================
+Total Tests: 39
+Passed: 19
+Failed: 20
+Success Rate: 48.7%

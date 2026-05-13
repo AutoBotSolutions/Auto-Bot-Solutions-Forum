@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Verification - Auto Bot Solutions Forum</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #00d4ff;
+        }
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #00d4ff;
+            text-shadow: 0 0 10px rgba(0,212,255,0.5);
+        }
+        .content {
+            margin-bottom: 30px;
+        }
+        .button {
+            display: inline-block;
+            background: linear-gradient(45deg, #00d4ff, #0099cc);
+            color: white;
+            padding: 12px 30px;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: bold;
+            margin: 20px 0;
+            box-shadow: 0 4px 15px rgba(0,212,255,0.3);
+            transition: all 0.3s ease;
+        }
+        .button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,212,255,0.4);
+        }
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            font-size: 12px;
+            color: #666;
+        }
+        .code {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 16px;
+            text-align: center;
+            margin: 20px 0;
+            border: 1px solid #e9ecef;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">🤖 Auto Bot Solutions Forum</div>
+            <h1>Email Verification</h1>
+        </div>
+        
+        <div class="content">
+            <p>Hello {{ user.username }},</p>
+            
+            <p>Thank you for registering at Auto Bot Solutions Forum! To complete your registration and activate your account, please verify your email address.</p>
+            
+            <p>You can verify your email by clicking the button below:</p>
+            
+            <div style="text-align: center;">
+                <a href="{{ verification_url }}" class="button">Verify Email Address</a>
+            </div>
+            
+            <p>Alternatively, you can copy and paste the verification code below:</p>
+            
+            <div class="code">{{ user.verification_token }}</div>
+            
+            <p><strong>Note:</strong> This verification link will expire in 24 hours for security reasons.</p>
+            
+            <p>If you didn't register for an account at Auto Bot Solutions Forum, you can safely ignore this email.</p>
+        </div>
+        
+        <div class="footer">
+            <p>This is an automated message from Auto Bot Solutions Forum.</p>
+            <p>If you have any questions, please contact our support team.</p>
+            <p>&copy; 2026 Auto Bot Solutions. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>

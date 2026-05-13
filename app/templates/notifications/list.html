@@ -1,0 +1,619 @@
+{% extends "base.html" %}
+
+{% block title %}All Notifications{% endblock %}
+
+{% block extra_css %}
+<style>
+.notifications-list {
+    padding: 20px;
+}
+
+.filters-section {
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+}
+
+.notifications-container {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+
+.notifications-header {
+    padding: 20px;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.notification-item {
+    padding: 20px;
+    border-bottom: 1px solid #eee;
+    transition: background-color 0.2s;
+}
+
+.notification-item:hover {
+    background-color: #f8f9fa;
+}
+
+.notification-item.unread {
+    background-color: #f0f8ff;
+    border-left: 4px solid #007bff;
+}
+
+.notification-item:last-child {
+    border-bottom: none;
+}
+
+.notification-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.notification-main {
+    flex: 1;
+}
+
+.notification-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.notification-title {
+    font-weight: bold;
+    color: #333;
+    font-size: 1.1rem;
+    margin-bottom: 5px;
+}
+
+.notification-meta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.notification-message {
+    color: #555;
+    line-height: 1.5;
+    margin-bottom: 10px;
+}
+
+.notification-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.notification-sidebar {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 10px;
+    margin-left: 20px;
+    min-width: 120px;
+}
+
+.priority-badge {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.priority-low {
+    background: #d4edda;
+    color: #155724;
+}
+
+.priority-medium {
+    background: #cce5ff;
+    color: #004085;
+}
+
+.priority-high {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.priority-critical {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.severity-badge {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.severity-info {
+    background: #e3f2fd;
+    color: #1976d2;
+}
+
+.severity-warning {
+    background: #fff3e0;
+    color: #f57c00;
+}
+
+.severity-error {
+    background: #ffebee;
+    color: #c62828;
+}
+
+.severity-critical {
+    background: #fce4ec;
+    color: #ad1457;
+}
+
+.category-badge {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    background: #f5f5f5;
+    color: #666;
+}
+
+.action-required {
+    color: #dc3545;
+    font-weight: bold;
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.notification-time {
+    font-size: 0.8rem;
+    color: #999;
+    text-align: right;
+}
+
+.notification-status {
+    display: flex;
+    gap: 8px;
+}
+
+.status-indicator {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.status-indicator.unread {
+    background: #007bff;
+}
+
+.status-indicator.read {
+    background: #6c757d;
+}
+
+.status-indicator.acknowledged {
+    background: #28a745;
+}
+
+.bulk-actions {
+    padding: 20px;
+    border-top: 1px solid #eee;
+    background: #f8f9fa;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.pagination-container {
+    padding: 20px;
+    border-top: 1px solid #eee;
+    display: flex;
+    justify-content: center;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: #666;
+}
+
+.empty-state i {
+    font-size: 4rem;
+    margin-bottom: 20px;
+    color: #ddd;
+}
+
+@media (max-width: 768px) {
+    .notification-content {
+        flex-direction: column;
+    }
+    
+    .notification-sidebar {
+        flex-direction: row;
+        margin-left: 0;
+        margin-top: 10px;
+        min-width: auto;
+    }
+    
+    .notification-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="notifications-list">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>All Notifications</h1>
+        <div>
+            <a href="{{ url_for('notifications.index') }}" class="btn btn-outline-secondary me-2">Dashboard</a>
+            {% if current_user.is_admin %}
+            <a href="{{ url_for('notifications.create_notification') }}" class="btn btn-primary me-2">Create Notification</a>
+            {% endif %}
+            <a href="{{ url_for('notifications.preferences') }}" class="btn btn-outline-primary">Preferences</a>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="filters-section">
+        <form method="GET" id="filterForm">
+            <div class="row">
+                <div class="col-md-2">
+                    {{ form.notification_type.label(class="form-label") }}
+                    {{ form.notification_type(class="form-select") }}
+                </div>
+                <div class="col-md-2">
+                    {{ form.category.label(class="form-label") }}
+                    {{ form.category(class="form-select") }}
+                </div>
+                <div class="col-md-2">
+                    {{ form.priority.label(class="form-label") }}
+                    {{ form.priority(class="form-select") }}
+                </div>
+                <div class="col-md-2">
+                    {{ form.severity.label(class="form-label") }}
+                    {{ form.severity(class="form-select") }}
+                </div>
+                <div class="col-md-2">
+                    {{ form.is_read.label(class="form-label") }}
+                    {{ form.is_read(class="form-select") }}
+                </div>
+                <div class="col-md-2">
+                    {{ form.requires_action.label(class="form-label") }}
+                    {{ form.requires_action(class="form-select") }}
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col-md-3">
+                    {{ form.search.label(class="form-label") }}
+                    {{ form.search(class="form-control", placeholder="Search notifications...") }}
+                </div>
+                <div class="col-md-2">
+                    {{ form.limit.label(class="form-label") }}
+                    {{ form.limit(class="form-select") }}
+                </div>
+                <div class="col-md-7 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary me-2">Apply Filters</button>
+                    <a href="{{ url_for('notifications.list_notifications') }}" class="btn btn-outline-secondary">Clear</a>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Notifications -->
+    <div class="notifications-container">
+        <div class="notifications-header">
+            <div>
+                <h5>Notifications</h5>
+                <small class="text-muted">{{ notifications|length }} notifications</small>
+            </div>
+            <div class="d-flex gap-2">
+                <button class="btn btn-sm btn-outline-secondary" onclick="toggleSelectAll()">Select All</button>
+                <button class="btn btn-sm btn-outline-primary" onclick="markSelectedRead()">Mark Read</button>
+                <button class="btn btn-sm btn-outline-warning" onclick="acknowledgeSelected()">Acknowledge</button>
+                <button class="btn btn-sm btn-outline-danger" onclick="deleteSelected()">Delete</button>
+            </div>
+        </div>
+
+        {% if notifications %}
+            {% for notification in notifications %}
+            <div class="notification-item {% if not notification.is_read %}unread{% endif %}" data-notification-id="{{ notification.id }}">
+                <div class="notification-content">
+                    <div class="notification-main">
+                        <div class="notification-header">
+                            <div>
+                                <div class="notification-title">{{ notification.title }}</div>
+                                <div class="notification-meta">
+                                    <span class="priority-badge priority-{{ notification.priority }}">{{ notification.priority }}</span>
+                                    <span class="severity-badge severity-{{ notification.severity }}">{{ notification.severity }}</span>
+                                    <span class="category-badge">{{ notification.category.replace('_', ' ').title() }}</span>
+                                    {% if notification.target_type and notification.target_id %}
+                                    <span class="category-badge">{{ notification.target_type.title() }} #{{ notification.target_id }}</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="notification-message">{{ notification.message }}</div>
+                        
+                        {% if notification.data %}
+                        <div class="notification-meta">
+                            <small class="text-muted">
+                                {% for key, value in notification.data.items() %}
+                                    {{ key }}: {{ value }}{% if not loop.last %} | {% endif %}
+                                {% endfor %}
+                            </small>
+                        </div>
+                        {% endif %}
+                        
+                        <div class="notification-actions">
+                            {% if notification.requires_action %}
+                            <div class="action-required">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                Action Required
+                                {% if notification.action_url %}
+                                <a href="{{ notification.action_url }}" class="btn btn-sm btn-primary ms-2">Take Action</a>
+                                {% endif %}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="notification-sidebar">
+                        <div class="notification-time">
+                            {{ notification.created_at.strftime('%b %d, %H:%M') }}
+                        </div>
+                        <div class="notification-status">
+                            <span class="status-indicator {% if not notification.is_read %}unread{% else %}read{% endif %}" title="{% if not notification.is_read %}Unread{% else %}Read{% endif %}"></span>
+                            {% if notification.is_acknowledged %}
+                            <span class="status-indicator acknowledged" title="Acknowledged"></span>
+                            {% endif %}
+                        </div>
+                        <div class="btn-group btn-group-sm">
+                            <button class="btn btn-outline-secondary" onclick="viewNotification({{ notification.id }})" title="View">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            {% if not notification.is_read %}
+                            <button class="btn btn-outline-primary" onclick="markRead({{ notification.id }})" title="Mark as Read">
+                                <i class="fas fa-check"></i>
+                            </button>
+                            {% endif %}
+                            {% if not notification.is_acknowledged %}
+                            <button class="btn btn-outline-warning" onclick="acknowledge({{ notification.id }})" title="Acknowledge">
+                                <i class="fas fa-check-circle"></i>
+                            </button>
+                            {% endif %}
+                            <button class="btn btn-outline-danger" onclick="deleteNotification({{ notification.id }})" title="Delete">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty-state">
+                <i class="fas fa-inbox"></i>
+                <h5>No notifications found</h5>
+                <p>
+                    {% if form.notification_type.data or form.category.data or form.priority.data or form.search.data %}
+                        No notifications match your current filters. Try adjusting your filter criteria.
+                    {% else %}
+                        You don't have any notifications yet. They will appear here as they're created.
+                    {% endif %}
+                </p>
+                {% if form.notification_type.data or form.category.data or form.priority.data or form.search.data %}
+                    <a href="{{ url_for('notifications.list_notifications') }}" class="btn btn-outline-primary">Clear Filters</a>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Bulk Actions -->
+    {% if notifications %}
+    <div class="bulk-actions">
+        <div>
+            <span id="selectedCount">0</span> selected
+        </div>
+        <div>
+            <button class="btn btn-sm btn-outline-secondary" onclick="clearSelection()">Clear Selection</button>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+let selectedNotifications = new Set();
+
+function toggleSelectAll() {
+    const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+    const selectAllBtn = event.target;
+    
+    if (selectAllBtn.textContent === 'Select All') {
+        checkboxes.forEach(cb => {
+            cb.checked = true;
+            selectedNotifications.add(parseInt(cb.value));
+        });
+        selectAllBtn.textContent = 'Deselect All';
+    } else {
+        checkboxes.forEach(cb => {
+            cb.checked = false;
+        });
+        selectedNotifications.clear();
+        selectAllBtn.textContent = 'Select All';
+    }
+    
+    updateSelectedCount();
+}
+
+function updateSelectedCount() {
+    document.getElementById('selectedCount').textContent = selectedNotifications.size;
+}
+
+function markSelectedRead() {
+    if (selectedNotifications.size === 0) {
+        alert('Please select notifications to mark as read');
+        return;
+    }
+    
+    bulkOperation('mark_read');
+}
+
+function acknowledgeSelected() {
+    if (selectedNotifications.size === 0) {
+        alert('Please select notifications to acknowledge');
+        return;
+    }
+    
+    bulkOperation('acknowledge');
+}
+
+function deleteSelected() {
+    if (selectedNotifications.size === 0) {
+        alert('Please select notifications to delete');
+        return;
+    }
+    
+    if (confirm(`Are you sure you want to delete ${selectedNotifications.size} notification(s)?`)) {
+        bulkOperation('delete');
+    }
+}
+
+function bulkOperation(operation) {
+    const notificationIds = Array.from(selectedNotifications).join(',');
+    
+    fetch('/notifications/bulk', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: JSON.stringify({
+            operation: operation,
+            notification_ids: notificationIds
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        } else {
+            alert('Operation failed: ' + data.error);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Operation failed');
+    });
+}
+
+function viewNotification(notificationId) {
+    window.location.href = `/notifications/${notificationId}`;
+}
+
+function markRead(notificationId) {
+    fetch(`/notifications/${notificationId}/read`, {
+        method: 'POST',
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+}
+
+function acknowledge(notificationId) {
+    fetch(`/notifications/${notificationId}/acknowledge`, {
+        method: 'POST',
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+}
+
+function deleteNotification(notificationId) {
+    if (confirm('Are you sure you want to delete this notification?')) {
+        fetch(`/notifications/${notificationId}/delete`, {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    }
+}
+
+function clearSelection() {
+    selectedNotifications.clear();
+    document.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+        cb.checked = false;
+    });
+    updateSelectedCount();
+}
+
+// Add checkboxes to notification items
+document.addEventListener('DOMContentLoaded', function() {
+    const notificationItems = document.querySelectorAll('.notification-item');
+    
+    notificationItems.forEach(item => {
+        const notificationId = item.dataset.notificationId;
+        if (notificationId) {
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.value = notificationId;
+            checkbox.style.marginRight = '10px';
+            checkbox.onchange = function() {
+                if (this.checked) {
+                    selectedNotifications.add(parseInt(notificationId));
+                } else {
+                    selectedNotifications.delete(parseInt(notificationId));
+                }
+                updateSelectedCount();
+            };
+            
+            // Insert checkbox at the beginning of the item
+            item.insertBefore(checkbox, item.firstChild);
+        }
+    });
+});
+</script>
+{% endblock %}

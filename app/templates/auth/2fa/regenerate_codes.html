@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}Regenerate Backup Codes - AutoBot Solutions Forum{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="text-center">🔄 Regenerate Backup Codes</h3>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning">
+                        <h5><i class="fas fa-exclamation-triangle"></i> Important</h5>
+                        <p>Regenerating backup codes will invalidate all your existing backup codes. Make sure you save the new codes in a secure location.</p>
+                    </div>
+
+                    <form method="POST">
+                        {{ form.hidden_tag() }}
+                        
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Confirm Your Password</label>
+                            {{ form.password(class="form-control", placeholder="Enter your password") }}
+                            {% if form.password.errors %}
+                                <div class="text-danger mt-1">
+                                    {% for error in form.password.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-warning">
+                                <i class="fas fa-sync"></i> Regenerate Backup Codes
+                            </button>
+                            <a href="{{ url_for('auth.two_factor.manage') }}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Cancel
+                            </a>
+                        </div>
+                    </form>
+
+                    <div class="mt-4">
+                        <h6><i class="fas fa-info-circle"></i> Why Regenerate Backup Codes?</h6>
+                        <div class="alert alert-info">
+                            <p class="mb-0">You should regenerate your backup codes if:</p>
+                            <ul class="mb-0">
+                                <li>You've used most of your existing backup codes</li>
+                                <li>You think your backup codes may have been compromised</li>
+                                <li>You want to refresh your backup codes regularly for security</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

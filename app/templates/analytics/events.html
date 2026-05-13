@@ -1,0 +1,384 @@
+{% extends "base.html" %}
+
+{% block title %}Analytics Events{% endblock %}
+
+{% block extra_css %}
+<style>
+.analytics-events {
+    padding: 20px;
+}
+
+.filter-section {
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+}
+
+.events-table {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+
+.event-row {
+    padding: 15px;
+    border-bottom: 1px solid #eee;
+    transition: background-color 0.2s;
+}
+
+.event-row:hover {
+    background-color: #f8f9fa;
+}
+
+.event-row:last-child {
+    border-bottom: none;
+}
+
+.event-type-badge {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.event-type-badge.view {
+    background: #e3f2fd;
+    color: #1976d2;
+}
+
+.event-type-badge.click {
+    background: #f3e5f5;
+    color: #7b1fa2;
+}
+
+.event-type-badge.vote {
+    background: #e8f5e8;
+    color: #388e3c;
+}
+
+.event-type-badge.search {
+    background: #fff3e0;
+    color: #f57c00;
+}
+
+.event-type-badge.session {
+    background: #fce4ec;
+    color: #c2185b;
+}
+
+.event-details {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.event-info {
+    flex: 1;
+}
+
+.event-meta {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.event-time {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.event-user {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.event-target {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.event-value {
+    font-weight: bold;
+    color: #007bff;
+}
+
+.pagination-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.stats-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.stat-item {
+    text-align: center;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 6px;
+}
+
+.stat-number {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #333;
+}
+
+.stat-label {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.export-section {
+    margin-top: 20px;
+    text-align: right;
+}
+
+@media (max-width: 768px) {
+    .event-details {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    
+    .event-meta {
+        flex-wrap: wrap;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="analytics-events">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Analytics Events</h1>
+        <div>
+            <a href="{{ url_for('analytics.dashboard') }}" class="btn btn-outline-secondary me-2">Dashboard</a>
+            <button class="btn btn-primary" onclick="toggleFilters()">Filters</button>
+        </div>
+    </div>
+
+    <!-- Filter Section -->
+    <div class="filter-section" id="filterSection" style="display: none;">
+        <form method="GET">
+            <div class="row">
+                <div class="col-md-3">
+                    {{ form.period_preset.label(class="form-label") }}
+                    {{ form.period_preset(class="form-select") }}
+                </div>
+                <div class="col-md-3">
+                    {{ form.start_date.label(class="form-label") }}
+                    {{ form.start_date(class="form-control") }}
+                </div>
+                <div class="col-md-3">
+                    {{ form.end_date.label(class="form-label") }}
+                    {{ form.end_date(class="form-control") }}
+                </div>
+                <div class="col-md-3">
+                    {{ form.event_type.label(class="form-label") }}
+                    {{ form.event_type(class="form-select") }}
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col-md-3">
+                    {{ form.event_category.label(class="form-label") }}
+                    {{ form.event_category(class="form-select") }}
+                </div>
+                <div class="col-md-3">
+                    {{ form.user_id.label(class="form-label") }}
+                    {{ form.user_id(class="form-control") }}
+                </div>
+                <div class="col-md-3">
+                    {{ form.target_type.label(class="form-label") }}
+                    {{ form.target_type(class="form-select") }}
+                </div>
+                <div class="col-md-3">
+                    {{ form.sort_by.label(class="form-label") }}
+                    {{ form.sort_by(class="form-select") }}
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col-md-3">
+                    {{ form.sort_order.label(class="form-label") }}
+                    {{ form.sort_order(class="form-select") }}
+                </div>
+                <div class="col-md-3">
+                    {{ form.limit.label(class="form-label") }}
+                    {{ form.limit(class="form-control") }}
+                </div>
+                <div class="col-md-6 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary me-2">Apply Filters</button>
+                    <a href="{{ url_for('analytics.events') }}" class="btn btn-outline-secondary">Clear</a>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Statistics Summary -->
+    {% if events %}
+    <div class="stats-summary">
+        <div class="stat-item">
+            <div class="stat-number">{{ events|length }}</div>
+            <div class="stat-label">Total Events</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number">{{ events|selectattr('user_id')|list|length }}</div>
+            <div class="stat-label">User Events</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number">{{ events|selectattr('target_id')|list|length }}</div>
+            <div class="stat-label">Target Events</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number">{{ events|selectattr('event_value')|list|length }}</div>
+            <div class="stat-label">Value Events</div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Events Table -->
+    <div class="events-table">
+        {% if events %}
+            {% for event in events %}
+            <div class="event-row">
+                <div class="event-details">
+                    <div class="event-info">
+                        <span class="event-type-badge {{ event.event_type }}">
+                            {{ event.event_type }}
+                        </span>
+                        {% if event.event_category %}
+                        <span class="event-type-badge {{ event.event_category }}">
+                            {{ event.event_category }}
+                        </span>
+                        {% endif %}
+                        
+                        {% if event.event_data %}
+                        <div class="mt-2">
+                            <small class="text-muted">
+                                {% if event.event_data %}
+                                    {% for key, value in event.event_data.items() %}
+                                        {{ key }}: {{ value }}{% if not loop.last %} | {% endif %}
+                                    {% endfor %}
+                                {% endif %}
+                            </small>
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="event-meta">
+                        <div class="event-time">
+                            <i class="fas fa-clock"></i>
+                            {{ event.created_at.strftime('%Y-%m-%d %H:%M:%S') }}
+                        </div>
+                        
+                        {% if event.user %}
+                        <div class="event-user">
+                            <i class="fas fa-user"></i>
+                            <a href="{{ url_for('main.user_profile', user_id=event.user.id) }}">
+                                {{ event.user.username }}
+                            </a>
+                        </div>
+                        {% endif %}
+                        
+                        {% if event.target_type and event.target_id %}
+                        <div class="event-target">
+                            <i class="fas fa-bullseye"></i>
+                            {{ event.target_type|title }} #{{ event.target_id }}
+                        </div>
+                        {% endif %}
+                        
+                        {% if event.event_value is not none %}
+                        <div class="event-value">
+                            Value: {{ event.event_value }}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="text-center p-4">
+                <i class="fas fa-chart-line fa-3x text-muted mb-3"></i>
+                <h5>No Events Found</h5>
+                <p class="text-muted">
+                    {% if form.event_type.data or form.event_category.data or form.user_id.data %}
+                        No events match your current filters. Try adjusting your filter criteria.
+                    {% else %}
+                        No events have been recorded yet. Events will appear here as users interact with the system.
+                    {% endif %}
+                </p>
+                {% if form.event_type.data or form.event_category.data or form.user_id.data %}
+                    <a href="{{ url_for('analytics.events') }}" class="btn btn-outline-primary">Clear Filters</a>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Export Section -->
+    <div class="export-section">
+        <div class="btn-group">
+            <button class="btn btn-outline-secondary" onclick="exportEvents('csv')">
+                <i class="fas fa-file-csv"></i> Export CSV
+            </button>
+            <button class="btn btn-outline-secondary" onclick="exportEvents('json')">
+                <i class="fas fa-file-code"></i> Export JSON
+            </button>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function toggleFilters() {
+    const filterSection = document.getElementById('filterSection');
+    filterSection.style.display = filterSection.style.display === 'none' ? 'block' : 'none';
+}
+
+function exportEvents(format) {
+    const url = new URL(window.location);
+    url.searchParams.set('format', format);
+    url.searchParams.set('export', 'true');
+    
+    window.open(url.toString(), '_blank');
+}
+
+// Auto-refresh events every 30 seconds
+setInterval(() => {
+    if (!document.hidden) {
+        location.reload();
+    }
+}, 30000);
+
+// Handle period preset changes
+document.querySelector('#period_preset')?.addEventListener('change', function() {
+    if (this.value) {
+        // Auto-submit form when period preset is selected
+        this.form.submit();
+    }
+});
+
+// Initialize tooltips
+document.addEventListener('DOMContentLoaded', function() {
+    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    const tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+});
+</script>
+{% endblock %}

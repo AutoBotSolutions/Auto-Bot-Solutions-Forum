@@ -1,0 +1,399 @@
+{% extends "base.html" %}
+
+{% block title %}My Files{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="mb-4">
+                <i class="fas fa-folder-open"></i>
+                My Files
+            </h1>
+        </div>
+    </div>
+
+    <!-- Search and Filter -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <form method="GET" id="searchForm">
+                        <div class="row">
+                            <div class="col-md-3">
+                                {{ form.query.label(class="form-label") }}
+                                {{ form.query(class="form-control") }}
+                            </div>
+                            <div class="col-md-2">
+                                {{ form.file_type.label(class="form-label") }}
+                                {{ form.file_type(class="form-select") }}
+                            </div>
+                            <div class="col-md-2">
+                                {{ form.date_from.label(class="form-label") }}
+                                {{ form.date_from(class="form-control") }}
+                            </div>
+                            <div class="col-md-2">
+                                {{ form.date_to.label(class="form-label") }}
+                                {{ form.date_to(class="form-control") }}
+                            </div>
+                            <div class="col-md-1">
+                                <label class="form-label">&nbsp;</label>
+                                <button type="submit" class="btn btn-primary d-block">
+                                    <i class="fas fa-search"></i> Search
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bulk Actions -->
+    <div class="row mb-3">
+        <div class="col-12">
+            <form method="POST" id="bulkActionForm">
+                {{ bulk_form.hidden_tag() }}
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <input type="checkbox" id="selectAll" class="form-check-input me-2">
+                        <label for="selectAll" class="form-check-label me-3">Select All</label>
+                        {{ bulk_form.action(class="form-select d-inline-block w-auto me-2") }}
+                        <div id="targetFolderField" class="d-inline-block" style="display: none;">
+                            {{ bulk_form.target_folder(class="form-control d-inline-block w-auto") }}
+                        </div>
+                        <button type="submit" class="btn btn-primary" disabled>
+                            Apply Action
+                        </button>
+                    </div>
+                    <div>
+                        <a href="{{ url_for('storage.upload_file') }}" class="btn btn-success">
+                            <i class="fas fa-plus"></i> Upload New File
+                        </a>
+                        <a href="{{ url_for('storage.dashboard') }}" class="btn btn-outline-secondary ms-2">
+                            <i class="fas fa-tachometer-alt"></i> Dashboard
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Files List -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    {% if files.items %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th><input type="checkbox" id="selectAllHeader"></th>
+                                        <th>Name</th>
+                                        <th>Type</th>
+                                        <th>Size</th>
+                                        <th>Upload Date</th>
+                                        <th>Status</th>
+                                        <th>Downloads</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for file in files.items %}
+                                    <tr>
+                                        <td>
+                                            <input type="checkbox" name="file_ids" value="{{ file.id }}" class="form-check-input">
+                                        </td>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                {% if file.file_type == 'image' and file.thumbnail_path %}
+                                                    <img src="{{ url_for('storage.preview_file', file_id=file.id) }}" 
+                                                         class="me-2" style="width: 40px; height: 40px; object-fit: cover; border-radius: 4px;">
+                                                {% else %}
+                                                    <div class="me-2 file-icon-{{ file.file_type }}" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 4px; background-color: #f8f9fa;">
+                                                        <i class="fas fa-{{ get_file_icon(file.file_type) }}"></i>
+                                                    </div>
+                                                {% endif %}
+                                                <div>
+                                                    <a href="{{ url_for('storage.file_detail', file_id=file.id) }}" class="text-decoration-none">
+                                                        {{ file.original_filename }}
+                                                    </a>
+                                                    {% if file.is_public %}
+                                                        <span class="badge bg-success ms-1">Public</span>
+                                                    {% endif %}
+                                                    {% if file.preview_available %}
+                                                        <span class="badge bg-info ms-1">Preview</span>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-{{ get_file_type_color(file.file_type) }}">{{ file.file_type.title() }}</span>
+                                        </td>
+                                        <td>{{ format_file_size(file.file_size) }}</td>
+                                        <td>{{ file.upload_date.strftime('%Y-%m-%d %H:%M') }}</td>
+                                        <td>
+                                            {% if file.is_processed %}
+                                                <span class="text-success"><i class="fas fa-check-circle"></i> Processed</span>
+                                            {% else %}
+                                                <span class="text-warning"><i class="fas fa-clock"></i> Processing</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ file.download_count }}</td>
+                                        <td>
+                                            <div class="btn-group" role="group">
+                                                <a href="{{ url_for('storage.file_detail', file_id=file.id) }}" class="btn btn-sm btn-outline-primary">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                                <a href="{{ url_for('storage.download_file', file_id=file.id) }}" class="btn btn-sm btn-outline-success">
+                                                    <i class="fas fa-download"></i>
+                                                </a>
+                                                {% if file.preview_available %}
+                                                <a href="{{ url_for('storage.preview_file', file_id=file.id) }}" class="btn btn-sm btn-outline-info">
+                                                    <i class="fas fa-search"></i>
+                                                </a>
+                                                {% endif %}
+                                                <div class="btn-group" role="group">
+                                                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                                        <i class="fas fa-ellipsis-h"></i>
+                                                    </button>
+                                                    <ul class="dropdown-menu">
+                                                        <li>
+                                                            <a class="dropdown-item" href="{{ url_for('storage.share_file', file_id=file.id) }}">
+                                                                <i class="fas fa-share"></i> Share
+                                                            </a>
+                                                        </li>
+                                                        {% if file.file_type == 'image' %}
+                                                        <li>
+                                                            <a class="dropdown-item" href="#" onclick="processImage('{{ file.id }}')">
+                                                                <i class="fas fa-image"></i> Process Image
+                                                            </a>
+                                                        </li>
+                                                        {% endif %}
+                                                        <li>
+                                                            <a class="dropdown-item" href="#" onclick="copyShareLink('{{ file.id }}')">
+                                                                <i class="fas fa-link"></i> Copy Link
+                                                            </a>
+                                                        </li>
+                                                        <li><hr class="dropdown-divider"></li>
+                                                        <li>
+                                                            <a class="dropdown-item text-danger" href="#" onclick="deleteFile('{{ file.id }}')">
+                                                                <i class="fas fa-trash"></i> Delete
+                                                            </a>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Pagination -->
+                        <nav aria-label="Files pagination">
+                            <ul class="pagination justify-content-center">
+                                {% if files.has_prev %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="{{ url_for('storage.files', page=files.prev_num, **request.args) }}">Previous</a>
+                                    </li>
+                                {% endif %}
+                                
+                                {% for page_num in files.iter_pages() %}
+                                    {% if page_num %}
+                                        {% if page_num != files.page %}
+                                            <li class="page-item">
+                                                <a class="page-link" href="{{ url_for('storage.files', page=page_num, **request.args) }}">{{ page_num }}</a>
+                                            </li>
+                                        {% else %}
+                                            <li class="page-item active">
+                                                <span class="page-link">{{ page_num }}</span>
+                                            </li>
+                                        {% endif %}
+                                    {% else %}
+                                        <li class="page-item disabled">
+                                            <span class="page-link">...</span>
+                                        </li>
+                                    {% endif %}
+                                {% endfor %}
+                                
+                                {% if files.has_next %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="{{ url_for('storage.files', page=files.next_num, **request.args) }}">Next</a>
+                                    </li>
+                                {% endif %}
+                            </ul>
+                        </nav>
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="fas fa-folder-open fa-3x text-muted mb-3"></i>
+                            <h4 class="text-muted">No files found</h4>
+                            <p class="text-muted">
+                                {% if form.query.data or form.file_type.data != 'all' %}
+                                    Try adjusting your search criteria or
+                                    <a href="{{ url_for('storage.files') }}">clear all filters</a>.
+                                {% else %}
+                                    <a href="{{ url_for('storage.upload_file') }}">Upload your first file</a> to get started.
+                                {% endif %}
+                            </p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+// File management functionality
+document.addEventListener('DOMContentLoaded', function() {
+    // Setup search functionality
+    const searchForm = document.getElementById('searchForm');
+    if (searchForm) {
+        let searchTimeout;
+        const searchInput = searchForm.querySelector('input[name="query"]');
+        
+        if (searchInput) {
+            searchInput.addEventListener('input', function(e) {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    searchForm.submit();
+                }, 500);
+            });
+        }
+    }
+    
+    // Setup bulk actions
+    const selectAllCheckbox = document.getElementById('selectAll');
+    const selectAllHeader = document.getElementById('selectAllHeader');
+    const fileCheckboxes = document.querySelectorAll('input[name="file_ids"]');
+    
+    function updateBulkActionButton() {
+        const form = document.getElementById('bulkActionForm');
+        const submitButton = form.querySelector('button[type="submit"]');
+        const selectedCount = document.querySelectorAll('input[name="file_ids"]:checked').length;
+        
+        submitButton.disabled = selectedCount === 0;
+        submitButton.textContent = selectedCount > 0 ? 
+            `Apply Action (${selectedCount} selected)` : 'Apply Action';
+    }
+    
+    if (selectAllCheckbox) {
+        selectAllCheckbox.addEventListener('change', function(e) {
+            fileCheckboxes.forEach(checkbox => {
+                checkbox.checked = e.target.checked;
+            });
+            updateBulkActionButton();
+        });
+    }
+    
+    if (selectAllHeader) {
+        selectAllHeader.addEventListener('change', function(e) {
+            fileCheckboxes.forEach(checkbox => {
+                checkbox.checked = e.target.checked;
+            });
+            updateBulkActionButton();
+        });
+    }
+    
+    fileCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', updateBulkActionButton);
+    });
+    
+    // Handle action changes
+    const actionSelect = document.querySelector('select[name="action"]');
+    if (actionSelect) {
+        actionSelect.addEventListener('change', function(e) {
+            const targetFolderField = document.getElementById('targetFolderField');
+            targetFolderField.style.display = e.target.value === 'move' ? 'inline-block' : 'none';
+        });
+    }
+});
+
+// Helper functions
+function format_file_size(bytes) {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+}
+
+function get_file_icon(file_type) {
+    const icons = {
+        'image': 'image',
+        'document': 'file-alt',
+        'video': 'video',
+        'audio': 'music',
+        'other': 'file'
+    };
+    return icons[file_type] || 'file';
+}
+
+function get_file_type_color(file_type) {
+    const colors = {
+        'image': 'primary',
+        'document': 'success',
+        'video': 'danger',
+        'audio': 'info',
+        'other': 'secondary'
+    };
+    return colors[file_type] || 'secondary';
+}
+
+function deleteFile(fileId) {
+    if (confirm('Are you sure you want to delete this file? This action cannot be undone.')) {
+        fetch('/files/delete/' + fileId, {
+            method: 'DELETE',
+            headers: {
+                'X-CSRFToken': document.querySelector('input[name="csrf_token"]').value
+            }
+        })
+        .then(response => {
+            if (response.ok) {
+                location.reload();
+            } else {
+                alert('Failed to delete file');
+            }
+        })
+        .catch(error => {
+            alert('Error deleting file: ' + error.message);
+        });
+    }
+}
+
+function copyShareLink(fileId) {
+    const shareLink = window.location.origin + '/files/file/' + fileId;
+    
+    navigator.clipboard.writeText(shareLink).then(() => {
+        // Show success message
+        const button = event.target.closest('a');
+        const originalText = button.innerHTML;
+        button.innerHTML = '<i class="fas fa-check"></i> Copied!';
+        setTimeout(() => {
+            button.innerHTML = originalText;
+        }, 2000);
+    }).catch(err => {
+        alert('Failed to copy link');
+    });
+}
+
+function processImage(fileId) {
+    // This would open an image processing modal
+    alert('Image processing feature coming soon!');
+}
+</script>
+
+<style>
+.file-icon-image { background-color: #e3f2fd; color: #1976d2; }
+.file-icon-document { background-color: #e8f5e8; color: #388e3c; }
+.file-icon-video { background-color: #ffebee; color: #c62828; }
+.file-icon-audio { background-color: #e3f2fd; color: #1976d2; }
+.file-icon-other { background-color: #f5f5f5; color: #616161; }
+</style>
+{% endblock %}

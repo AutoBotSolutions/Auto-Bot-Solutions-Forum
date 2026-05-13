@@ -1,0 +1,299 @@
+{% extends "base.html" %}
+
+{% block title %}Post Versions - {{ post.title }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('content.dashboard') }}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{{ url_for('content.posts') }}">Posts</a></li>
+                    <li class="breadcrumb-item"><a href="{{ url_for('forum.post', post_id=post.id) }}">{{ post.title }}</a></li>
+                    <li class="breadcrumb-item active">Versions</li>
+                </ol>
+            </nav>
+            
+            <h1 class="mb-4">
+                <i class="fas fa-history"></i>
+                Post Versions - {{ post.title }}
+            </h1>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-8">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Version History</h5>
+                    <div>
+                        <a href="{{ url_for('content.compare_versions', post_id=post.id) }}" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-code-branch"></i> Compare Versions
+                        </a>
+                        <a href="{{ url_for('forum.post', post_id=post.id) }}" class="btn btn-outline-secondary btn-sm">
+                            <i class="fas fa-arrow-left"></i> Back to Post
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    {% if versions %}
+                        <div class="timeline">
+                            {% for version in versions %}
+                            <div class="timeline-item">
+                                <div class="timeline-marker">
+                                    <span class="badge bg-primary">v{{ version.version_number }}</span>
+                                </div>
+                                <div class="timeline-content">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                                <h6 class="card-title mb-1">
+                                                    {{ version.title }}
+                                                    {% if version.version_number == post.version_number %}
+                                                        <span class="badge bg-success ms-1">Current</span>
+                                                    {% endif %}
+                                                </h6>
+                                                <small class="text-muted">
+                                                    {{ version.created_at.strftime('%Y-%m-%d %H:%M') }} by {{ version.editor.username }}
+                                                </small>
+                                            </div>
+                                            
+                                            {% if version.change_summary %}
+                                                <p class="text-muted mb-2">
+                                                    <i class="fas fa-info-circle"></i> {{ version.change_summary }}
+                                                </p>
+                                            {% endif %}
+                                            
+                                            <div class="content-preview">
+                                                <p class="text-muted">{{ version.content[:200] }}...</p>
+                                            </div>
+                                            
+                                            <div class="mt-3">
+                                                <div class="btn-group" role="group">
+                                                    <a href="#" class="btn btn-sm btn-outline-primary" onclick="viewVersion({{ version.id }})">
+                                                        <i class="fas fa-eye"></i> View
+                                                    </a>
+                                                    {% if version.version_number != post.version_number %}
+                                                        <a href="{{ url_for('content.restore_version', post_id=post.id, version_number=version.version_number) }}" 
+                                                           class="btn btn-sm btn-outline-warning"
+                                                           onclick="return confirm('Are you sure you want to restore to version {{ version.version_number }}? This will create a new version.')">
+                                                            <i class="fas fa-undo"></i> Restore
+                                                        </a>
+                                                    {% endif %}
+                                                    {% if version.version_number > 1 %}
+                                                        <a href="#" class="btn btn-sm btn-outline-info" onclick="compareWithCurrent({{ version.id }})">
+                                                            <i class="fas fa-code-branch"></i> Compare
+                                                        </a>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="fas fa-history fa-3x text-muted mb-3"></i>
+                            <h4 class="text-muted">No version history found</h4>
+                            <p class="text-muted">This post doesn't have any version history yet.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Version Statistics</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-6">
+                            <h4 class="text-primary">{{ versions|length }}</h4>
+                            <small class="text-muted">Total Versions</small>
+                        </div>
+                        <div class="col-6">
+                            <h4 class="text-success">{{ post.version_number }}</h4>
+                            <small class="text-muted">Current Version</small>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="mb-3">
+                        <small class="text-muted">Created:</small><br>
+                        <strong>{{ post.created_at.strftime('%Y-%m-%d %H:%M') }}</strong>
+                    </div>
+                    <div class="mb-3">
+                        <small class="text-muted">Last Updated:</small><br>
+                        <strong>{{ post.updated_at.strftime('%Y-%m-%d %H:%M') }}</strong>
+                    </div>
+                    <div>
+                        <small class="text-muted">Editors:</small><br>
+                        <div>
+                            {% set editors = [] %}
+                            {% for version in versions %}
+                                {% if version.editor.username not in editors %}
+                                    {% set editors = editors + [version.editor.username] %}
+                                {% endif %}
+                            {% endfor %}
+                            {% for editor in editors %}
+                                <span class="badge bg-secondary">{{ editor }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h5 class="mb-0">Quick Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="{{ url_for('content.edit_post', post_id=post.id) }}" class="btn btn-primary">
+                            <i class="fas fa-edit"></i> Edit Post
+                        </a>
+                        <a href="{{ url_for('content.compare_versions', post_id=post.id) }}" class="btn btn-outline-primary">
+                            <i class="fas fa-code-branch"></i> Compare Versions
+                        </a>
+                        <a href="{{ url_for('content.analytics', post_id=post.id) }}" class="btn btn-outline-success">
+                            <i class="fas fa-chart-bar"></i> View Analytics
+                        </a>
+                        <a href="{{ url_for('forum.post', post_id=post.id) }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left"></i> Back to Post
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Version Modal -->
+    <div class="modal fade" id="versionModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Version Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="versionContent"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+function viewVersion(versionId) {
+    fetch(`/content/version/${versionId}`)
+        .then(response => response.json())
+        .then(data => {
+            const content = `
+                <h6>${data.title}</h6>
+                <p class="text-muted">Version ${data.version_number} - ${data.created_at}</p>
+                <p class="text-muted">Edited by: ${data.editor}</p>
+                ${data.change_summary ? `<p class="text-muted">${data.change_summary}</p>` : ''}
+                <hr>
+                <div class="content-display">
+                    ${data.content.replace(/\n/g, '<br>')}
+                </div>
+            `;
+            document.getElementById('versionContent').innerHTML = content;
+            new bootstrap.Modal(document.getElementById('versionModal')).show();
+        })
+        .catch(error => {
+            alert('Error loading version details: ' + error.message);
+        });
+}
+
+function compareWithCurrent(versionId) {
+    window.location.href = `/content/compare/{{ post.id }}?from=${versionId}&to=current`;
+}
+
+// Timeline styling
+document.addEventListener('DOMContentLoaded', function() {
+    const timelineItems = document.querySelectorAll('.timeline-item');
+    timelineItems.forEach((item, index) => {
+        if (index > 0) {
+            item.style.marginTop = '20px';
+        }
+    });
+});
+</script>
+
+<style>
+.timeline {
+    position: relative;
+    padding-left: 40px;
+}
+
+.timeline::before {
+    content: '';
+    position: absolute;
+    left: 15px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: #dee2e6;
+}
+
+.timeline-item {
+    position: relative;
+    margin-bottom: 30px;
+}
+
+.timeline-marker {
+    position: absolute;
+    left: -25px;
+    top: 0;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: white;
+    border: 2px solid #dee2e6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.timeline-content {
+    margin-left: 10px;
+}
+
+.content-preview {
+    max-height: 100px;
+    overflow: hidden;
+    position: relative;
+}
+
+.content-preview::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 30px;
+    background: linear-gradient(transparent, white);
+}
+
+.content-display {
+    max-height: 400px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    font-family: monospace;
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 5px;
+}
+</style>
+{% endblock %}

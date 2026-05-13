@@ -1,0 +1,217 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Post - {{ post.title }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="mb-0">
+                        <i class="fas fa-edit me-2"></i>Edit Post
+                    </h4>
+                </div>
+                <div class="card-body">
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+
+                    <form method="POST" enctype="multipart/form-data">
+                        {{ form.hidden_tag() }}
+                        
+                        <div class="mb-3">
+                            {{ form.title.label(class="form-label") }}
+                            {{ form.title(class="form-control" + (" is-invalid" if form.title.errors else "")) }}
+                            {% if form.title.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.title.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form.content.label(class="form-label") }}
+                            {{ form.content(class="form-control", rows="10", id="content-editor") }}
+                            {% if form.content.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.content.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    {{ form.repository_id.label(class="form-label") }}
+                                    {{ form.repository_id(class="form-select") }}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    {{ form.category_id.label(class="form-label") }}
+                                    {{ form.category_id(class="form-select") }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form.attachment.label(class="form-label") }}
+                            {{ form.attachment(class="form-control") }}
+                            <small class="form-text text-muted">
+                                Allowed file types: PNG, JPG, JPEG, GIF, PDF, TXT, MD. Max size: 16MB.
+                            </small>
+                            {% if post.attachment %}
+                                <div class="mt-2">
+                                    <strong>Current attachment:</strong> 
+                                    <a href="{{ url_for('static', filename='uploads/' + post.attachment) }}" target="_blank">
+                                        {{ post.attachment }}
+                                    </a>
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <small class="text-muted">
+                                    Created: {{ post.created_at.strftime('%Y-%m-%d %H:%M') }}
+                                    {% if post.updated_at != post.created_at %}
+                                        | Last updated: {{ post.updated_at.strftime('%Y-%m-%d %H:%M') }}
+                                    {% endif %}
+                                </small>
+                            </div>
+                            <div>
+                                <a href="{{ url_for('forum.post', post_id=post.id) }}" class="btn btn-secondary me-2">
+                                    <i class="fas fa-times me-1"></i>Cancel
+                                </a>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save me-1"></i>Update Post
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Simple rich text editor for the content field
+document.addEventListener('DOMContentLoaded', function() {
+    const contentEditor = document.getElementById('content-editor');
+    if (contentEditor) {
+        // Add basic formatting buttons
+        const toolbar = document.createElement('div');
+        toolbar.className = 'mb-2';
+        toolbar.innerHTML = `
+            <div class="btn-group" role="group">
+                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatText('bold')">
+                    <i class="fas fa-bold"></i>
+                </button>
+                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatText('italic')">
+                    <i class="fas fa-italic"></i>
+                </button>
+                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatText('underline')">
+                    <i class="fas fa-underline"></i>
+                </button>
+                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatText('code')">
+                    <i class="fas fa-code"></i>
+                </button>
+            </div>
+            <div class="btn-group ms-2" role="group">
+                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="insertLink()">
+                    <i class="fas fa-link"></i>
+                </button>
+                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="insertList('ul')">
+                    <i class="fas fa-list-ul"></i>
+                </button>
+                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="insertList('ol')">
+                    <i class="fas fa-list-ol"></i>
+                </button>
+            </div>
+        `;
+        
+        contentEditor.parentNode.insertBefore(toolbar, contentEditor);
+    }
+});
+
+function formatText(command) {
+    const contentEditor = document.getElementById('content-editor');
+    const start = contentEditor.selectionStart;
+    const end = contentEditor.selectionEnd;
+    const selectedText = contentEditor.value.substring(start, end);
+    
+    let formattedText = '';
+    switch(command) {
+        case 'bold':
+            formattedText = `**${selectedText}**`;
+            break;
+        case 'italic':
+            formattedText = `*${selectedText}*`;
+            break;
+        case 'underline':
+            formattedText = `__${selectedText}__`;
+            break;
+        case 'code':
+            formattedText = `\`${selectedText}\``;
+            break;
+    }
+    
+    contentEditor.value = contentEditor.value.substring(0, start) + formattedText + contentEditor.value.substring(end);
+    contentEditor.focus();
+    contentEditor.setSelectionRange(start + formattedText.length, start + formattedText.length);
+}
+
+function insertLink() {
+    const url = prompt('Enter URL:');
+    if (url) {
+        const contentEditor = document.getElementById('content-editor');
+        const start = contentEditor.selectionStart;
+        const end = contentEditor.selectionEnd;
+        const selectedText = contentEditor.value.substring(start, end);
+        const linkText = selectedText || url;
+        const linkMarkdown = `[${linkText}](${url})`;
+        
+        contentEditor.value = contentEditor.value.substring(0, start) + linkMarkdown + contentEditor.value.substring(end);
+        contentEditor.focus();
+    }
+}
+
+function insertList(type) {
+    const contentEditor = document.getElementById('content-editor');
+    const start = contentEditor.selectionStart;
+    const listPrefix = type === 'ul' ? '- ' : '1. ';
+    const listMarkdown = `\n${listPrefix}List item\n${listPrefix}List item\n${listPrefix}List item`;
+    
+    contentEditor.value = contentEditor.value.substring(0, start) + listMarkdown + contentEditor.value.substring(start);
+    contentEditor.focus();
+}
+
+// Auto-save functionality
+let autoSaveTimer;
+const contentEditor = document.getElementById('content-editor');
+if (contentEditor) {
+    contentEditor.addEventListener('input', function() {
+        clearTimeout(autoSaveTimer);
+        autoSaveTimer = setTimeout(function() {
+            // Auto-save logic could be implemented here
+            console.log('Auto-saving draft...');
+        }, 30000); // Auto-save after 30 seconds of inactivity
+    });
+}
+</script>
+{% endblock %}

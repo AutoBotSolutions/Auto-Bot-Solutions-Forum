@@ -1,0 +1,444 @@
+# Analytics Data Pipeline Configuration
+# Auto Bot Solutions Forum
+
+version: "1.0"
+environment: "production"
+
+# Database Configuration
+database:
+  analytics:
+    host: "localhost"
+    port: 5432
+    database: "forum_analytics"
+    username: "analytics_user"
+    password: "analytics_password"
+    pool_size: 20
+    max_overflow: 30
+    pool_timeout: 30
+    pool_recycle: 3600
+  
+  source:
+    host: "localhost"
+    port: 5432
+    database: "forum_production"
+    username: "forum_user"
+    password: "forum_password"
+    pool_size: 10
+    max_overflow: 20
+    pool_timeout: 30
+    pool_recycle: 3600
+
+# Redis Configuration
+redis:
+  host: "localhost"
+  port: 6379
+  db: 0
+  password: null
+  max_connections: 20
+  socket_timeout: 30
+  socket_connect_timeout: 30
+
+# Pipeline Configuration
+pipelines:
+  user_activity_pipeline:
+    name: "User Activity Analytics Pipeline"
+    type: "streaming"
+    source: "forum_production"
+    target: "forum_analytics"
+    schedule: "*/5 * * * *"  # Every 5 minutes
+    batch_size: 1000
+    timeout: 300
+    retry_count: 3
+    retry_delay: 60
+    
+    # Source configuration
+    source_query: |
+      SELECT 
+        u.id as user_id,
+        u.username,
+        u.email,
+        u.last_login,
+        u.created_at,
+        COUNT(f.id) as forum_posts,
+        COUNT(fc.id) as forum_comments,
+        COUNT(v.id) as votes_cast,
+        COUNT(pv.id) as votes_received,
+        MAX(l.timestamp) as last_activity
+      FROM users u
+      LEFT JOIN forum_posts f ON u.id = f.author_id
+      LEFT JOIN forum_comments fc ON u.id = fc.author_id
+      LEFT JOIN votes v ON u.id = v.user_id
+      LEFT JOIN post_votes pv ON f.id = pv.post_id
+      LEFT JOIN login_logs l ON u.id = l.user_id
+      WHERE u.updated_at > :last_run_time
+      GROUP BY u.id, u.username, u.email, u.last_login, u.created_at
+      ORDER BY u.updated_at DESC
+    
+    # Transformation configuration
+    transformations:
+      - name: "calculate_engagement_score"
+        type: "python"
+        function: "calculate_user_engagement"
+        parameters:
+          post_weight: 3
+          comment_weight: 2
+          vote_weight: 1
+          login_weight: 0.5
+      
+      - name: "determine_activity_level"
+        type: "python"
+        function: "determine_activity_level"
+        parameters:
+          high_threshold: 50
+          medium_threshold: 10
+          low_threshold: 1
+      
+      - name: "geolocation_enrichment"
+        type: "api"
+        function: "enrich_geolocation"
+        parameters:
+          api_key: "${GEOLOCATION_API_KEY}"
+          cache_ttl: 86400
+    
+    # Target configuration
+    target_table: "analytics.user_activity"
+    target_columns:
+      - "user_id"
+      - "username"
+      - "email"
+      - "engagement_score"
+      - "activity_level"
+      - "last_login"
+      - "last_activity"
+      - "posts_count"
+      - "comments_count"
+      - "votes_cast"
+      - "votes_received"
+      - "location_country"
+      - "location_city"
+      - "device_type"
+      - "session_duration"
+      - "metadata"
+
+  content_analytics_pipeline:
+    name: "Content Analytics Pipeline"
+    type: "batch"
+    source: "forum_production"
+    target: "forum_analytics"
+    schedule: "0 */2 * * *"  # Every 2 hours
+    batch_size: 5000
+    timeout: 600
+    retry_count: 3
+    retry_delay: 120
+    
+    # Source configuration
+    source_query: |
+      SELECT 
+        f.id as content_id,
+        f.title,
+        f.content,
+        f.created_at,
+        f.updated_at,
+        f.views_count,
+        u.username as author_username,
+        c.name as category_name,
+        COUNT(fc.id) as comments_count,
+        COUNT(pv.id) as votes_count,
+        AVG(pv.vote_type) as avg_vote_score,
+        MAX(fc.created_at) as last_comment_time
+      FROM forum_posts f
+      JOIN users u ON f.author_id = u.id
+      LEFT JOIN categories c ON f.category_id = c.id
+      LEFT JOIN forum_comments fc ON f.id = fc.post_id
+      LEFT JOIN post_votes pv ON f.id = pv.post_id
+      WHERE f.updated_at > :last_run_time
+      GROUP BY f.id, f.title, f.content, f.created_at, f.updated_at, 
+               f.views_count, u.username, c.name
+      ORDER BY f.updated_at DESC
+      LIMIT :batch_size
+    
+    # Transformation configuration
+    transformations:
+      - name: "calculate_content_quality_score"
+        type: "python"
+        function: "calculate_content_quality"
+        parameters:
+          title_weight: 0.3
+          content_weight: 0.4
+          engagement_weight: 0.2
+          recency_weight: 0.1
+      
+      - name: "sentiment_analysis"
+        type: "ml"
+        function: "analyze_sentiment"
+        parameters:
+          model_name: "sentiment_v2"
+          threshold_positive: 0.6
+          threshold_negative: 0.4
+      
+      - name: "topic_extraction"
+        type: "ml"
+        function: "extract_topics"
+        parameters:
+          max_topics: 5
+          min_topic_score: 0.1
+    
+    # Target configuration
+    target_table: "analytics.content_analytics"
+    target_columns:
+      - "content_id"
+      - "title"
+      - "content_hash"
+      - "quality_score"
+      - "sentiment_score"
+      - "sentiment_label"
+      - "topics"
+      - "views_count"
+      - "comments_count"
+      - "votes_count"
+      - "avg_vote_score"
+      - "last_comment_time"
+      - "content_age_days"
+      - "metadata"
+
+  system_metrics_pipeline:
+    name: "System Metrics Pipeline"
+    type: "streaming"
+    source: "system_monitoring"
+    target: "forum_analytics"
+    schedule: "*/1 * * * *"  # Every minute
+    batch_size: 100
+    timeout: 60
+    retry_count: 3
+    retry_delay: 30
+    
+    # Source configuration (system metrics)
+    source_metrics:
+      - name: "cpu_usage"
+        type: "system"
+        collection_method: "psutil"
+        interval: 60
+      
+      - name: "memory_usage"
+        type: "system"
+        collection_method: "psutil"
+        interval: 60
+      
+      - name: "disk_usage"
+        type: "system"
+        collection_method: "psutil"
+        interval: 300
+      
+      - name: "network_io"
+        type: "system"
+        collection_method: "psutil"
+        interval: 60
+      
+      - name: "database_connections"
+        type: "database"
+        collection_method: "pg_stat_activity"
+        interval: 60
+      
+      - name: "database_queries"
+        type: "database"
+        collection_method: "pg_stat_statements"
+        interval: 60
+    
+    # Transformation configuration
+    transformations:
+      - name: "normalize_metrics"
+        type: "python"
+        function: "normalize_system_metrics"
+        parameters:
+          cpu_threshold: 80
+          memory_threshold: 85
+          disk_threshold: 90
+      
+      - name: "calculate_derived_metrics"
+        type: "python"
+        function: "calculate_derived_metrics"
+        parameters:
+          include_trends: true
+          trend_window: 300
+    
+    # Target configuration
+    target_table: "analytics.system_metrics"
+    target_columns:
+      - "metric_name"
+      - "metric_value"
+      - "metric_unit"
+      - "metric_timestamp"
+      - "source"
+      - "tags"
+      - "metadata"
+
+# Monitoring Configuration
+monitoring:
+  enabled: true
+  metrics_port: 8080
+  health_check_interval: 30
+  
+  alerts:
+    pipeline_failure:
+      enabled: true
+      threshold: 3  # 3 consecutive failures
+      notification_channels: ["email", "slack"]
+    
+    high_latency:
+      enabled: true
+      threshold: 300  # 5 minutes
+      notification_channels: ["email"]
+    
+    data_quality:
+      enabled: true
+      threshold: 0.95  # 95% data quality
+      notification_channels: ["email", "slack"]
+    
+    resource_usage:
+      enabled: true
+      thresholds:
+        cpu: 80
+        memory: 85
+        disk: 90
+      notification_channels: ["email"]
+
+# Performance Configuration
+performance:
+  parallel_processing: true
+  max_workers: 4
+  worker_memory_limit: "512MB"
+  batch_timeout: 300
+  
+  caching:
+    enabled: true
+    cache_backend: "redis"
+    cache_ttl: 3600
+    max_cache_size: "1GB"
+  
+  connection_pooling:
+    enabled: true
+    max_connections: 50
+    connection_timeout: 30
+    idle_timeout: 300
+
+# Data Quality Configuration
+data_quality:
+  enabled: true
+  validation_rules:
+    user_activity:
+      - field: "user_id"
+        type: "required"
+        validator: "integer_positive"
+      - field: "engagement_score"
+        type: "range"
+        validator: "0-100"
+      - field: "activity_level"
+        type: "enum"
+        validator: "high,medium,low,inactive"
+    
+    content_analytics:
+      - field: "content_id"
+        type: "required"
+        validator: "integer_positive"
+      - field: "quality_score"
+        type: "range"
+        validator: "0-100"
+      - field: "sentiment_score"
+        type: "range"
+        validator: "-1-1"
+    
+    system_metrics:
+      - field: "metric_name"
+        type: "required"
+        validator: "string_non_empty"
+      - field: "metric_value"
+        type: "required"
+        validator: "numeric"
+      - field: "metric_timestamp"
+        type: "required"
+        validator: "datetime"
+
+# Retention Configuration
+retention:
+  user_activity:
+    raw_data: 365  # days
+    aggregated_data: 1095  # 3 years
+    archive_after: 90  # days
+  
+  content_analytics:
+    raw_data: 365  # days
+    aggregated_data: 1825  # 5 years
+    archive_after: 90  # days
+  
+  system_metrics:
+    raw_data: 30  # days
+    hourly_aggregated: 365  # days
+    daily_aggregated: 1095  # 3 years
+    archive_after: 7  # days
+
+# Security Configuration
+security:
+  encryption:
+    enabled: true
+    algorithm: "AES-256"
+    key_rotation_days: 90
+  
+  access_control:
+    enabled: true
+    default_role: "analyst"
+    roles:
+      - name: "admin"
+        permissions: ["read", "write", "delete", "manage"]
+      - name: "analyst"
+        permissions: ["read", "write"]
+      - name: "viewer"
+        permissions: ["read"]
+  
+  audit_logging:
+    enabled: true
+    log_all_operations: false
+    log_sensitive_operations: true
+    retention_days: 365
+
+# Backup Configuration
+backup:
+  enabled: true
+  schedule: "0 2 * * *"  # Daily at 2 AM
+  retention_days: 30
+  compression: true
+  encryption: true
+  
+  destinations:
+    - type: "local"
+      path: "/opt/analytics/backup"
+    - type: "s3"
+      bucket: "forum-analytics-backup"
+      region: "us-east-1"
+  
+  backup_types:
+    - "database"
+    - "configuration"
+    - "logs"
+
+# Environment Variables
+environment_variables:
+  - name: "ANALYTICS_DB_HOST"
+    value: "localhost"
+  - name: "ANALYTICS_DB_PORT"
+    value: "5432"
+  - name: "ANALYTICS_DB_NAME"
+    value: "forum_analytics"
+  - name: "ANALYTICS_DB_USER"
+    value: "analytics_user"
+  - name: "ANALYTICS_DB_PASSWORD"
+    value: "analytics_password"
+  - name: "REDIS_HOST"
+    value: "localhost"
+  - name: "REDIS_PORT"
+    value: "6379"
+  - name: "GEOLOCATION_API_KEY"
+    value: "${GEOLOCATION_API_KEY}"
+  - name: "LOG_LEVEL"
+    value: "INFO"
+  - name: "ENVIRONMENT"
+    value: "production"

@@ -5,27 +5,55 @@
 {% block content %}
 <div class="form-container">
     <h2>NEW USER REGISTRATION</h2>
-    <form method="POST">
+    <form method="POST" id="registrationForm">
         {{ form.hidden_tag() }}
         
         <div class="form-group">
             {{ form.username.label }}
             {{ form.username(class="form-control") }}
+            {% if form.username.errors %}
+                <div class="error-message">
+                    {% for error in form.username.errors %}
+                        <span style="color: #ff4444; font-size: 0.9rem;">{{ error }}</span>
+                    {% endfor %}
+                </div>
+            {% endif %}
         </div>
         
         <div class="form-group">
             {{ form.email.label }}
             {{ form.email(class="form-control") }}
+            {% if form.email.errors %}
+                <div class="error-message">
+                    {% for error in form.email.errors %}
+                        <span style="color: #ff4444; font-size: 0.9rem;">{{ error }}</span>
+                    {% endfor %}
+                </div>
+            {% endif %}
         </div>
         
         <div class="form-group">
             {{ form.password.label }}
             {{ form.password(class="form-control") }}
+            {% if form.password.errors %}
+                <div class="error-message">
+                    {% for error in form.password.errors %}
+                        <span style="color: #ff4444; font-size: 0.9rem;">{{ error }}</span>
+                    {% endfor %}
+                </div>
+            {% endif %}
         </div>
         
         <div class="form-group">
             {{ form.password2.label }}
             {{ form.password2(class="form-control") }}
+            {% if form.password2.errors %}
+                <div class="error-message">
+                    {% for error in form.password2.errors %}
+                        <span style="color: #ff4444; font-size: 0.9rem;">{{ error }}</span>
+                    {% endfor %}
+                </div>
+            {% endif %}
         </div>
         
         <button type="submit" class="btn-submit">CREATE ACCOUNT</button>
@@ -35,4 +63,19 @@
         Already registered? <a href="{{ url_for('auth.login') }}" style="color: var(--neon-cyan);">Access system</a>
     </p>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Ensure registration form submits properly
+document.addEventListener('DOMContentLoaded', function() {
+    const registrationForm = document.getElementById('registrationForm');
+    if (registrationForm) {
+        registrationForm.addEventListener('submit', function(e) {
+            // Allow normal form submission - don't prevent default
+            console.log('Registration form submitting...');
+        });
+    }
+});
+</script>
 {% endblock %}

@@ -1,0 +1,516 @@
+{
+  "total_tests": 58,
+  "passed_tests": 40,
+  "failed_tests": 17,
+  "warning_tests": 1,
+  "success_rate": 68.96551724137932,
+  "execution_time": 1.478075,
+  "errors": [
+    {
+      "test_name": "Model import: app.content.models",
+      "status": "FAIL",
+      "message": "Error: Table 'content_categories' is already defined for this MetaData instance.  Specify 'extend_existing=True' to redefine options and columns on an existing Table object.",
+      "details": {},
+      "timestamp": "2026-05-13 01:39:09.937624"
+    },
+    {
+      "test_name": "Model import: app.social.models",
+      "status": "FAIL",
+      "message": "Error: 'SchemaItem' object, such as a 'Column' or a 'Constraint' expected, got False",
+      "details": {},
+      "timestamp": "2026-05-13 01:39:09.947223"
+    },
+    {
+      "test_name": "Model: ContentTag",
+      "status": "FAIL",
+      "message": "Error instantiating: Table 'content_categories' is already defined for this MetaData instance.  Specify 'extend_existing=True' to redefine options and columns on an existing Table object.",
+      "details": {},
+      "timestamp": "2026-05-13 01:39:10.106172"
+    },
+    {
+      "test_name": "Model: ContentCategory",
+      "status": "FAIL",
+      "message": "Error instantiating: Table 'content_categories' is already defined for this MetaData instance.  Specify 'extend_existing=True' to redefine options and columns on an existing Table object.",
+      "details": {},
+      "timestamp": "2026-05-13 01:39:10.111190"
+    },
+    {
+      "test_name": "Model: ContentRelationship",
+      "status": "FAIL",
+      "message": "Error instantiating: Table 'content_categories' is already defined for this MetaData instance.  Specify 'extend_existing=True' to redefine options and columns on an existing Table object.",
+      "details": {},
+      "timestamp": "2026-05-13 01:39:10.116991"
+    },
+    {
+      "test_name": "Model: UserConnection",
+      "status": "FAIL",
+      "message": "Error instantiating: Table 'user_connections' is already defined for this MetaData instance.  Specify 'extend_existing=True' to redefine options and columns on an existing Table object.",
+      "details": {},
+      "timestamp": "2026-05-13 01:39:10.120096"
+    },
+    {
+      "test_name": "Model: UserSocialProfile",
+      "status": "FAIL",
+      "message": "Error instantiating: Table 'user_connections' is already defined for this MetaData instance.  Specify 'extend_existing=True' to redefine options and columns on an existing Table object.",
+      "details": {},
+      "timestamp": "2026-05-13 01:39:10.122868"
+    },
+    {
+      "test_name": "Service import: app.content.service",
+      "status": "FAIL",
+      "message": "Error: Table 'content_categories' is already defined for this MetaData instance.  Specify 'extend_existing=True' to redefine options and columns on an existing Table object.",
+      "details": {},
+      "timestamp": "2026-05-13 01:39:10.161403"
+    },
+    {
+      "test_name": "Service import: app.social.service",
+      "status": "FAIL",
+      "message": "Error: Table 'user_connections' is already defined for this MetaData instance.  Specify 'extend_existing=True' to redefine options and columns on an existing Table object.",
+      "details": {},
+      "timestamp": "2026-05-13 01:39:10.164509"
+    },
+    {
+      "test_name": "Service class: ContentService",
+      "status": "FAIL",
+      "message": "Error: Table 'content_categories' is already defined for this MetaData instance.  Specify 'extend_existing=True' to redefine options and columns on an existing Table object.",
+      "details": {},
+      "timestamp": "2026-05-13 01:39:10.170083"
+    },
+    {
+      "test_name": "Service class: SocialService",
+      "status": "FAIL",
+      "message": "Error: Table 'user_connections' is already defined for this MetaData instance.  Specify 'extend_existing=True' to redefine options and columns on an existing Table object.",
+      "details": {},
+      "timestamp": "2026-05-13 01:39:10.173248"
+    },
+    {
+      "test_name": "Blueprint import: app.admin.routes",
+      "status": "FAIL",
+      "message": "ImportError: cannot import name 'SecurityEvent' from 'app.admin.models' (/home/robbie/Desktop/repo-forum/app/admin/models.py)",
+      "details": {},
+      "timestamp": "2026-05-13 01:39:10.245259"
+    },
+    {
+      "test_name": "Blueprint: admin_bp",
+      "status": "FAIL",
+      "message": "Error: cannot import name 'SecurityEvent' from 'app.admin.models' (/home/robbie/Desktop/repo-forum/app/admin/models.py)",
+      "details": {},
+      "timestamp": "2026-05-13 01:39:10.247289"
+    },
+    {
+      "test_name": "Flask app creation",
+      "status": "FAIL",
+      "message": "Error creating app: cannot import name 'SecurityEvent' from 'app.admin.models' (/home/robbie/Desktop/repo-forum/app/admin/models.py)",
+      "details": {},
+      "timestamp": "2026-05-13 01:39:10.477411"
+    },
+    {
+      "test_name": "App context integration",
+      "status": "FAIL",
+      "message": "Error: cannot import name 'SecurityEvent' from 'app.admin.models' (/home/robbie/Desktop/repo-forum/app/admin/models.py)",
+      "details": {},
+      "timestamp": "2026-05-13 01:39:10.579843"
+    },
+    {
+      "test_name": "Model integration",
+      "status": "FAIL",
+      "message": "Error: cannot import name 'SecurityEvent' from 'app.admin.models' (/home/robbie/Desktop/repo-forum/app/admin/models.py)",
+      "details": {},
+      "timestamp": "2026-05-13 01:39:10.590263"
+    },
+    {
+      "test_name": "Blueprint integration",
+      "status": "FAIL",
+      "message": "Error: cannot import name 'SecurityEvent' from 'app.admin.models' (/home/robbie/Desktop/repo-forum/app/admin/models.py)",
+      "details": {},
+      "timestamp": "2026-05-13 01:39:10.604131"
+    }
+  ],
+  "warnings": [
+    {
+      "test_name": "Post relationship: tags",
+      "status": "WARN",
+      "message": "Relationship tags missing",
+      "details": {},
+      "timestamp": "2026-05-13 01:39:10.125458"
+    }
+  ],
+  "layer_results": {
+    "Database Layer": [
+      {
+        "test_name": "Config var: SQLALCHEMY_DATABASE_URI",
+        "status": "PASS",
+        "message": "SQLALCHEMY_DATABASE_URI configured",
+        "details": {},
+        "timestamp": "2026-05-13 01:39:09.148404"
+      },
+      {
+        "test_name": "Database URI format",
+        "status": "PASS",
+        "message": "Valid URI: sqlite://",
+        "details": {},
+        "timestamp": "2026-05-13 01:39:09.148425"
+      },
+      {
+        "test_name": "Database object creation",
+        "status": "PASS",
+        "message": "SQLAlchemy object created",
+        "details": {},
+        "timestamp": "2026-05-13 01:39:09.562599"
+      },
+      {
+        "test_name": "Database metadata",
+        "status": "PASS",
+        "message": "Metadata accessible",
+        "details": {},
+        "timestamp": "2026-05-13 01:39:09.562619"
+      }
+    ],
+    "Model Layer": [
+      {
+        "test_name": "Model import: app.models",
+        "status": "PASS",
+        "message": "Imported successfully",
+        "details": {},
+        "timestamp": "2026-05-13 01:39:09.931897"
+      },
+      {
+        "test_name": "Model import: app.content.models",
+        "status": "FAIL",
+        "message": "Error: Table 'content_categories' is already defined for this MetaData instance.  Specify 'extend_existing=True' to redefine options and columns on an existing Table object.",
+        "details": {},
+        "timestamp": "2026-05-13 01:39:09.937624"
+      },
+      {
+        "test_name": "Model import: app.social.models",
+        "status": "FAIL",
+        "message": "Error: 'SchemaItem' object, such as a 'Column' or a 'Constraint' expected, got False",
+        "details": {},
+        "timestamp": "2026-05-13 01:39:09.947223"
+      },
+      {
+        "test_name": "Model import: app.security.models",
+        "status": "PASS",
+        "message": "Imported successfully",
+        "details": {},
+        "timestamp": "2026-05-13 01:39:09.969133"
+      },
+      {
+        "test_name": "Model: User",
+        "status": "PASS",
+        "message": "Model User can be instantiated",
+        "details": {},
+        "timestamp": "2026-05-13 01:39:10.100638"
+      },
+      {
+        "test_name": "Model: Category",
+        "status": "PASS",
+        "message": "Model Category can be instantiated",
+        "details": {},
+        "timestamp": "2026-05-13 01:39:10.100715"
+      },
+      {
+        "test_name": "Model: Repository",
+        "status": "PASS",
+        "message": "Model Repository can be instantiated",
+        "details": {},
+        "timestamp": "2026-05-13 01:39:10.100739"
+      },
+      {
+        "test_name": "Model: Post",
+        "status": "PASS",
+        "message": "Model Post can be instantiated",
+        "details": {},
+        "timestamp": "2026-05-13 01:39:10.100756"
+      },
+      {
+        "test_name": "Model: Comment",
+        "status": "PASS",
+        "message": "Model Comment can be instantiated",
+        "details": {},
+        "timestamp": "2026-05-13 01:39:10.100771"
+      },
+      {
+        "test_name": "Model: AuditLog",
+        "status": "PASS",
+        "message": "Model AuditLog can be instantiated",
+        "details": {},
+        "timestamp": "2026-05-13 01:39:10.100788"
+      },
+      {
+        "test_name": "Model: ContentTag",
+        "status": "FAIL",
+        "message": "Error instantiating: Table 'content_categories' is already defined for this MetaData instance.  Specify 'extend_existing=True' to redefine options and columns on an existing Table object.",
+        "details": {},
+        "timestamp": "2026-05-13 01:39:10.106172"
+      },
+      {
+        "test_name": "Model: ContentCategory",
+        "status": "FAIL",
+        "message": "Error instantiating: Table 'content_categories' is already defined for this MetaData instance.  Specify 'extend_existing=True' to redefine options and columns on an existing Table object.",
+        "details": {},
+        "timestamp": "2026-05-13 01:39:10.111190"
+      },
+      {
+        "test_name": "Model: ContentRelationship",
+        "status": "FAIL",
+        "message": "Error instantiating: Table 'content_categories' is already defined for this MetaData instance.  Specify 'extend_existing=True' to redefine options and columns on an existing Table object.",
+        "details": {},
+        "timestamp": "2026-05-13 01:39:10.116991"
+      },
+      {
+        "test_name": "Model: UserConnection",
+        "status": "FAIL",
+        "message": "Error instantiating: Table 'user_connections' is already defined for this MetaData instance.  Specify 'extend_existing=True' to redefine options and columns on an existing Table object.",
+        "details": {},
+        "timestamp": "2026-05-13 01:39:10.120096"
+      },
+      {
+        "test_name": "Model: UserSocialProfile",
+        "status": "FAIL",
+        "message": "Error instantiating: Table 'user_connections' is already defined for this MetaData instance.  Specify 'extend_existing=True' to redefine options and columns on an existing Table object.",
+        "details": {},
+        "timestamp": "2026-05-13 01:39:10.122868"
+      },
+      {
+        "test_name": "Model: SecurityEvent",
+        "status": "PASS",
+        "message": "Model SecurityEvent can be instantiated",
+        "details": {},
+        "timestamp": "2026-05-13 01:39:10.124406"
+      },
+      {
+        "test_name": "Model: AuditTrail",
+        "status": "PASS",
+        "message": "Model AuditTrail can be instantiated",
+        "details": {},
+        "timestamp": "2026-05-13 01:39:10.124467"
+      },
+      {
+        "test_name": "Model integration",
+        "status": "FAIL",
+        "message": "Error: cannot import name 'SecurityEvent' from 'app.admin.models' (/home/robbie/Desktop/repo-forum/app/admin/models.py)",
+        "details": {},
+        "timestamp": "2026-05-13 01:39:10.590263"
+      }
+    ],
+    "Service Layer": [
+      {
+        "test_name": "Service import: app.forum.service",
+        "status": "PASS",
+        "message": "Imported successfully",
+        "details": {},
+        "timestamp": "2026-05-13 01:39:10.154111"
+      },
+      {
+        "test_name": "Service import: app.content.service",
+        "status": "FAIL",
+        "message": "Error: Table 'content_categories' is already defined for this MetaData instance.  Specify 'extend_existing=True' to redefine options and columns on an existing Table object.",
+        "details": {},
+        "timestamp": "2026-05-13 01:39:10.161403"
+      },
+      {
+        "test_name": "Service import: app.social.service",
+        "status": "FAIL",
+        "message": "Error: Table 'user_connections' is already defined for this MetaData instance.  Specify 'extend_existing=True' to redefine options and columns on an existing Table object.",
+        "details": {},
+        "timestamp": "2026-05-13 01:39:10.164509"
+      },
+      {
+        "test_name": "Service import: app.security.service",
+        "status": "PASS",
+        "message": "Imported successfully",
+        "details": {},
+        "timestamp": "2026-05-13 01:39:10.164577"
+      },
+      {
+        "test_name": "Service class: ForumService",
+        "status": "PASS",
+        "message": "Service ForumService callable",
+        "details": {},
+        "timestamp": "2026-05-13 01:39:10.164593"
+      },
+      {
+        "test_name": "Service class: ContentService",
+        "status": "FAIL",
+        "message": "Error: Table 'content_categories' is already defined for this MetaData instance.  Specify 'extend_existing=True' to redefine options and columns on an existing Table object.",
+        "details": {},
+        "timestamp": "2026-05-13 01:39:10.170083"
+      },
+      {
+        "test_name": "Service class: SocialService",
+        "status": "FAIL",
+        "message": "Error: Table 'user_connections' is already defined for this MetaData instance.  Specify 'extend_existing=True' to redefine options and columns on an existing Table object.",
+        "details": {},
+        "timestamp": "2026-05-13 01:39:10.173248"
+      },
+      {
+        "test_name": "Service class: SecurityService",
+        "status": "PASS",
+        "message": "Service SecurityService callable",
+        "details": {},
+        "timestamp": "2026-05-13 01:39:10.173321"
+      }
+    ],
+    "Blueprint Layer": [
+      {
+        "test_name": "Blueprint import: app.forum.routes",
+        "status": "PASS",
+        "message": "Imported successfully",
+        "details": {},
+        "timestamp": "2026-05-13 01:39:10.173350"
+      },
+      {
+        "test_name": "Blueprint import: app.auth.routes",
+        "status": "PASS",
+        "message": "Imported successfully",
+        "details": {},
+        "timestamp": "2026-05-13 01:39:10.209746"
+      },
+      {
+        "test_name": "Blueprint import: app.admin.routes",
+        "status": "FAIL",
+        "message": "ImportError: cannot import name 'SecurityEvent' from 'app.admin.models' (/home/robbie/Desktop/repo-forum/app/admin/models.py)",
+        "details": {},
+        "timestamp": "2026-05-13 01:39:10.245259"
+      },
+      {
+        "test_name": "Blueprint import: app.api.routes",
+        "status": "PASS",
+        "message": "Imported successfully",
+        "details": {},
+        "timestamp": "2026-05-13 01:39:10.245903"
+      },
+      {
+        "test_name": "Blueprint: forum_bp",
+        "status": "PASS",
+        "message": "Blueprint forum_bp has name: forum",
+        "details": {},
+        "timestamp": "2026-05-13 01:39:10.245933"
+      },
+      {
+        "test_name": "Blueprint: auth_bp",
+        "status": "PASS",
+        "message": "Blueprint auth_bp has name: auth",
+        "details": {},
+        "timestamp": "2026-05-13 01:39:10.246057"
+      },
+      {
+        "test_name": "Blueprint: admin_bp",
+        "status": "FAIL",
+        "message": "Error: cannot import name 'SecurityEvent' from 'app.admin.models' (/home/robbie/Desktop/repo-forum/app/admin/models.py)",
+        "details": {},
+        "timestamp": "2026-05-13 01:39:10.247289"
+      },
+      {
+        "test_name": "Auth blueprint",
+        "status": "PASS",
+        "message": "Auth blueprint exists: auth",
+        "details": {},
+        "timestamp": "2026-05-13 01:39:10.569104"
+      },
+      {
+        "test_name": "Blueprint integration",
+        "status": "FAIL",
+        "message": "Error: cannot import name 'SecurityEvent' from 'app.admin.models' (/home/robbie/Desktop/repo-forum/app/admin/models.py)",
+        "details": {},
+        "timestamp": "2026-05-13 01:39:10.604131"
+      }
+    ],
+    "Application Layer": [
+      {
+        "test_name": "Post relationship: author",
+        "status": "PASS",
+        "message": "Relationship author exists",
+        "details": {},
+        "timestamp": "2026-05-13 01:39:10.125324"
+      },
+      {
+        "test_name": "Comment relationship: author",
+        "status": "PASS",
+        "message": "Relationship author exists",
+        "details": {},
+        "timestamp": "2026-05-13 01:39:10.125535"
+      },
+      {
+        "test_name": "Blueprint import: app.auth.routes",
+        "status": "PASS",
+        "message": "Imported successfully",
+        "details": {},
+        "timestamp": "2026-05-13 01:39:10.209746"
+      },
+      {
+        "test_name": "Blueprint: auth_bp",
+        "status": "PASS",
+        "message": "Blueprint auth_bp has name: auth",
+        "details": {},
+        "timestamp": "2026-05-13 01:39:10.246057"
+      },
+      {
+        "test_name": "Flask import",
+        "status": "PASS",
+        "message": "Flask imported successfully",
+        "details": {},
+        "timestamp": "2026-05-13 01:39:10.247465"
+      },
+      {
+        "test_name": "Flask app creation",
+        "status": "FAIL",
+        "message": "Error creating app: cannot import name 'SecurityEvent' from 'app.admin.models' (/home/robbie/Desktop/repo-forum/app/admin/models.py)",
+        "details": {},
+        "timestamp": "2026-05-13 01:39:10.477411"
+      },
+      {
+        "test_name": "Flask-Login import",
+        "status": "PASS",
+        "message": "Flask-Login imported successfully",
+        "details": {},
+        "timestamp": "2026-05-13 01:39:10.479747"
+      },
+      {
+        "test_name": "User auth method: set_password",
+        "status": "PASS",
+        "message": "Method set_password exists",
+        "details": {},
+        "timestamp": "2026-05-13 01:39:10.569045"
+      },
+      {
+        "test_name": "User auth method: check_password",
+        "status": "PASS",
+        "message": "Method check_password exists",
+        "details": {},
+        "timestamp": "2026-05-13 01:39:10.569087"
+      },
+      {
+        "test_name": "Auth blueprint",
+        "status": "PASS",
+        "message": "Auth blueprint exists: auth",
+        "details": {},
+        "timestamp": "2026-05-13 01:39:10.569104"
+      }
+    ],
+    "Integration Layer": [
+      {
+        "test_name": "App context integration",
+        "status": "FAIL",
+        "message": "Error: cannot import name 'SecurityEvent' from 'app.admin.models' (/home/robbie/Desktop/repo-forum/app/admin/models.py)",
+        "details": {},
+        "timestamp": "2026-05-13 01:39:10.579843"
+      },
+      {
+        "test_name": "Model integration",
+        "status": "FAIL",
+        "message": "Error: cannot import name 'SecurityEvent' from 'app.admin.models' (/home/robbie/Desktop/repo-forum/app/admin/models.py)",
+        "details": {},
+        "timestamp": "2026-05-13 01:39:10.590263"
+      },
+      {
+        "test_name": "Blueprint integration",
+        "status": "FAIL",
+        "message": "Error: cannot import name 'SecurityEvent' from 'app.admin.models' (/home/robbie/Desktop/repo-forum/app/admin/models.py)",
+        "details": {},
+        "timestamp": "2026-05-13 01:39:10.604131"
+      }
+    ]
+  }
+}

@@ -1,0 +1,109 @@
+{
+  "total_tests": 50,
+  "passed_tests": 36,
+  "failed_tests": 14,
+  "warning_tests": 0,
+  "success_rate": 72.0,
+  "execution_time": 2.195118,
+  "errors": [
+    {
+      "test_name": "Import error: run",
+      "status": "FAIL",
+      "message": "Unexpected error: Table 'content_categories' is already defined for this MetaData instance.  Specify 'extend_existing=True' to redefine options and columns on an existing Table object.",
+      "details": {},
+      "timestamp": "2026-05-13 01:35:35.522450"
+    },
+    {
+      "test_name": "Flask app creation",
+      "status": "FAIL",
+      "message": "Error creating app: Table 'content_categories' is already defined for this MetaData instance.  Specify 'extend_existing=True' to redefine options and columns on an existing Table object.",
+      "details": {},
+      "timestamp": "2026-05-13 01:35:35.664237"
+    },
+    {
+      "test_name": "Social models",
+      "status": "FAIL",
+      "message": "Error: 'SchemaItem' object, such as a 'Column' or a 'Constraint' expected, got False",
+      "details": {},
+      "timestamp": "2026-05-13 01:35:36.005310"
+    },
+    {
+      "test_name": "Content models",
+      "status": "FAIL",
+      "message": "Error: Table 'content_categories' is already defined for this MetaData instance.  Specify 'extend_existing=True' to redefine options and columns on an existing Table object.",
+      "details": {},
+      "timestamp": "2026-05-13 01:35:36.012777"
+    },
+    {
+      "test_name": "Blueprint registrations",
+      "status": "FAIL",
+      "message": "Error testing blueprints: Table 'content_categories' is already defined for this MetaData instance.  Specify 'extend_existing=True' to redefine options and columns on an existing Table object.",
+      "details": {},
+      "timestamp": "2026-05-13 01:35:36.128476"
+    },
+    {
+      "test_name": "Login manager integration",
+      "status": "FAIL",
+      "message": "Error: Table 'content_categories' is already defined for this MetaData instance.  Specify 'extend_existing=True' to redefine options and columns on an existing Table object.",
+      "details": {},
+      "timestamp": "2026-05-13 01:35:36.226983"
+    },
+    {
+      "test_name": "Social system",
+      "status": "FAIL",
+      "message": "Error: 'SchemaItem' object, such as a 'Column' or a 'Constraint' expected, got False",
+      "details": {},
+      "timestamp": "2026-05-13 01:35:36.233348"
+    },
+    {
+      "test_name": "Content system",
+      "status": "FAIL",
+      "message": "Error: Table 'content_categories' is already defined for this MetaData instance.  Specify 'extend_existing=True' to redefine options and columns on an existing Table object.",
+      "details": {},
+      "timestamp": "2026-05-13 01:35:36.242640"
+    },
+    {
+      "test_name": "Security model: SecurityEvent",
+      "status": "FAIL",
+      "message": "Error: Error creating backref 'social_connections' on relationship 'UserConnection.user': property of that name exists on mapper 'Mapper[User(user)]'",
+      "details": {},
+      "timestamp": "2026-05-13 01:35:36.258241"
+    },
+    {
+      "test_name": "Security model: AuditTrail",
+      "status": "FAIL",
+      "message": "Error: One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[UserConnection(user_connections)]'. Original exception was: Error creating backref 'social_connections' on relationship 'UserConnection.user': property of that name exists on mapper 'Mapper[User(user)]'",
+      "details": {},
+      "timestamp": "2026-05-13 01:35:36.258533"
+    },
+    {
+      "test_name": "Audit logging",
+      "status": "FAIL",
+      "message": "Error: One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[UserConnection(user_connections)]'. Original exception was: Error creating backref 'social_connections' on relationship 'UserConnection.user': property of that name exists on mapper 'Mapper[User(user)]'",
+      "details": {},
+      "timestamp": "2026-05-13 01:35:36.258679"
+    },
+    {
+      "test_name": "App context integration",
+      "status": "FAIL",
+      "message": "Error: Table 'content_categories' is already defined for this MetaData instance.  Specify 'extend_existing=True' to redefine options and columns on an existing Table object.",
+      "details": {},
+      "timestamp": "2026-05-13 01:35:36.346516"
+    },
+    {
+      "test_name": "Model relationships",
+      "status": "FAIL",
+      "message": "Error: One or more mappers failed to initialize - can't proceed with initialization of other mappers. Triggering mapper: 'Mapper[UserConnection(user_connections)]'. Original exception was: Error creating backref 'social_connections' on relationship 'UserConnection.user': property of that name exists on mapper 'Mapper[User(user)]'",
+      "details": {},
+      "timestamp": "2026-05-13 01:35:36.346750"
+    },
+    {
+      "test_name": "Blueprint integration",
+      "status": "FAIL",
+      "message": "Error: Table 'content_categories' is already defined for this MetaData instance.  Specify 'extend_existing=True' to redefine options and columns on an existing Table object.",
+      "details": {},
+      "timestamp": "2026-05-13 01:35:36.447680"
+    }
+  ],
+  "warnings": []
+}

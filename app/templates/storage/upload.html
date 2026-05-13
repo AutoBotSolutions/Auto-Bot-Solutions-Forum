@@ -1,0 +1,311 @@
+{% extends "base.html" %}
+
+{% block title %}Upload File{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="mb-4">
+                <i class="fas fa-upload"></i>
+                Upload File
+            </h1>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <form method="POST" enctype="multipart/form-data" id="uploadForm">
+                        {{ form.hidden_tag() }}
+                        
+                        <div class="mb-3">
+                            {{ form.file.label(class="form-label") }}
+                            {{ form.file(class="form-control", accept=".jpg,.jpeg,.png,.gif,.webp,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.zip,.rar") }}
+                            {% if form.file.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.file.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            <small class="form-text text-muted">
+                                Allowed formats: Images, Documents, Archives. Max size: 50MB
+                            </small>
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form.description.label(class="form-label") }}
+                            {{ form.description(class="form-control", rows="3") }}
+                            {% if form.description.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.description.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                {{ form.folder.label(class="form-label") }}
+                                {{ form.folder(class="form-control", placeholder="documents/images") }}
+                                <small class="form-text text-muted">Optional folder path</small>
+                            </div>
+                            <div class="col-md-6">
+                                {{ form.tags.label(class="form-label") }}
+                                {{ form.tags(class="form-control", placeholder="tag1, tag2, tag3") }}
+                                <small class="form-text text-muted">Comma-separated tags</small>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="form-check">
+                                {{ form.is_public(class="form-check-input") }}
+                                {{ form.is_public.label(class="form-check-label") }}
+                                <small class="form-text text-muted">Make this file publicly accessible</small>
+                            </div>
+                        </div>
+
+                        <!-- File Preview -->
+                        <div id="filePreview" class="mb-3" style="display: none;">
+                            <h6>File Preview</h6>
+                            <div id="previewContent" class="border rounded p-3 bg-light"></div>
+                        </div>
+
+                        <!-- Upload Progress -->
+                        <div id="uploadProgress" class="mb-3" style="display: none;">
+                            <div class="progress">
+                                <div id="progressBar" class="progress-bar" role="progressbar" style="width: 0%">
+                                    0%
+                                </div>
+                            </div>
+                            <small id="uploadStatus" class="text-muted"></small>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <a href="{{ url_for('storage.dashboard') }}" class="btn btn-secondary">
+                                    <i class="fas fa-arrow-left"></i> Back to Dashboard
+                                </a>
+                            </div>
+                            <div>
+                                <button type="submit" class="btn btn-primary" id="uploadBtn">
+                                    <i class="fas fa-upload"></i> Upload File
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Upload Guidelines</h5>
+                </div>
+                <div class="card-body">
+                    <h6>Supported File Types</h6>
+                    <ul class="list-unstyled">
+                        <li><i class="fas fa-image text-primary"></i> Images: JPG, PNG, GIF, WebP</li>
+                        <li><i class="fas fa-file-alt text-success"></i> Documents: PDF, DOC, DOCX, TXT</li>
+                        <li><i class="fas fa-file-excel text-info"></i> Spreadsheets: XLS, XLSX</li>
+                        <li><i class="fas fa-file-powerpoint text-warning"></i> Presentations: PPT, PPTX</li>
+                        <li><i class="fas fa-file-archive text-secondary"></i> Archives: ZIP, RAR</li>
+                    </ul>
+
+                    <h6 class="mt-3">File Processing</h6>
+                    <ul class="list-unstyled">
+                        <li><i class="fas fa-check text-success"></i> Automatic image optimization</li>
+                        <li><i class="fas fa-check text-success"></i> Thumbnail generation</li>
+                        <li><i class="fas fa-check text-success"></i> Preview creation</li>
+                        <li><i class="fas fa-check text-success"></i> Metadata extraction</li>
+                    </ul>
+
+                    <h6 class="mt-3">Storage Options</h6>
+                    <ul class="list-unstyled">
+                        <li><i class="fas fa-hdd text-primary"></i> Local storage</li>
+                        <li><i class="fas fa-cloud text-info"></i> Cloud storage (S3, GCS)</li>
+                        <li><i class="fas fa-lock text-warning"></i> Secure upload</li>
+                        <li><i class="fas fa-chart-line text-success"></i> Usage tracking</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h5 class="mb-0">Recent Uploads</h5>
+                </div>
+                <div class="card-body">
+                    <div id="recentUploads">
+                        <p class="text-muted">Loading recent uploads...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+// File upload functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const fileInput = document.getElementById('file');
+    const filePreview = document.getElementById('filePreview');
+    const previewContent = document.getElementById('previewContent');
+    const uploadForm = document.getElementById('uploadForm');
+    const uploadBtn = document.getElementById('uploadBtn');
+    const uploadProgress = document.getElementById('uploadProgress');
+    const progressBar = document.getElementById('progressBar');
+    const uploadStatus = document.getElementById('uploadStatus');
+
+    // File preview
+    fileInput.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            showFilePreview(file);
+        } else {
+            filePreview.style.display = 'none';
+        }
+    });
+
+    function showFilePreview(file) {
+        filePreview.style.display = 'block';
+        
+        const fileInfo = `
+            <div class="row">
+                <div class="col-md-6">
+                    <strong>Name:</strong> ${file.name}<br>
+                    <strong>Size:</strong> ${formatFileSize(file.size)}<br>
+                    <strong>Type:</strong> ${file.type || 'Unknown'}
+                </div>
+                <div class="col-md-6">
+                    <strong>Last Modified:</strong> ${new Date(file.lastModified).toLocaleString()}<br>
+                    <strong>Extension:</strong> ${getFileExtension(file.name)}
+                </div>
+            </div>
+        `;
+        
+        previewContent.innerHTML = fileInfo;
+
+        // Show image preview if it's an image
+        if (file.type && file.type.startsWith('image/')) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                previewContent.innerHTML += `
+                    <div class="mt-3">
+                        <img src="${e.target.result}" class="img-fluid rounded" alt="Preview">
+                    </div>
+                `;
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+
+    function formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+
+    function getFileExtension(filename) {
+        return filename.split('.').pop().toUpperCase();
+    }
+
+    // Form submission with progress
+    uploadForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(uploadForm);
+        const xhr = new XMLHttpRequest();
+        
+        // Show progress
+        uploadProgress.style.display = 'block';
+        uploadBtn.disabled = true;
+        uploadBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
+        
+        // Progress tracking
+        xhr.upload.addEventListener('progress', function(e) {
+            if (e.lengthComputable) {
+                const percentComplete = (e.loaded / e.total) * 100;
+                progressBar.style.width = percentComplete + '%';
+                progressBar.textContent = Math.round(percentComplete) + '%';
+                uploadStatus.textContent = `Uploaded ${formatFileSize(e.loaded)} of ${formatFileSize(e.total)}`;
+            }
+        });
+        
+        // Completion
+        xhr.addEventListener('load', function() {
+            if (xhr.status === 200) {
+                progressBar.style.width = '100%';
+                progressBar.textContent = 'Upload Complete!';
+                uploadStatus.textContent = 'File uploaded successfully!';
+                uploadBtn.innerHTML = '<i class="fas fa-check"></i> Upload Complete';
+                uploadBtn.classList.remove('btn-primary');
+                uploadBtn.classList.add('btn-success');
+                
+                // Redirect after a short delay
+                setTimeout(() => {
+                    window.location.href = '/files/files';
+                }, 1500);
+            } else {
+                uploadStatus.textContent = 'Upload failed. Please try again.';
+                uploadBtn.disabled = false;
+                uploadBtn.innerHTML = '<i class="fas fa-upload"></i> Upload File';
+                uploadProgress.style.display = 'none';
+            }
+        });
+        
+        // Error handling
+        xhr.addEventListener('error', function() {
+            uploadStatus.textContent = 'Upload error. Please check your connection.';
+            uploadBtn.disabled = false;
+            uploadBtn.innerHTML = '<i class="fas fa-upload"></i> Upload File';
+            uploadProgress.style.display = 'none';
+        });
+        
+        // Send request
+        xhr.open('POST', uploadForm.action);
+        xhr.send(formData);
+    });
+
+    // Load recent uploads (mock data for now)
+    function loadRecentUploads() {
+        const recentUploadsDiv = document.getElementById('recentUploads');
+        
+        // This would be an API call to get recent uploads
+        const mockRecentUploads = [
+            { name: 'document.pdf', size: '2.3 MB', date: '2 hours ago' },
+            { name: 'image.jpg', size: '1.1 MB', date: '5 hours ago' },
+            { name: 'presentation.pptx', size: '5.7 MB', date: '1 day ago' }
+        ];
+        
+        let html = '<div class="list-group list-group-flush">';
+        mockRecentUploads.forEach(upload => {
+            html += `
+                <div class="list-group-item px-0">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <small class="text-truncate d-block">${upload.name}</small>
+                            <small class="text-muted">${upload.size}</small>
+                        </div>
+                        <small class="text-muted">${upload.date}</small>
+                    </div>
+                </div>
+            `;
+        });
+        html += '</div>';
+        
+        recentUploadsDiv.innerHTML = html;
+    }
+    
+    loadRecentUploads();
+});
+</script>
+{% endblock %}

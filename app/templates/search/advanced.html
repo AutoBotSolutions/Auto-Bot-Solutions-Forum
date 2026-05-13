@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+
+{% block title %}Advanced Search{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8">
+            <h2>Advanced Search</h2>
+            <p class="text-muted">Use advanced filters to find exactly what you're looking for.</p>
+            
+            <form method="POST" class="mb-4">
+                {{ form.hidden_tag() }}
+                
+                <div class="row mb-3">
+                    <div class="col-md-12">
+                        {{ form.query.label(class="form-label") }}
+                        {{ form.query(class="form-control") }}
+                        {% if form.query.errors %}
+                            <div class="text-danger">
+                                {% for error in form.query.errors %}
+                                    <small>{{ error }}</small>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        {{ form.content_type.label(class="form-label") }}
+                        {{ form.content_type(class="form-select") }}
+                    </div>
+                    <div class="col-md-6">
+                        {{ form.sort_by.label(class="form-label") }}
+                        {{ form.sort_by(class="form-select") }}
+                    </div>
+                </div>
+                
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        {{ form.per_page.label(class="form-label") }}
+                        {{ form.per_page(class="form-select") }}
+                    </div>
+                    <div class="col-md-6">
+                        {{ form.author.label(class="form-label") }}
+                        {{ form.author(class="form-control") }}
+                    </div>
+                </div>
+                
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        {{ form.category.label(class="form-label") }}
+                        {{ form.category(class="form-select") }}
+                    </div>
+                    <div class="col-md-6">
+                        {{ form.tags.label(class="form-label") }}
+                        {{ form.tags(class="form-control", placeholder="tag1, tag2, tag3") }}
+                    </div>
+                </div>
+                
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        {{ form.date_from.label(class="form-label") }}
+                        {{ form.date_from(class="form-control") }}
+                    </div>
+                    <div class="col-md-6">
+                        {{ form.date_to.label(class="form-label") }}
+                        {{ form.date_to(class="form-control") }}
+                    </div>
+                </div>
+                
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        {{ form.min_votes.label(class="form-label") }}
+                        {{ form.min_votes(class="form-control") }}
+                    </div>
+                    <div class="col-md-6">
+                        {{ form.max_votes.label(class="form-label") }}
+                        {{ form.max_votes(class="form-control") }}
+                    </div>
+                </div>
+                
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        {{ form.min_views.label(class="form-label") }}
+                        {{ form.min_views(class="form-control") }}
+                    </div>
+                    <div class="col-md-6">
+                        {{ form.max_views.label(class="form-label") }}
+                        {{ form.max_views(class="form-control") }}
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-search"></i> Search
+                    </button>
+                    <a href="{{ url_for('search.index') }}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Back to Basic Search
+                    </a>
+                </div>
+            </form>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Search Tips</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled">
+                        <li><i class="fas fa-check text-success"></i> Use quotes for exact phrases</li>
+                        <li><i class="fas fa-check text-success"></i> Combine terms with AND, OR, NOT</li>
+                        <li><i class="fas fa-check text-success"></i> Use wildcards like python*</li>
+                        <li><i class="fas fa-check text-success"></i> Filter by date ranges</li>
+                        <li><i class="fas fa-check text-success"></i> Sort by relevance or date</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

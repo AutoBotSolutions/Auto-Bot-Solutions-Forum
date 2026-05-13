@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Inbox Test</title>
+</head>
+<body>
+    <h1>INBOX TEST</h1>
+    <p>{{ unread_count }} unread messages</p>
+    
+    {% for message in messages %}
+    <div style="border: 1px solid #ccc; padding: 10px; margin: 10px 0;">
+        <p><strong>{{ message.sender.username }}</strong></p>
+        <p>{{ message.content[:200] }}{% if message.content|length > 200 %}...{% endif %}</p>
+        <p><small>{{ message.created_at.strftime('%B %d, %Y at %I:%M %p') }}</small></p>
+    </div>
+    {% else %}
+    <p>No messages yet.</p>
+    {% endfor %}
+</body>
+</html>

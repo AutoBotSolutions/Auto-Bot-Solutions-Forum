@@ -1,0 +1,355 @@
+{% extends "base.html" %}
+
+{% block title %}User Management - Admin{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h1><i class="fas fa-users-cog"></i> Advanced User Management</h1>
+            <p class="text-muted">Comprehensive user management with roles, groups, and permissions</p>
+        </div>
+    </div>
+    
+    <!-- Management Overview Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h5 class="card-title text-primary">
+                        <i class="fas fa-users"></i> Total Users
+                    </h5>
+                    <h3 class="text-primary">{{ total_users if total_users is defined else 'N/A' }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h5 class="card-title text-success">
+                        <i class="fas fa-user-shield"></i> Active Roles
+                    </h5>
+                    <h3 class="text-success">{{ active_roles if active_roles is defined else 'N/A' }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h5 class="card-title text-info">
+                        <i class="fas fa-users"></i> User Groups
+                    </h5>
+                    <h3 class="text-info">{{ user_groups if user_groups is defined else 'N/A' }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h5 class="card-title text-warning">
+                        <i class="fas fa-shield-alt"></i> Permissions
+                    </h5>
+                    <h3 class="text-warning">{{ total_permissions if total_permissions is defined else 'N/A' }}</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Quick Actions -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-bolt"></i> Quick Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 mb-2">
+                            <a href="{{ url_for('admin.assign_user_role') }}" class="btn btn-outline-primary btn-sm w-100">
+                                <i class="fas fa-user-plus"></i> Assign Role
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <a href="{{ url_for('admin.create_user_group') }}" class="btn btn-outline-success btn-sm w-100">
+                                <i class="fas fa-users"></i> Create Group
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <a href="{{ url_for('admin.create_role') }}" class="btn btn-outline-info btn-sm w-100">
+                                <i class="fas fa-user-shield"></i> Create Role
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <a href="{{ url_for('admin.create_permission') }}" class="btn btn-outline-warning btn-sm w-100">
+                                <i class="fas fa-key"></i> Create Permission
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Management Tools -->
+    <div class="row">
+        <div class="col-md-6">
+            <!-- Permission Checker -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5><i class="fas fa-check-circle"></i> Permission Checker</h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">Check if a user has specific permissions</p>
+                    <a href="{{ url_for('admin.check_user_permission') }}" class="btn btn-primary">
+                        <i class="fas fa-search"></i> Check Permissions
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Security Events -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5><i class="fas fa-shield-alt"></i> Security Events</h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">Monitor security events and access attempts</p>
+                    <a href="{{ url_for('admin.security_events') }}" class="btn btn-warning">
+                        <i class="fas fa-exclamation-triangle"></i> View Security Events
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <!-- Access Logs -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5><i class="fas fa-list-alt"></i> Access Logs</h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">View system access logs and permission checks</p>
+                    <a href="{{ url_for('admin.access_logs') }}" class="btn btn-info">
+                        <i class="fas fa-history"></i> View Access Logs
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Bulk Operations -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5><i class="fas fa-tasks"></i> Bulk Operations</h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">Perform bulk user management operations</p>
+                    <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#bulkOperationModal">
+                        <i class="fas fa-users-cog"></i> Bulk Operations
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- System Statistics -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-chart-bar"></i> System Statistics</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <h6>Role Distribution</h6>
+                            <div class="progress mb-3">
+                                <div class="progress-bar bg-success" style="width: 35%">Admin: 35%</div>
+                            </div>
+                            <div class="progress mb-3">
+                                <div class="progress-bar bg-info" style="width: 25%">Moderator: 25%</div>
+                            </div>
+                            <div class="progress mb-3">
+                                <div class="progress-bar bg-warning" style="width: 40%">User: 40%</div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <h6>Permission Categories</h6>
+                            <div class="progress mb-2">
+                                <div class="progress-bar bg-primary" style="width: 20%">Users</div>
+                            </div>
+                            <div class="progress mb-2">
+                                <div class="progress-bar bg-secondary" style="width: 15%">Content</div>
+                            </div>
+                            <div class="progress mb-2">
+                                <div class="progress-bar bg-dark" style="width: 25%">System</div>
+                            </div>
+                            <div class="progress mb-2">
+                                <div class="progress-bar bg-danger" style="width: 10%">Security</div>
+                            </div>
+                            <div class="progress mb-2">
+                                <div class="progress-bar bg-info" style="width: 30%">Other</div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <h6>Recent Activity</h6>
+                            <ul class="list-unstyled">
+                                <li><i class="fas fa-user-plus text-success"></i> 5 new users added</li>
+                                <li><i class="fas fa-user-shield text-primary"></i> 3 role assignments</li>
+                                <li><i class="fas fa-users text-info"></i> 2 group memberships</li>
+                                <li><i class="fas fa-shield-alt text-warning"></i> 1 security event</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bulk Operation Modal -->
+<div class="modal fade" id="bulkOperationModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Bulk User Operations</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Select users and choose an action to perform:</p>
+                
+                <!-- User Selection -->
+                <div class="mb-3">
+                    <label class="form-label">Select Users</label>
+                    <textarea class="form-control" rows="3" placeholder="Enter user IDs separated by commas"></textarea>
+                    <small class="text-muted">Enter user IDs (e.g., 1,2,3,4,5)</small>
+                </div>
+                
+                <!-- Action Selection -->
+                <div class="mb-3">
+                    <label class="form-label">Action</label>
+                    <select class="form-select">
+                        <option value="">Choose an action...</option>
+                        <option value="assign_role">Assign Role</option>
+                        <option value="revoke_role">Revoke Role</option>
+                        <option value="add_to_group">Add to Group</option>
+                        <option value="remove_from_group">Remove from Group</option>
+                        <option value="activate">Activate Users</option>
+                        <option value="deactivate">Deactivate Users</option>
+                    </select>
+                </div>
+                
+                <!-- Target Selection (conditional) -->
+                <div class="mb-3" id="targetSelection" style="display: none;">
+                    <label class="form-label">Target</label>
+                    <select class="form-select">
+                        <option value="">Select target...</option>
+                    </select>
+                </div>
+                
+                <!-- Reason -->
+                <div class="mb-3">
+                    <label class="form-label">Reason (Optional)</label>
+                    <textarea class="form-control" rows="2" placeholder="Reason for this action"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary">Execute Action</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Handle bulk operation modal
+    const actionSelect = document.querySelector('#bulkOperationModal select.form-select');
+    const targetSelection = document.getElementById('targetSelection');
+    const targetSelect = targetSelection.querySelector('select');
+    
+    actionSelect.addEventListener('change', function() {
+        const action = this.value;
+        
+        if (action === 'assign_role' || action === 'revoke_role') {
+            targetSelection.style.display = 'block';
+            targetSelect.innerHTML = '<option value="">Select role...</option>';
+            // Load roles dynamically
+            fetch('/admin/api/roles')
+                .then(response => response.json())
+                .then(roles => {
+                    roles.forEach(role => {
+                        const option = document.createElement('option');
+                        option.value = role.id;
+                        option.textContent = role.display_name;
+                        targetSelect.appendChild(option);
+                    });
+                });
+        } else if (action === 'add_to_group' || action === 'remove_from_group') {
+            targetSelection.style.display = 'block';
+            targetSelect.innerHTML = '<option value="">Select group...</option>';
+            // Load groups dynamically
+            fetch('/admin/api/groups')
+                .then(response => response.json())
+                .then(groups => {
+                    groups.forEach(group => {
+                        const option = document.createElement('option');
+                        option.value = group.id;
+                        option.textContent = group.display_name;
+                        targetSelect.appendChild(option);
+                    });
+                });
+        } else {
+            targetSelection.style.display = 'none';
+        }
+    });
+    
+    // Handle bulk action execution
+    document.querySelector('#bulkOperationModal .btn-primary').addEventListener('click', function() {
+        const userIds = document.querySelector('#bulkOperationModal textarea').value;
+        const action = actionSelect.value;
+        const target = targetSelect.value;
+        const reason = document.querySelector('#bulkOperationModal textarea[rows="2"]').value;
+        
+        if (!userIds || !action) {
+            alert('Please select users and an action');
+            return;
+        }
+        
+        if ((action.includes('role') || action.includes('group')) && !target) {
+            alert('Please select a target for this action');
+            return;
+        }
+        
+        // Create form data
+        const formData = new FormData();
+        formData.append('user_ids', userIds);
+        formData.append('action', action);
+        if (target) {
+            if (action.includes('role')) {
+                formData.append('role_id', target);
+            } else if (action.includes('group')) {
+                formData.append('group_id', target);
+            }
+        }
+        formData.append('reason', reason);
+        
+        // Submit bulk action
+        fetch('/admin/user-management/bulk-action', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Bulk action completed successfully');
+                bootstrap.Modal.getInstance(document.getElementById('bulkOperationModal')).hide();
+                location.reload();
+            } else {
+                alert('Error: ' + data.message);
+            }
+        })
+        .catch(error => {
+            alert('Error: ' + error.message);
+        });
+    });
+});
+</script>
+{% endblock %}

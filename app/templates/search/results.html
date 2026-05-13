@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+
+{% block title %}Search Results{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>Search Results</h2>
+                <span class="text-muted">
+                    Found {{ results.total }} results for "{{ query }}"
+                </span>
+            </div>
+            
+            <form method="GET" class="mb-4">
+                <div class="input-group">
+                    <input type="text" name="q" value="{{ query }}" class="form-control" placeholder="Search...">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-search"></i> Search
+                    </button>
+                </div>
+            </form>
+            
+            {% if results.results %}
+                <div class="search-results">
+                    {% for result in results.results %}
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <a href="{{ result.url }}">{{ result.title }}</a>
+                            </h5>
+                            <p class="card-text">
+                                {{ result.indexed_content[:200] }}{% if result.indexed_content|length > 200 %}...{% endif %}
+                            </p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-muted">
+                                    <i class="fas fa-user"></i> Author ID: {{ result.author_id or 'Unknown' }}
+                                    {% if result.category_id %}
+                                    <i class="fas fa-folder"></i> Category ID: {{ result.category_id }}
+                                    {% endif %}
+                                    <i class="fas fa-clock"></i> {{ result.created_at.strftime('%Y-%m-%d') if result.created_at else 'Unknown' }}
+                                </small>
+                                <small class="text-muted">
+                                    <i class="fas fa-star"></i> Score: {{ "%.2f"|format(result.relevance_score or 0) }}
+                                    {% if result.view_count %}
+                                    <i class="fas fa-eye"></i> {{ result.view_count }} views
+                                    {% endif %}
+                                </small>
+                            </div>
+                            {% if result.tags %}
+                            <div class="mt-2">
+                                {% for tag in result.tags %}
+                                <span class="badge bg-secondary">{{ tag }}</span>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                <!-- Pagination -->
+                {% if results.total > results.per_page %}
+                <nav aria-label="Search results pagination">
+                    <ul class="pagination justify-content-center">
+                        {% if results.page > 1 %}
+                        <li class="page-item">
+                            <a class="page-link" href="?q={{ query }}&page={{ results.page - 1 }}">Previous</a>
+                        </li>
+                        {% endif %}
+                        
+                        {% for page_num in range(1, (results.total // results.per_page) + 2) %}
+                            {% if page_num == results.page %}
+                            <li class="page-item active">
+                                <span class="page-link">{{ page_num }}</span>
+                            </li>
+                            {% elif page_num <= 5 or page_num > (results.total // results.per_page) - 2 or (page_num >= results.page - 2 and page_num <= results.page + 2) %}
+                            <li class="page-item">
+                                <a class="page-link" href="?q={{ query }}&page={{ page_num }}">{{ page_num }}</a>
+                            </li>
+                            {% elif page_num == 6 and results.page > 5 %}
+                            <li class="page-item disabled">
+                                <span class="page-link">...</span>
+                            </li>
+                            {% endif %}
+                        {% endfor %}
+                        
+                        {% if results.page < (results.total // results.per_page) + 1 %}
+                        <li class="page-item">
+                            <a class="page-link" href="?q={{ query }}&page={{ results.page + 1 }}">Next</a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+                {% endif %}
+            {% else %}
+                <div class="alert alert-info">
+                    <h4>No results found</h4>
+                    <p>Try different keywords or check your spelling.</p>
+                    <a href="{{ url_for('search.advanced') }}" class="btn btn-primary">
+                        Try Advanced Search
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Search Info</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled">
+                        <li><strong>Query:</strong> {{ query }}</li>
+                        <li><strong>Results:</strong> {{ results.total }}</li>
+                        <li><strong>Page:</strong> {{ results.page }}</li>
+                        <li><strong>Per Page:</strong> {{ results.per_page }}</li>
+                        {% if results.get('search_time') %}
+                        <li><strong>Search Time:</strong> {{ "%.3f"|format(results.search_time) }}s</li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h5>Quick Actions</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled">
+                        <li><a href="{{ url_for('search.index') }}">New Search</a></li>
+                        <li><a href="{{ url_for('search.advanced') }}">Advanced Search</a></li>
+                        <li><a href="{{ url_for('search.api_suggestions') }}?q={{ query }}">Get Suggestions</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

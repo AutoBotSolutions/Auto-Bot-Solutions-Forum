@@ -1,0 +1,30 @@
+{{ site_name }} - New Message Notification
+
+Hello {{ user.username }},
+
+You have received a new message in your {{ site_name }} inbox.
+
+Message Details:
+{{ notification.content }}
+
+Time: {{ notification.created_at.strftime('%B %d, %Y at %I:%M %p') }}
+Type: {{ notification_type|title }}
+{% if is_important %}Priority: Important{% endif %}
+
+{% if notification.link %}
+Read the message here: {{ notification.link }}
+{% endif %}
+
+Check your inbox to read and respond to this message at your convenience.
+
+View all messages: {{ notifications_url }}
+Visit the forum: {{ forum_url }}
+
+---
+This notification was sent to {{ user.email }} because you have enabled email notifications for {{ site_name }}.
+
+Manage your notification preferences: {{ settings_url }}
+View all notifications: {{ notifications_url }}
+
+© {{ current_date }} {{ site_name }}. All rights reserved.
+If you no longer wish to receive these emails, you can update your preferences here: {{ settings_url }}

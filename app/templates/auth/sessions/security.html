@@ -1,0 +1,199 @@
+{% extends "base.html" %}
+
+{% block title %}Security Settings - {{ config.SITE_NAME or 'Forum' }}{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3>
+                        <i class="fas fa-shield-alt"></i> Security Settings
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        {{ form.hidden_tag() }}
+                        
+                        <!-- Two-Factor Authentication -->
+                        <div class="mb-4">
+                            <h5>Two-Factor Authentication</h5>
+                            <div class="form-check form-switch">
+                                {{ form.two_factor_required(class="form-check-input") }}
+                                <label class="form-check-label" for="{{ form.two_factor_required.id }}">
+                                    Require two-factor authentication for login
+                                </label>
+                            </div>
+                            <small class="form-text text-muted">
+                                Adds an extra layer of security to your account
+                            </small>
+                        </div>
+                        
+                        <!-- IP Whitelist -->
+                        <div class="mb-4">
+                            <h5>IP Whitelist</h5>
+                            <div class="form-check form-switch mb-3">
+                                {{ form.ip_whitelist_enabled(class="form-check-input") }}
+                                <label class="form-check-label" for="{{ form.ip_whitelist_enabled.id }}">
+                                    Enable IP whitelist
+                                </label>
+                            </div>
+                            
+                            {{ form.ip_whitelist(class="form-control", rows="4", placeholder="Enter IP addresses or CIDR ranges, one per line") }}
+                            <small class="form-text text-muted">
+                                Only allow logins from these IP addresses. Leave empty to allow all IPs.
+                                <br>Example: 192.168.1.1, 10.0.0.0/8, 203.0.113.0/24
+                            </small>
+                            {% if form.ip_whitelist.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.ip_whitelist.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Email Alerts -->
+                        <div class="mb-4">
+                            <h5>Email Notifications</h5>
+                            <div class="form-check form-switch">
+                                {{ form.email_alerts(class="form-check-input") }}
+                                <label class="form-check-label" for="{{ form.email_alerts.id }}">
+                                    Receive email alerts for security events
+                                </label>
+                            </div>
+                            <small class="form-text text-muted">
+                                Get notified about suspicious activity and security events
+                            </small>
+                        </div>
+                        
+                        <!-- Session Monitoring -->
+                        <div class="mb-4">
+                            <h5>Session Monitoring</h5>
+                            <div class="form-check form-switch">
+                                {{ form.session_monitoring(class="form-check-input") }}
+                                <label class="form-check-label" for="{{ form.session_monitoring.id }}">
+                                    Enable session monitoring
+                                </label>
+                            </div>
+                            <small class="form-text text-muted">
+                                Track and monitor all your active sessions
+                            </small>
+                        </div>
+                        
+                        <!-- Suspicious Activity Detection -->
+                        <div class="mb-4">
+                            <h5>Suspicious Activity Detection</h5>
+                            <div class="form-check form-switch">
+                                {{ form.suspicious_activity_detection(class="form-check-input") }}
+                                <label class="form-check-label" for="{{ form.suspicious_activity_detection.id }}">
+                                    Detect suspicious activity
+                                </label>
+                            </div>
+                            <small class="form-text text-muted">
+                                Automatically detect and alert on unusual login patterns
+                            </small>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Save Security Settings
+                            </button>
+                            <a href="{{ url_for('session.manage_sessions') }}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left"></i> Back to Sessions
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5>
+                        <i class="fas fa-info-circle"></i> Security Features
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <h6>Protection Layers</h6>
+                    <ul class="list-unstyled">
+                        <li class="mb-2">
+                            <i class="fas fa-shield-alt text-success"></i>
+                            <strong>2FA:</strong> Two-factor authentication
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-map-marker-alt text-warning"></i>
+                            <strong>IP Control:</strong> Location-based access
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-desktop text-info"></i>
+                            <strong>Session Tracking:</strong> Device monitoring
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-exclamation-triangle text-danger"></i>
+                            <strong>Alert System:</strong> Real-time notifications
+                        </li>
+                    </ul>
+                    
+                    <hr>
+                    
+                    <h6>Security Tips</h6>
+                    <ul class="list-unstyled small">
+                        <li class="mb-2">
+                            <i class="fas fa-check text-success"></i>
+                            Use strong, unique passwords
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-check text-success"></i>
+                            Enable two-factor authentication
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-check text-success"></i>
+                            Monitor your active sessions
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-check text-success"></i>
+                            Keep your email secure
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h5>
+                        <i class="fas fa-history"></i> Recent Activity
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% set recent_events = current_user.get_security_events(limit=5) %}
+                    {% if recent_events %}
+                        {% for event in recent_events %}
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <div>
+                                    <small class="fw-bold">{{ event.event_type.replace('_', ' ').title() }}</small>
+                                    <br>
+                                    <small class="text-muted">{{ event.created_at.strftime('%b %d, %H:%M') }}</small>
+                                </div>
+                                <span class="badge bg-{{ 'danger' if event.severity == 'critical' else 'warning' if event.severity == 'warning' else 'secondary' }}">
+                                    {{ event.severity.upper() }}
+                                </span>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted small">No recent security events.</p>
+                    {% endif %}
+                    
+                    <div class="mt-3">
+                        <a href="{{ url_for('session.session_analytics') }}" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-chart-line"></i> View All Activity
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

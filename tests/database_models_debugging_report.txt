@@ -1,0 +1,35 @@
+DATABASE MODELS SYSTEMS DEBUGGING REPORT
+==================================================
+Generated at: 2026-05-13 04:13:15.073286
+Total Tests: 32
+Passed: 26
+Failed: 6
+Success Rate: 81.2%
+
+Advanced Caching Models:
+  Tests: 4/8
+  Errors:
+    - Import Cache Models: Working outside of application context.
+
+This typically means that you attempted to use functionality that needed
+the current application. To solve this, set up an application context
+with app.app_context(). See the documentation for more information.
+    - CacheService: Test returned False
+    - DistributedCacheService: Test returned False
+    - Cache Utilities: Test returned False
+
+Analytics and Metrics Models:
+  Tests: 7/7
+
+Search Index Models:
+  Tests: 5/7
+  Errors:
+    - EnhancedSearchService: Test returned False
+    - Search Analytics: Test returned False
+
+Advanced Security Models:
+  Tests: 5/5
+
+Real-time Data Models:
+  Tests: 5/5
+

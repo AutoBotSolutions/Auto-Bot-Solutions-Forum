@@ -1,0 +1,228 @@
+{% extends "base.html" %}
+
+{% block title %}Session Management - {{ config.SITE_NAME or 'Forum' }}{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3>
+                        <i class="fas fa-desktop"></i> Active Sessions
+                    </h3>
+                </div>
+                <div class="card-body">
+                    {% if sessions %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Device</th>
+                                        <th>IP Address</th>
+                                        <th>Location</th>
+                                        <th>Last Activity</th>
+                                        <th>Type</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for session in sessions %}
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <i class="fas fa-desktop me-2"></i>
+                                                    <div>
+                                                        <div class="fw-bold">
+                                                            {{ session.user_agent[:50] + '...' if session.user_agent|length > 50 else session.user_agent or 'Unknown Device' }}
+                                                        </div>
+                                                        <small class="text-muted">
+                                                            {{ session.created_at.strftime('%b %d, %Y') }}
+                                                        </small>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <code>{{ session.ip_address or 'Unknown' }}</code>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-secondary">
+                                                    {{ session.location or 'Unknown' }}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <small class="text-muted">
+                                                    {{ session.last_activity.strftime('%b %d, %H:%M') }}
+                                                </small>
+                                            </td>
+                                            <td>
+                                                {% if session.is_persistent %}
+                                                    <span class="badge bg-success">
+                                                        <i class="fas fa-check"></i> Persistent
+                                                    </span>
+                                                {% else %}
+                                                    <span class="badge bg-info">
+                                                        <i class="fas fa-clock"></i> Temporary
+                                                    </span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                <div class="btn-group btn-group-sm">
+                                                    <button class="btn btn-outline-warning" 
+                                                            onclick="revokeSession('{{ session.session_id }}')"
+                                                            title="Revoke Session">
+                                                        <i class="fas fa-ban"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <div class="mt-3">
+                            <a href="{{ url_for('session.revoke_all_sessions') }}" class="btn btn-danger">
+                                <i class="fas fa-ban"></i> Revoke All Sessions
+                            </a>
+                            <a href="{{ url_for('session.session_preferences') }}" class="btn btn-outline-secondary">
+                                <i class="fas fa-cog"></i> Preferences
+                            </a>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="fas fa-desktop fa-3x text-muted mb-3"></i>
+                            <h4 class="text-muted">No Active Sessions</h4>
+                            <p class="text-muted">
+                                You don't have any active sessions. This might be because you're currently logged out.
+                            </p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5>
+                        <i class="fas fa-chart-line"></i> Session Analytics
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if analytics %}
+                        <div class="mb-3">
+                            <h6>Total Sessions</h6>
+                            <span class="badge bg-primary">{{ analytics.total_sessions }}</span>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <h6>Devices Used</h6>
+                            {% for device, count in analytics.devices.items() %}
+                                <div class="d-flex justify-content-between">
+                                    <span>{{ device[:30] + '...' if device|length > 30 else device }}</span>
+                                    <span class="badge bg-secondary">{{ count }}</span>
+                                </div>
+                            {% endfor %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <h6>Locations</h6>
+                            {% for location, count in analytics.locations.items() %}
+                                <div class="d-flex justify-content-between">
+                                    <span>{{ location }}</span>
+                                    <span class="badge bg-secondary">{{ count }}</span>
+                                </div>
+                            {% endfor %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <h6>Last Activity</h6>
+                            <small class="text-muted">
+                                {{ analytics.last_activity[:19] if analytics.last_activity else 'Never' }}
+                            </small>
+                        </div>
+                    {% else %}
+                        <p class="text-muted">No session data available.</p>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h5>
+                        <i class="fas fa-shield-alt"></i> Quick Actions
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="{{ url_for('session.session_analytics') }}" class="btn btn-outline-primary">
+                            <i class="fas fa-chart-bar"></i> View Analytics
+                        </a>
+                        <a href="{{ url_for('session.security_settings') }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-shield-alt"></i> Security Settings
+                        </a>
+                        <a href="{{ url_for('session.export_sessions') }}" class="btn btn-outline-info">
+                            <i class="fas fa-download"></i> Export Data
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Revoke Session Modal -->
+<div class="modal fade" id="revokeSessionModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Revoke Session</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to revoke this session?</p>
+                <p class="text-muted">The user will be logged out from this device.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" id="confirmRevoke">Revoke Session</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function revokeSession(sessionId) {
+    document.getElementById('revokeSessionModal').classList.add('show');
+    document.getElementById('confirmRevoke').onclick = function() {
+        fetch(`/auth/sessions/revoke/${sessionId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({
+                session_id: sessionId,
+                confirm: true
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('Error revoking session');
+            }
+        });
+    };
+}
+
+// Close modal when clicking outside
+document.getElementById('revokeSessionModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        this.classList.remove('show');
+    }
+});
+</script>
+{% endblock %}

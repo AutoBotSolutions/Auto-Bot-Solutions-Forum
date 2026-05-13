@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}Link Social Account - {{ config.SITE_NAME or 'Forum' }}{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="text-center">
+                        <i class="fas fa-link"></i> Link Social Account
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <p class="text-center text-muted">
+                        Connect your social account to enable easy login with your existing profile.
+                    </p>
+                    
+                    <form method="POST">
+                        {{ form.hidden_tag() }}
+                        
+                        <div class="mb-3">
+                            {{ form.provider.label(class="form-label") }}
+                            {{ form.provider(class="form-select form-select-lg") }}
+                            {% if form.provider.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.provider.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-link"></i> Link Social Account
+                            </button>
+                        </div>
+                    </form>
+                    
+                    <hr class="my-4">
+                    
+                    <div class="text-center">
+                        <a href="{{ url_for('auth.profile') }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left"></i> Back to Profile
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

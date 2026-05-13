@@ -1,0 +1,101 @@
+{
+  "total_tests": 78,
+  "passed_tests": 78,
+  "failed_tests": 0,
+  "warning_tests": 0,
+  "success_rate": 100.0,
+  "execution_time": 2.410068,
+  "errors": [],
+  "warnings": [],
+  "layer_results": {
+    "Core Models": [
+      {
+        "test_name": "Core model: User",
+        "status": "PASS",
+        "message": "Model User can be instantiated",
+        "details": {},
+        "timestamp": "2026-05-13 01:57:40.397261"
+      },
+      {
+        "test_name": "Core model: Post",
+        "status": "PASS",
+        "message": "Model Post can be instantiated",
+        "details": {},
+        "timestamp": "2026-05-13 01:57:40.397430"
+      },
+      {
+        "test_name": "Core model: Comment",
+        "status": "PASS",
+        "message": "Model Comment can be instantiated",
+        "details": {},
+        "timestamp": "2026-05-13 01:57:40.397505"
+      },
+      {
+        "test_name": "Core model: Category",
+        "status": "PASS",
+        "message": "Model Category can be instantiated",
+        "details": {},
+        "timestamp": "2026-05-13 01:57:40.397582"
+      },
+      {
+        "test_name": "Core model: Repository",
+        "status": "PASS",
+        "message": "Model Repository can be instantiated",
+        "details": {},
+        "timestamp": "2026-05-13 01:57:40.397605"
+      },
+      {
+        "test_name": "Core model: AuditLog",
+        "status": "PASS",
+        "message": "Model AuditLog can be instantiated",
+        "details": {},
+        "timestamp": "2026-05-13 01:57:40.397662"
+      },
+      {
+        "test_name": "Core models in app context",
+        "status": "PASS",
+        "message": "All core models created in app context",
+        "details": {},
+        "timestamp": "2026-05-13 01:57:41.849188"
+      }
+    ],
+    "Core Relationships": [],
+    "Core Flask App": [],
+    "Core Authentication": [],
+    "Core Forum Routes": [],
+    "Core Services": [
+      {
+        "test_name": "Core service: ForumService",
+        "status": "PASS",
+        "message": "Service ForumService callable",
+        "details": {},
+        "timestamp": "2026-05-13 01:57:41.527808"
+      },
+      {
+        "test_name": "Core service: SecurityService",
+        "status": "PASS",
+        "message": "Service SecurityService callable",
+        "details": {},
+        "timestamp": "2026-05-13 01:57:41.527858"
+      }
+    ],
+    "Extended Systems": [
+      {
+        "test_name": "Extended service: ContentService",
+        "status": "PASS",
+        "message": "Service ContentService callable",
+        "details": {},
+        "timestamp": "2026-05-13 01:57:41.558911"
+      },
+      {
+        "test_name": "Extended service: SocialService",
+        "status": "PASS",
+        "message": "Service SocialService callable",
+        "details": {},
+        "timestamp": "2026-05-13 01:57:41.558920"
+      }
+    ],
+    "Admin Integration": [],
+    "Full Integration": []
+  }
+}

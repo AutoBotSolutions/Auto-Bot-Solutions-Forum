@@ -1,0 +1,24 @@
+Admin Systems Operational Testing Report
+Generated: 2026-05-12 00:31:45.680675
+============================================================
+
+DATABASE_MODELS:
+  database_models: FAILED: No module named 'email.utils'
+
+SERVICE_CLASSES:
+  service_classes: FAILED: No module named 'email.utils'
+
+FORMS:
+  forms: FAILED: No module named 'email.utils'
+
+ROUTES:
+  routes: FAILED: No module named 'email.utils'
+
+FUNCTIONALITY:
+  functionality: FAILED: No module named 'email.utils'
+
+============================================================
+Total Tests: 5
+Passed: 0
+Failed: 5
+Success Rate: 0.0%

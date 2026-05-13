@@ -1,0 +1,173 @@
+{% extends "base.html" %}
+
+{% block title %}Backup Codes - AutoBot Solutions Forum{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="text-center">🔑 Your New Backup Codes</h3>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-success">
+                        <h5><i class="fas fa-check-circle"></i> Backup Codes Generated</h5>
+                        <p>Your backup codes have been successfully regenerated. Please save them in a secure location.</p>
+                    </div>
+
+                    <div class="alert alert-danger">
+                        <h5><i class="fas fa-exclamation-triangle"></i> Important: Save These Codes Now!</h5>
+                        <p>These codes will not be shown again. Save them in a secure, offline location:</p>
+                        <ul>
+                            <li>Print them and store them in a safe place</li>
+                            <li>Save them in a password manager</li>
+                            <li>Store them in a secure digital vault</li>
+                            <li>Keep a copy with someone you trust</li>
+                        </ul>
+                    </div>
+
+                    <!-- Backup Codes Display -->
+                    <div class="card bg-light">
+                        <div class="card-body">
+                            <h6 class="text-center mb-3">Your Backup Codes</h6>
+                            <div class="row">
+                                {% for code in backup_codes %}
+                                <div class="col-md-6 mb-2">
+                                    <div class="text-center">
+                                        <code class="bg-white p-2 rounded border">{{ code }}</code>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Printable Version -->
+                    <div class="mt-4 text-center">
+                        <button onclick="window.print()" class="btn btn-outline-primary">
+                            <i class="fas fa-print"></i> Print Backup Codes
+                        </button>
+                        <button onclick="copyToClipboard()" class="btn btn-outline-secondary ms-2">
+                            <i class="fas fa-copy"></i> Copy to Clipboard
+                        </button>
+                    </div>
+
+                    <!-- Instructions -->
+                    <div class="mt-4">
+                        <h6><i class="fas fa-info-circle"></i> How to Use Backup Codes</h6>
+                        <div class="alert alert-info">
+                            <p class="mb-2"><strong>When to use backup codes:</strong></p>
+                            <ul class="mb-2">
+                                <li>If you lose access to your authenticator app</li>
+                                <li>If your phone is lost or stolen</li>
+                                <li>If you can't generate 2FA codes for any reason</li>
+                            </ul>
+                            
+                            <p class="mb-2"><strong>How to use:</strong></p>
+                            <ol class="mb-0">
+                                <li>Go to the 2FA verification page</li>
+                                <li>Click "Use Backup Code"</li>
+                                <li>Enter one of your backup codes</li>
+                                <li>Each code can only be used once</li>
+                            </ol>
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2 mt-4">
+                        <a href="{{ url_for('auth.two_factor.manage') }}" class="btn btn-primary">
+                            <i class="fas fa-check"></i> I've Saved My Backup Codes
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Hidden text for copying -->
+<div id="backupCodesText" style="display: none;">
+Auto Bot Solutions Forum - 2FA Backup Codes
+============================================
+
+{% for code in backup_codes %}
+{{ code }}
+{% endfor %}
+
+Save these codes in a secure location. Each code can only be used once.
+Generated on: {{ moment().format('YYYY-MM-DD HH:mm:ss') }}
+</div>
+
+<script>
+function copyToClipboard() {
+    const text = document.getElementById('backupCodesText').textContent;
+    
+    if (navigator.clipboard) {
+        navigator.clipboard.writeText(text).then(() => {
+            // Show success message
+            const btn = event.target;
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+            btn.classList.remove('btn-outline-secondary');
+            btn.classList.add('btn-success');
+            
+            setTimeout(() => {
+                btn.innerHTML = originalText;
+                btn.classList.remove('btn-success');
+                btn.classList.add('btn-outline-secondary');
+            }, 2000);
+        });
+    } else {
+        // Fallback for older browsers
+        const textArea = document.createElement('textarea');
+        textArea.value = text;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+        
+        // Show success message
+        const btn = event.target;
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+        btn.classList.remove('btn-outline-secondary');
+        btn.classList.add('btn-success');
+        
+        setTimeout(() => {
+            btn.innerHTML = originalText;
+            btn.classList.remove('btn-success');
+            btn.classList.add('btn-outline-secondary');
+        }, 2000);
+    }
+}
+
+// Add print-specific styles
+window.addEventListener('beforeprint', () => {
+    const style = document.createElement('style');
+    style.textContent = `
+        @media print {
+            body { font-family: monospace; }
+            .btn, .alert, .card-header { display: none !important; }
+            .card { border: none !important; box-shadow: none !important; }
+            .bg-light { background: white !important; }
+        }
+    `;
+    document.head.appendChild(style);
+});
+</script>
+
+<style>
+@media print {
+    .btn, .alert, .card-header {
+        display: none !important;
+    }
+    .card {
+        border: none !important;
+        box-shadow: none !important;
+    }
+    .bg-light {
+        background: white !important;
+    }
+}
+</style>
+{% endblock %}

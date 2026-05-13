@@ -1,0 +1,269 @@
+{% extends "base.html" %}
+
+{% block title %}Create New Post{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="mb-4">
+                <i class="fas fa-plus"></i>
+                Create New Post
+            </h1>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <form method="POST" id="postForm">
+                        {{ form.hidden_tag() }}
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-8">
+                                {{ form.title.label(class="form-label") }}
+                                {{ form.title(class="form-control") }}
+                                {% if form.title.errors %}
+                                    <div class="text-danger">
+                                        {% for error in form.title.errors %}
+                                            <small>{{ error }}</small>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-4">
+                                {{ form.category_id.label(class="form-label") }}
+                                {{ form.category_id(class="form-select") }}
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form.content.label(class="form-label") }}
+                            {{ form.content(class="form-control", rows="15", id="contentTextarea") }}
+                            {% if form.content.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.content.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Content Management Options -->
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <div class="form-check">
+                                    {{ form.is_draft(class="form-check-input") }}
+                                    {{ form.is_draft.label(class="form-check-label") }}
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-check">
+                                    {{ form.auto_save_enabled(class="form-check-input") }}
+                                    {{ form.auto_save_enabled.label(class="form-check-label") }}
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-check">
+                                    {{ form.is_scheduled(class="form-check-input") }}
+                                    {{ form.is_scheduled.label(class="form-check-label") }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Scheduling Options -->
+                        <div id="schedulingOptions" class="mb-3" style="display: none;">
+                            {{ form.scheduled_publish_at.label(class="form-label") }}
+                            {{ form.scheduled_publish_at(class="form-control") }}
+                            {% if form.scheduled_publish_at.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.scheduled_publish_at.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Expiration Options -->
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                {{ form.expires_at.label(class="form-label") }}
+                                {{ form.expires_at(class="form-control") }}
+                                <small class="form-text text-muted">Leave empty for no expiration</small>
+                            </div>
+                            <div class="col-md-6">
+                                {{ form.engagement_score.label(class="form-label") }}
+                                {{ form.engagement_score(class="form-control", step="0.1") }}
+                                <small class="form-text text-muted">Score from 0.0 to 10.0</small>
+                            </div>
+                        </div>
+
+                        <!-- Auto-save Status -->
+                        <div class="mb-3">
+                            <div id="autoSaveStatus" class="text-muted">
+                                <small><i class="fas fa-info-circle"></i> Auto-save is enabled</small>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <a href="{{ url_for('content.dashboard') }}" class="btn btn-secondary">
+                                    <i class="fas fa-arrow-left"></i> Back to Dashboard
+                                </a>
+                            </div>
+                            <div>
+                                <button type="button" id="saveDraftBtn" class="btn btn-warning me-2">
+                                    <i class="fas fa-save"></i> Save Draft
+                                </button>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-paper-plane"></i> {{ 'Publish' if not form.is_draft.data else 'Save Draft' }}
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+// Auto-save functionality
+let autoSaveTimer;
+let autoSaveEnabled = true;
+let lastSaveTime = null;
+
+function initAutoSave() {
+    const form = document.getElementById('postForm');
+    const titleField = form.querySelector('#title');
+    const contentField = form.querySelector('#contentTextarea');
+    const autoSaveCheckbox = form.querySelector('#auto_save_enabled');
+    const autoSaveStatus = document.getElementById('autoSaveStatus');
+    
+    // Toggle auto-save
+    autoSaveCheckbox.addEventListener('change', function() {
+        autoSaveEnabled = this.checked;
+        if (autoSaveEnabled) {
+            startAutoSave();
+            updateStatus('Auto-save enabled');
+        } else {
+            stopAutoSave();
+            updateStatus('Auto-save disabled');
+        }
+    });
+    
+    // Start auto-save on input
+    titleField.addEventListener('input', () => startAutoSave());
+    contentField.addEventListener('input', () => startAutoSave());
+    
+    // Initial auto-save setup
+    if (autoSaveEnabled) {
+        startAutoSave();
+    }
+}
+
+function startAutoSave() {
+    if (!autoSaveEnabled) return;
+    
+    stopAutoSave(); // Clear existing timer
+    
+    autoSaveTimer = setTimeout(() => {
+        autoSave();
+    }, 30000); // 30 seconds
+}
+
+function stopAutoSave() {
+    if (autoSaveTimer) {
+        clearTimeout(autoSaveTimer);
+        autoSaveTimer = null;
+    }
+}
+
+function autoSave() {
+    const form = document.getElementById('postForm');
+    const titleField = form.querySelector('#title');
+    const contentField = form.querySelector('#contentTextarea');
+    
+    const data = {
+        title: titleField.value,
+        content: contentField.value,
+        post_id: null // New post
+    };
+    
+    fetch('/content/auto_save', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': form.querySelector('input[name="csrf_token"]').value
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(result => {
+        if (result.success) {
+            lastSaveTime = new Date(result.saved_at);
+            updateStatus('Auto-saved at ' + lastSaveTime.toLocaleTimeString());
+            
+            // Update form with post ID if it's a new post
+            if (result.post_id && !data.post_id) {
+                data.post_id = result.post_id;
+            }
+        } else {
+            updateStatus('Auto-save failed: ' + (result.error || 'Unknown error'), 'error');
+        }
+    })
+    .catch(error => {
+        updateStatus('Auto-save error: ' + error.message, 'error');
+    });
+}
+
+function updateStatus(message, type = 'info') {
+    const statusElement = document.getElementById('autoSaveStatus');
+    const iconClass = type === 'error' ? 'fas fa-exclamation-triangle' : 'fas fa-info-circle';
+    const textClass = type === 'error' ? 'text-danger' : 'text-muted';
+    
+    statusElement.innerHTML = `<small class="${textClass}"><i class="${iconClass}"></i> ${message}</small>`;
+}
+
+// Scheduling toggle
+document.addEventListener('DOMContentLoaded', function() {
+    const isScheduledCheckbox = document.querySelector('#is_scheduled');
+    const schedulingOptions = document.getElementById('schedulingOptions');
+    
+    isScheduledCheckbox.addEventListener('change', function() {
+        schedulingOptions.style.display = this.checked ? 'block' : 'none';
+    });
+    
+    // Initialize auto-save
+    initAutoSave();
+    
+    // Save draft button
+    const saveDraftBtn = document.getElementById('saveDraftBtn');
+    const form = document.getElementById('postForm');
+    const isDraftCheckbox = form.querySelector('#is_draft');
+    
+    saveDraftBtn.addEventListener('click', function() {
+        isDraftCheckbox.checked = true;
+        form.submit();
+    });
+    
+    // Warn before leaving if there are unsaved changes
+    let formChanged = false;
+    
+    form.addEventListener('change', function() {
+        formChanged = true;
+    });
+    
+    window.addEventListener('beforeunload', function(e) {
+        if (formChanged && autoSaveEnabled) {
+            e.preventDefault();
+            e.returnValue = 'You have unsaved changes. Are you sure you want to leave?';
+        }
+    });
+});
+</script>
+{% endblock %}

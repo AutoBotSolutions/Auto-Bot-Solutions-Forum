@@ -1,0 +1,367 @@
+{% extends "base.html" %}
+
+{% block title %}{{ file.original_filename }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('storage.dashboard') }}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{{ url_for('storage.files') }}">Files</a></li>
+                    <li class="breadcrumb-item active">{{ file.original_filename }}</li>
+                </ol>
+            </nav>
+            
+            <h1 class="mb-4">
+                <i class="fas fa-file"></i>
+                {{ file.original_filename }}
+            </h1>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <!-- File Preview -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">File Preview</h5>
+                </div>
+                <div class="card-body text-center">
+                    {% if preview %}
+                        {% if preview.type == 'image' %}
+                            <img src="{{ preview.url }}" class="img-fluid rounded" alt="File preview">
+                        {% elif preview.type == 'text' %}
+                            <div class="text-start bg-light p-3 rounded">
+                                <pre class="mb-0">{{ preview.preview_text }}</pre>
+                            </div>
+                        {% else %}
+                            <div class="text-muted">
+                                <i class="fas fa-file fa-3x mb-3"></i>
+                                <p>Preview not available for this file type</p>
+                                <a href="{{ url_for('storage.download_file', file_id=file.id) }}" class="btn btn-primary">
+                                    <i class="fas fa-download"></i> Download File
+                                </a>
+                            </div>
+                        {% endif %}
+                    {% else %}
+                        <div class="text-muted">
+                            <i class="fas fa-file fa-3x mb-3"></i>
+                            <p>Preview not available</p>
+                            <a href="{{ url_for('storage.download_file', file_id=file.id) }}" class="btn btn-primary">
+                                <i class="fas fa-download"></i> Download File
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- File Information -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">File Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <table class="table table-borderless">
+                                <tr>
+                                    <td><strong>Original Name:</strong></td>
+                                    <td>{{ file.original_filename }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>File Size:</strong></td>
+                                    <td>{{ format_file_size(file.file_size) }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>File Type:</strong></td>
+                                    <td><span class="badge bg-{{ get_file_type_color(file.file_type) }}">{{ file.file_type.title() }}</span></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>MIME Type:</strong></td>
+                                    <td>{{ file.mime_type }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Uploaded:</strong></td>
+                                    <td>{{ file.upload_date.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <table class="table table-borderless">
+                                <tr>
+                                    <td><strong>Storage Provider:</strong></td>
+                                    <td>{{ file.storage_provider.title() }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Visibility:</strong></td>
+                                    <td>
+                                        {% if file.is_public %}
+                                            <span class="badge bg-success">Public</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">Private</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Downloads:</strong></td>
+                                    <td>{{ file.download_count }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Views:</strong></td>
+                                    <td>{{ file.view_count }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Last Accessed:</strong></td>
+                                    <td>{{ file.last_accessed.strftime('%Y-%m-%d %H:%M') if file.last_accessed else 'Never' }}</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Analytics -->
+            {% if analytics %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Recent Activity</h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group list-group-flush">
+                        {% for activity in analytics %}
+                        <div class="list-group-item">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <span class="badge bg-{{ get_activity_color(activity.action_type) }}">{{ activity.action_type.title() }}</span>
+                                    {% if activity.user %}
+                                        by {{ activity.user.username }}
+                                    {% endif %}
+                                    <small class="text-muted ms-2">{{ activity.timestamp.strftime('%Y-%m-%d %H:%M') }}</small>
+                                </div>
+                                {% if activity.ip_address %}
+                                    <small class="text-muted">{{ activity.ip_address }}</small>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="col-md-4">
+            <!-- Actions -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="{{ url_for('storage.download_file', file_id=file.id) }}" class="btn btn-primary">
+                            <i class="fas fa-download"></i> Download
+                        </a>
+                        <a href="{{ url_for('storage.share_file', file_id=file.id) }}" class="btn btn-outline-primary">
+                            <i class="fas fa-share"></i> Share
+                        </a>
+                        {% if file.file_type == 'image' %}
+                        <button class="btn btn-outline-info" onclick="processImage('{{ file.id }}')">
+                            <i class="fas fa-image"></i> Process Image
+                        </button>
+                        {% endif %}
+                        <button class="btn btn-outline-secondary" onclick="copyShareLink('{{ file.id }}')">
+                            <i class="fas fa-link"></i> Copy Link
+                        </button>
+                        {% if file.uploaded_by == current_user.id %}
+                        <a href="{{ url_for('storage.edit_file', file_id=file.id) }}" class="btn btn-outline-warning">
+                            <i class="fas fa-edit"></i> Edit
+                        </a>
+                        <button class="btn btn-outline-danger" onclick="deleteFile('{{ file.id }}')">
+                            <i class="fas fa-trash"></i> Delete
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sharing Information -->
+            {% if shares %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Shared With</h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group list-group-flush">
+                        {% for share in shares %}
+                        <div class="list-group-item px-0">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <strong>{{ share.shared_user.username }}</strong>
+                                    <br>
+                                    <small class="text-muted">{{ share.permission_level.title() }}</small>
+                                </div>
+                                <div>
+                                    <span class="badge bg-{{ get_permission_color(share.permission_level) }}">{{ share.permission_level.title() }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Storage Information -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Storage Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group list-group-flush">
+                        <div class="list-group-item px-0">
+                            <strong>Provider:</strong> {{ file.storage_provider.title() }}
+                        </div>
+                        {% if file.storage_bucket %}
+                        <div class="list-group-item px-0">
+                            <strong>Bucket:</strong> {{ file.storage_bucket }}
+                        </div>
+                        {% endif %}
+                        {% if file.storage_region %}
+                        <div class="list-group-item px-0">
+                            <strong>Region:</strong> {{ file.storage_region }}
+                        </div>
+                        {% endif %}
+                        <div class="list-group-item px-0">
+                            <strong>File Path:</strong>
+                            <code>{{ file.file_path }}</code>
+                        </div>
+                        {% if file.thumbnail_path %}
+                        <div class="list-group-item px-0">
+                            <strong>Thumbnail:</strong> Available
+                        </div>
+                        {% endif %}
+                        {% if file.optimized_path %}
+                        <div class="list-group-item px-0">
+                            <strong>Optimized:</strong> Available
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Stats -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Statistics</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-6">
+                            <h4 class="text-primary">{{ file.download_count }}</h4>
+                            <small class="text-muted">Downloads</small>
+                        </div>
+                        <div class="col-6">
+                            <h4 class="text-info">{{ file.view_count }}</h4>
+                            <small class="text-muted">Views</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+// File detail functionality
+function processImage(fileId) {
+    // This would open an image processing modal
+    alert('Image processing feature coming soon!');
+}
+
+function copyShareLink(fileId) {
+    const shareLink = window.location.origin + '/files/file/' + fileId;
+    
+    navigator.clipboard.writeText(shareLink).then(() => {
+        // Show success message
+        const button = event.target;
+        const originalText = button.innerHTML;
+        button.innerHTML = '<i class="fas fa-check"></i> Copied!';
+        button.classList.remove('btn-outline-secondary');
+        button.classList.add('btn-success');
+        setTimeout(() => {
+            button.innerHTML = originalText;
+            button.classList.remove('btn-success');
+            button.classList.add('btn-outline-secondary');
+        }, 2000);
+    }).catch(err => {
+        alert('Failed to copy link');
+    });
+}
+
+function deleteFile(fileId) {
+    if (confirm('Are you sure you want to delete this file? This action cannot be undone.')) {
+        fetch('/files/delete/' + fileId, {
+            method: 'DELETE',
+            headers: {
+                'X-CSRFToken': document.querySelector('input[name="csrf_token"]').value
+            }
+        })
+        .then(response => {
+            if (response.ok) {
+                window.location.href = '/files/files';
+            } else {
+                alert('Failed to delete file');
+            }
+        })
+        .catch(error => {
+            alert('Error deleting file: ' + error.message);
+        });
+    }
+}
+
+// Helper functions
+function format_file_size(bytes) {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+}
+
+function get_file_type_color(file_type) {
+    const colors = {
+        'image': 'primary',
+        'document': 'success',
+        'video': 'danger',
+        'audio': 'info',
+        'other': 'secondary'
+    };
+    return colors[file_type] || 'secondary';
+}
+
+function get_activity_color(action_type) {
+    const colors = {
+        'upload': 'success',
+        'download': 'primary',
+        'view': 'info',
+        'share': 'warning',
+        'delete': 'danger'
+    };
+    return colors[action_type] || 'secondary';
+}
+
+function get_permission_color(permission_level) {
+    const colors = {
+        'view': 'info',
+        'download': 'primary',
+        'edit': 'warning'
+    };
+    return colors[permission_level] || 'secondary';
+}
+</script>
+{% endblock %}

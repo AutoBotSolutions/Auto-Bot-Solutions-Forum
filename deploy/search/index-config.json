@@ -1,0 +1,878 @@
+{
+  "search_indices": {
+    "forum_posts": {
+      "settings": {
+        "number_of_shards": 1,
+        "number_of_replicas": 0,
+        "refresh_interval": "1s",
+        "max_result_window": 10000,
+        "analysis": {
+          "analyzer": {
+            "forum_analyzer": {
+              "type": "custom",
+              "tokenizer": "standard",
+              "filter": [
+                "lowercase",
+                "stop",
+                "snowball"
+              ]
+            },
+            "forum_search_analyzer": {
+              "type": "custom",
+              "tokenizer": "keyword",
+              "filter": [
+                "lowercase",
+                "trim"
+              ]
+            }
+          },
+          "filter": {
+            "english_stop": {
+              "type": "stop",
+              "stopwords": "_english_"
+            },
+            "english_stemmer": {
+              "type": "stemmer",
+              "language": "english"
+            },
+            "english_possessive_stemmer": {
+              "type": "stemmer",
+              "language": "possessive_english"
+            }
+          }
+        }
+      },
+      "mappings": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "index": true
+          },
+          "title": {
+            "type": "text",
+            "analyzer": "forum_analyzer",
+            "search_analyzer": "forum_search_analyzer",
+            "fields": {
+              "keyword": {
+                "type": "keyword",
+                "ignore_above": 256
+              },
+              "suggest": {
+                "type": "completion",
+                "analyzer": "simple"
+              }
+            }
+          },
+          "content": {
+            "type": "text",
+            "analyzer": "forum_analyzer",
+            "search_analyzer": "forum_search_analyzer",
+            "fields": {
+              "keyword": {
+                "type": "keyword",
+                "ignore_above": 512
+              }
+            }
+          },
+          "author": {
+            "type": "text",
+            "analyzer": "forum_analyzer",
+            "search_analyzer": "forum_search_analyzer",
+            "fields": {
+              "keyword": {
+                "type": "keyword",
+                "ignore_above": 256
+              }
+            }
+          },
+          "author_id": {
+            "type": "integer",
+            "index": true
+          },
+          "category": {
+            "type": "keyword",
+            "index": true
+          },
+          "category_name": {
+            "type": "text",
+            "analyzer": "forum_analyzer",
+            "fields": {
+              "keyword": {
+                "type": "keyword",
+                "ignore_above": 256
+              }
+            }
+          },
+          "tags": {
+            "type": "keyword",
+            "index": true
+          },
+          "created_at": {
+            "type": "date",
+            "format": "yyyy-MM-dd HH:mm:ss||strict_date_optional_time",
+            "index": true
+          },
+          "updated_at": {
+            "type": "date",
+            "format": "yyyy-MM-dd HH:mm:ss||strict_date_optional_time",
+            "index": true
+          },
+          "views_count": {
+            "type": "integer",
+            "index": true
+          },
+          "comments_count": {
+            "type": "integer",
+            "index": true
+          },
+          "votes_count": {
+            "type": "integer",
+            "index": true
+          },
+          "status": {
+            "type": "keyword",
+            "index": true
+          },
+          "is_pinned": {
+            "type": "boolean",
+            "index": true
+          },
+          "is_locked": {
+            "type": "boolean",
+            "index": true
+          },
+          "is_featured": {
+            "type": "boolean",
+            "index": true
+          },
+          "last_activity": {
+            "type": "date",
+            "format": "yyyy-MM-dd HH:mm:ss||strict_date_optional_time",
+            "index": true
+          },
+          "content_length": {
+            "type": "integer",
+            "index": true
+          },
+          "reading_time_minutes": {
+            "type": "integer",
+            "index": true
+          },
+          "engagement_score": {
+            "type": "float",
+            "index": true
+          },
+          "quality_score": {
+            "type": "float",
+            "index": true
+          }
+        }
+      }
+    },
+    "users": {
+      "settings": {
+        "number_of_shards": 1,
+        "number_of_replicas": 0,
+        "refresh_interval": "1s",
+        "max_result_window": 10000,
+        "analysis": {
+          "analyzer": {
+            "user_analyzer": {
+              "type": "custom",
+              "tokenizer": "standard",
+              "filter": [
+                "lowercase",
+                "stop",
+                "snowball"
+              ]
+            },
+            "user_search_analyzer": {
+              "type": "custom",
+              "tokenizer": "keyword",
+              "filter": [
+                "lowercase",
+                "trim"
+              ]
+            }
+          }
+        }
+      },
+      "mappings": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "index": true
+          },
+          "username": {
+            "type": "text",
+            "analyzer": "user_analyzer",
+            "search_analyzer": "user_search_analyzer",
+            "fields": {
+              "keyword": {
+                "type": "keyword",
+                "ignore_above": 256
+              },
+              "suggest": {
+                "type": "completion",
+                "analyzer": "simple"
+              }
+            }
+          },
+          "email": {
+            "type": "keyword",
+            "index": true
+          },
+          "first_name": {
+            "type": "text",
+            "analyzer": "user_analyzer",
+            "search_analyzer": "user_search_analyzer",
+            "fields": {
+              "keyword": {
+                "type": "keyword",
+                "ignore_above": 256
+              }
+            }
+          },
+          "last_name": {
+            "type": "text",
+            "analyzer": "user_analyzer",
+            "search_analyzer": "user_search_analyzer",
+            "fields": {
+              "keyword": {
+                "type": "keyword",
+                "ignore_above": 256
+              }
+            }
+          },
+          "bio": {
+            "type": "text",
+            "analyzer": "user_analyzer",
+            "search_analyzer": "user_search_analyzer",
+            "fields": {
+              "keyword": {
+                "type": "keyword",
+                "ignore_above": 512
+              }
+            }
+          },
+          "location": {
+            "type": "text",
+            "analyzer": "user_analyzer",
+            "search_analyzer": "user_search_analyzer",
+            "fields": {
+              "keyword": {
+                "type": "keyword",
+                "ignore_above": 256
+              }
+            }
+          },
+          "website": {
+            "type": "keyword",
+            "index": true
+          },
+          "created_at": {
+            "type": "date",
+            "format": "yyyy-MM-dd HH:mm:ss||strict_date_optional_time",
+            "index": true
+          },
+          "last_login": {
+            "type": "date",
+            "format": "yyyy-MM-dd HH:mm:ss||strict_date_optional_time",
+            "index": true
+          },
+          "is_active": {
+            "type": "boolean",
+            "index": true
+          },
+          "roles": {
+            "type": "keyword",
+            "index": true
+          },
+          "reputation": {
+            "type": "integer",
+            "index": true
+          },
+          "posts_count": {
+            "type": "integer",
+            "index": true
+          },
+          "comments_count": {
+            "type": "integer",
+            "index": true
+          },
+          "followers_count": {
+            "type": "integer",
+            "index": true
+          },
+          "following_count": {
+            "type": "integer",
+            "index": true
+          },
+          "profile_views": {
+            "type": "integer",
+            "index": true
+          }
+        }
+      }
+    },
+    "forum_comments": {
+      "settings": {
+        "number_of_shards": 1,
+        "number_of_replicas": 0,
+        "refresh_interval": "1s",
+        "max_result_window": 10000,
+        "analysis": {
+          "analyzer": {
+            "comment_analyzer": {
+              "type": "custom",
+              "tokenizer": "standard",
+              "filter": [
+                "lowercase",
+                "stop",
+                "snowball"
+              ]
+            },
+            "comment_search_analyzer": {
+              "type": "custom",
+              "tokenizer": "keyword",
+              "filter": [
+                "lowercase",
+                "trim"
+              ]
+            }
+          }
+        }
+      },
+      "mappings": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "index": true
+          },
+          "content": {
+            "type": "text",
+            "analyzer": "comment_analyzer",
+            "search_analyzer": "comment_search_analyzer",
+            "fields": {
+              "keyword": {
+                "type": "keyword",
+                "ignore_above": 512
+              }
+            }
+          },
+          "author": {
+            "type": "text",
+            "analyzer": "comment_analyzer",
+            "search_analyzer": "comment_search_analyzer",
+            "fields": {
+              "keyword": {
+                "type": "keyword",
+                "ignore_above": 256
+              }
+            }
+          },
+          "author_id": {
+            "type": "integer",
+            "index": true
+          },
+          "post_id": {
+            "type": "integer",
+            "index": true
+          },
+          "post_title": {
+            "type": "text",
+            "analyzer": "comment_analyzer",
+            "search_analyzer": "comment_search_analyzer",
+            "fields": {
+              "keyword": {
+                "type": "keyword",
+                "ignore_above": 256
+              }
+            }
+          },
+          "created_at": {
+            "type": "date",
+            "format": "yyyy-MM-dd HH:mm:ss||strict_date_optional_time",
+            "index": true
+          },
+          "updated_at": {
+            "type": "date",
+            "format": "yyyy-MM-dd HH:mm:ss||strict_date_optional_time",
+            "index": true
+          },
+          "votes_count": {
+            "type": "integer",
+            "index": true
+          },
+          "status": {
+            "type": "keyword",
+            "index": true
+          },
+          "is_deleted": {
+            "type": "boolean",
+            "index": true
+          },
+          "parent_id": {
+            "type": "integer",
+            "index": true
+          },
+          "depth": {
+            "type": "integer",
+            "index": true
+          },
+          "content_length": {
+            "type": "integer",
+            "index": true
+          }
+        }
+      }
+    },
+    "search_analytics": {
+      "settings": {
+        "number_of_shards": 1,
+        "number_of_replicas": 0,
+        "refresh_interval": "1s",
+        "max_result_window": 10000
+      },
+      "mappings": {
+        "properties": {
+          "query_id": {
+            "type": "keyword",
+            "index": true
+          },
+          "query_text": {
+            "type": "text",
+            "analyzer": "standard",
+            "fields": {
+              "keyword": {
+                "type": "keyword",
+                "ignore_above": 512
+              }
+            }
+          },
+          "user_id": {
+            "type": "integer",
+            "index": true
+          },
+          "session_id": {
+            "type": "keyword",
+            "index": true
+          },
+          "ip_address": {
+            "type": "ip",
+            "index": true
+          },
+          "user_agent": {
+            "type": "text",
+            "analyzer": "keyword",
+            "fields": {
+              "keyword": {
+                "type": "keyword",
+                "ignore_above": 512
+              }
+            }
+          },
+          "search_type": {
+            "type": "keyword",
+            "index": true
+          },
+          "index_name": {
+            "type": "keyword",
+            "index": true
+          },
+          "results_count": {
+            "type": "integer",
+            "index": true
+          },
+          "execution_time_ms": {
+            "type": "float",
+            "index": true
+          },
+          "timestamp": {
+            "type": "date",
+            "format": "yyyy-MM-dd HH:mm:ss||strict_date_optional_time",
+            "index": true
+          },
+          "filters": {
+            "type": "object",
+            "dynamic": true
+          },
+          "sort": {
+            "type": "object",
+            "dynamic": true
+          },
+          "page": {
+            "type": "integer",
+            "index": true
+          },
+          "per_page": {
+            "type": "integer",
+            "index": true
+          },
+          "clicked_results": {
+            "type": "array",
+            "index": false
+          },
+          "conversion": {
+            "type": "boolean",
+            "index": true
+          }
+        }
+      }
+    },
+    "categories": {
+      "settings": {
+        "number_of_shards": 1,
+        "number_of_replicas": 0,
+        "refresh_interval": "1s",
+        "max_result_window": 10000,
+        "analysis": {
+          "analyzer": {
+            "category_analyzer": {
+              "type": "custom",
+              "tokenizer": "keyword",
+              "filter": [
+                "lowercase",
+                "trim"
+              ]
+            }
+          }
+        }
+      },
+      "mappings": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "index": true
+          },
+          "name": {
+            "type": "text",
+            "analyzer": "category_analyzer",
+            "fields": {
+              "keyword": {
+                "type": "keyword",
+                "ignore_above": 256
+              },
+              "suggest": {
+                "type": "completion",
+                "analyzer": "simple"
+              }
+            }
+          },
+          "description": {
+            "type": "text",
+            "analyzer": "category_analyzer",
+            "fields": {
+              "keyword": {
+                "type": "keyword",
+                "ignore_above": 512
+              }
+            }
+          },
+          "slug": {
+            "type": "keyword",
+            "index": true
+          },
+          "parent_id": {
+            "type": "integer",
+            "index": true
+          },
+          "created_at": {
+            "type": "date",
+            "format": "yyyy-MM-dd HH:mm:ss||strict_date_optional_time",
+            "index": true
+          },
+          "updated_at": {
+            "type": "date",
+            "format": "yyyy-MM-dd HH:mm:ss||strict_date_optional_time",
+            "index": true
+          },
+          "is_active": {
+            "type": "boolean",
+            "index": true
+          },
+          "posts_count": {
+            "type": "integer",
+            "index": true
+          },
+          "order": {
+            "type": "integer",
+            "index": true
+          },
+          "color": {
+            "type": "keyword",
+            "index": true
+          },
+          "icon": {
+            "type": "keyword",
+            "index": true
+          }
+        }
+      }
+    },
+    "tags": {
+      "settings": {
+        "number_of_shards": 1,
+        "number_of_replicas": 0,
+        "refresh_interval": "1s",
+        "max_result_window": 10000,
+        "analysis": {
+          "analyzer": {
+            "tag_analyzer": {
+              "type": "custom",
+              "tokenizer": "keyword",
+              "filter": [
+                "lowercase",
+                "trim"
+              ]
+            }
+          }
+        }
+      },
+      "mappings": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "index": true
+          },
+          "name": {
+            "type": "text",
+            "analyzer": "tag_analyzer",
+            "fields": {
+              "keyword": {
+                "type": "keyword",
+                "ignore_above": 256
+              },
+              "suggest": {
+                "type": "completion",
+                "analyzer": "simple"
+              }
+            }
+          },
+          "slug": {
+            "type": "keyword",
+            "index": true
+          },
+          "description": {
+            "type": "text",
+            "analyzer": "tag_analyzer",
+            "fields": {
+              "keyword": {
+                "type": "keyword",
+                "ignore_above": 512
+              }
+            }
+          },
+          "created_at": {
+            "type": "date",
+            "format": "yyyy-MM-dd HH:mm:ss||strict_date_optional_time",
+            "index": true
+          },
+          "updated_at": {
+            "type": "date",
+            "format": "yyyy-MM-dd HH:mm:ss||strict_date_optional_time",
+            "index": true
+          },
+          "is_active": {
+            "type": "boolean",
+            "index": true
+          },
+          "posts_count": {
+            "type": "integer",
+            "index": true
+          },
+          "color": {
+            "type": "keyword",
+            "index": true
+          }
+        }
+      }
+    }
+  },
+  "search_templates": {
+    "forum_search": {
+      "template": {
+        "query": {
+          "bool": {
+            "must": [
+              {
+                "multi_match": {
+                  "query": "{{query_string}}",
+                  "fields": [
+                    "title^3",
+                    "content^2",
+                    "author^1.5",
+                    "tags^2",
+                    "category_name^1.5"
+                  ],
+                  "type": "best_fields",
+                  "fuzziness": "AUTO"
+                }
+              }
+            ],
+            "filter": [
+              {
+                "term": {
+                  "status": "published"
+                }
+              }
+            ],
+            "should": [
+              {
+                "term": {
+                  "is_pinned": true
+                }
+              },
+              {
+                "term": {
+                  "is_featured": true
+                }
+              }
+            ]
+          }
+        },
+        "highlight": {
+          "fields": {
+            "title": {},
+            "content": {
+              "fragment_size": 150,
+              "number_of_fragments": 3
+            }
+          }
+        },
+        "sort": [
+          {
+            "_score": {
+              "order": "desc"
+            }
+          },
+          {
+            "created_at": {
+              "order": "desc"
+            }
+          }
+        ]
+      }
+    },
+    "user_search": {
+      "template": {
+        "query": {
+          "bool": {
+            "must": [
+              {
+                "multi_match": {
+                  "query": "{{query_string}}",
+                  "fields": [
+                    "username^3",
+                    "first_name^2",
+                    "last_name^2",
+                    "bio^1",
+                    "location^1"
+                  ],
+                  "type": "best_fields",
+                  "fuzziness": "AUTO"
+                }
+              }
+            ],
+            "filter": [
+              {
+                "term": {
+                  "is_active": true
+                }
+              }
+            ]
+          }
+        },
+        "highlight": {
+          "fields": {
+            "username": {},
+            "first_name": {},
+            "last_name": {},
+            "bio": {
+              "fragment_size": 150,
+              "number_of_fragments": 2
+            }
+          }
+        },
+        "sort": [
+          {
+            "_score": {
+              "order": "desc"
+            }
+          },
+          {
+            "reputation": {
+              "order": "desc"
+            }
+          }
+        ]
+      }
+    },
+    "comment_search": {
+      "template": {
+        "query": {
+          "bool": {
+            "must": [
+              {
+                "multi_match": {
+                  "query": "{{query_string}}",
+                  "fields": [
+                    "content^3",
+                    "author^2",
+                    "post_title^1.5"
+                  ],
+                  "type": "best_fields",
+                  "fuzziness": "AUTO"
+                }
+              }
+            ],
+            "filter": [
+              {
+                "term": {
+                  "is_deleted": false
+                }
+              }
+            ]
+          }
+        },
+        "highlight": {
+          "fields": {
+            "content": {
+              "fragment_size": 150,
+              "number_of_fragments": 3
+            }
+          }
+        },
+        "sort": [
+          {
+            "_score": {
+              "order": "desc"
+            }
+          },
+          {
+            "created_at": {
+              "order": "desc"
+            }
+          }
+        ]
+      }
+    }
+  },
+  "search_settings": {
+    "default_page_size": 20,
+    "max_page_size": 100,
+    "highlight_enabled": true,
+    "suggestions_enabled": true,
+    "analytics_enabled": true,
+    "cache_enabled": true,
+    "cache_ttl": 300,
+    "search_timeout": 30,
+    "max_clauses": 1024,
+    "max_expansions": 50,
+    "fuzziness": "AUTO",
+    "minimum_should_match": "75%",
+    "boost_recent_content": true,
+    "boost_popular_content": true,
+    "boost_pinned_content": true
+  }
+}

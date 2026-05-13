@@ -1,0 +1,30 @@
+{{ site_name }} - New Comment Notification
+
+Hello {{ user.username }},
+
+You have received a new comment on your post in the {{ site_name }} forum.
+
+Comment Details:
+{{ notification.content }}
+
+Time: {{ notification.created_at.strftime('%B %d, %Y at %I:%M %p') }}
+Type: {{ notification_type|title }}
+{% if is_important %}Priority: Important{% endif %}
+
+{% if notification.link %}
+View the comment here: {{ notification.link }}
+{% endif %}
+
+This comment was posted on your discussion. Click the link above to view the comment and respond if you'd like.
+
+Visit the forum: {{ forum_url }}
+Manage your notifications: {{ notifications_url }}
+
+---
+This notification was sent to {{ user.email }} because you have enabled email notifications for {{ site_name }}.
+
+Manage your notification preferences: {{ settings_url }}
+View all notifications: {{ notifications_url }}
+
+© {{ current_date }} {{ site_name }}. All rights reserved.
+If you no longer wish to receive these emails, you can update your preferences here: {{ settings_url }}

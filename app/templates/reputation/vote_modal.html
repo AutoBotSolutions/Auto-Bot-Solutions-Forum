@@ -1,0 +1,159 @@
+<div class="modal fade" id="voteModal" tabindex="-1" aria-labelledby="voteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="voteModalLabel">
+                    {% if target.__class__.__name__ == 'Post' %}
+                    Vote on Post
+                    {% else %}
+                    Vote on Comment
+                    {% endif %}
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="POST" action="{{ url_for('reputation.cast_vote') }}">
+                {{ form.hidden_tag() }}
+                <div class="modal-body">
+                    <!-- Target Preview -->
+                    <div class="mb-3 p-3 border rounded">
+                        <h6 class="text-muted mb-2">
+                            {% if target.__class__.__name__ == 'Post' %}
+                            Post by {{ target.user.username }}
+                            {% else %}
+                            Comment by {{ target.user.username }}
+                            {% endif %}
+                        </h6>
+                        <div class="small text-muted">
+                            {% if target.__class__.__name__ == 'Post' %}
+                            {{ target.title }}
+                            {% endif %}
+                            <div class="mt-2">
+                                {{ target.content[:200] }}{% if target.content|length > 200 %}...{% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Vote Type -->
+                    <div class="mb-3">
+                        {{ form.vote_type.label(class="form-label") }}
+                        <div class="btn-group w-100" role="group">
+                            <input type="radio" class="btn-check" name="vote_type" id="upvote" value="upvote" 
+                                   {% if existing_vote and existing_vote.vote_type == 'upvote' %}checked{% endif %}
+                                   required>
+                            <label class="btn btn-outline-success" for="upvote">
+                                <i class="fas fa-thumbs-up"></i> Upvote
+                            </label>
+                            
+                            <input type="radio" class="btn-check" name="vote_type" id="downvote" value="downvote"
+                                   {% if existing_vote and existing_vote.vote_type == 'downvote' %}checked{% endif %}
+                                   required>
+                            <label class="btn btn-outline-danger" for="downvote">
+                                <i class="fas fa-thumbs-down"></i> Downvote
+                            </label>
+                        </div>
+                        {% for error in form.vote_type.errors %}
+                        <div class="text-danger small">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Reason Category -->
+                    <div class="mb-3">
+                        {{ form.reason_category.label(class="form-label") }}
+                        {{ form.reason_category(class="form-select") }}
+                        {% for error in form.reason_category.errors %}
+                        <div class="text-danger small">{{ error }}</div>
+                        {% endfor %}
+                        <small class="form-text text-muted">
+                            Select a category to help others understand your vote
+                        </small>
+                    </div>
+
+                    <!-- Reason Text -->
+                    <div class="mb-3">
+                        {{ form.reason.label(class="form-label") }}
+                        {{ form.reason(class="form-control", rows="3") }}
+                        {% for error in form.reason.errors %}
+                        <div class="text-danger small">{{ error }}</div>
+                        {% endfor %}
+                        <small class="form-text text-muted">
+                            Explain why you're voting this way (optional but recommended)
+                        </small>
+                    </div>
+
+                    <!-- Voting Power Info -->
+                    <div class="mb-3">
+                        <div class="alert alert-info">
+                            <h6 class="alert-heading">Your Voting Power</h6>
+                            <p class="mb-0">
+                                Your vote will be weighted based on your reputation and trust score.
+                                {% if current_user.reputation %}
+                                Current voting power: <strong>{{ current_user.reputation.voting_power|round(2) }}</strong>
+                                {% else %}
+                                Voting power will be calculated based on your activity.
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Existing Vote Info -->
+                    {% if existing_vote %}
+                    <div class="mb-3">
+                        <div class="alert alert-warning">
+                            <h6 class="alert-heading">Existing Vote</h6>
+                            <p class="mb-0">
+                                You previously voted <strong>{{ existing_vote.vote_type }}</strong> on this
+                                {% if target.__class__.__name__ == 'Post' %}post{% else %}comment{% endif %}
+                                on {{ existing_vote.created_at.strftime('%Y-%m-%d %H:%M') }}.
+                                {% if existing_vote.reason %}
+                                <br>Reason: {{ existing_vote.reason }}
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">
+                        {% if existing_vote %}
+                        <i class="fas fa-edit"></i> Update Vote
+                        {% else %}
+                        <i class="fas fa-vote-yea"></i> Cast Vote
+                        {% endif %}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Show reason field when category is selected
+    const reasonCategory = document.getElementById('reason_category');
+    const reasonField = document.getElementById('reason');
+    
+    if (reasonCategory && reasonField) {
+        reasonCategory.addEventListener('change', function() {
+            if (this.value) {
+                reasonField.required = true;
+                reasonField.placeholder = 'Please provide a reason for selecting ' + this.options[this.selectedIndex].text;
+            } else {
+                reasonField.required = false;
+                reasonField.placeholder = 'Please provide a reason for your vote (optional but recommended)';
+            }
+        });
+        
+        // Set initial state
+        if (reasonCategory.value) {
+            reasonField.required = true;
+        }
+    }
+    
+    // Auto-focus on vote type if no existing vote
+    const upvoteRadio = document.getElementById('upvote');
+    if (upvoteRadio && !document.querySelector('input[name="vote_type"]:checked')) {
+        upvoteRadio.focus();
+    }
+});
+</script>

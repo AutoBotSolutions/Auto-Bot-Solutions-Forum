@@ -10,7 +10,15 @@
 
 <div class="notifications-container">
     <div class="notifications-header">
-        <a href="{{ url_for('notification.mark_all_read') }}" class="btn-primary" style="font-size: 0.9rem; padding: 0.5rem 1.5rem;">Mark All Read</a>
+        <div class="header-left">
+            <a href="{{ url_for('notification.mark_all_read') }}" class="btn-primary" style="font-size: 0.9rem; padding: 0.5rem 1.5rem;">Mark All Read</a>
+        </div>
+        <div class="header-right">
+            <button id="push-toggle" class="btn-secondary" style="font-size: 0.9rem; padding: 0.5rem 1.5rem; margin-left: 1rem;">Enable Push Notifications</button>
+        </div>
+    </div>
+    <div class="push-status" id="push-status" style="text-align: center; margin-bottom: 1rem; font-size: 0.9rem; color: var(--text-secondary);">
+        Push notifications are disabled
     </div>
 
     {% for notification in notifications %}
@@ -92,5 +100,418 @@
 .notification-link:hover {
     text-shadow: 0 0 10px var(--neon-cyan);
 }
+
+.notification-badge {
+    background: var(--neon-cyan);
+    color: var(--dark-bg);
+    border-radius: 50%;
+    padding: 2px 8px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    margin-left: 0.5rem;
+}
+
+.real-time-indicator {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    background: #00ff00;
+    border-radius: 50%;
+    margin-left: 0.5rem;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+}
 </style>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+<script src="{{ url_for('static', filename='js/push-notifications.js') }}"></script>
+<script>
+// Real-time notification system
+class NotificationManager {
+    constructor() {
+        this.socket = null;
+        this.unreadCount = {{ unread_count }};
+        this.notifications = [];
+        this.isConnected = false;
+        this.reconnectAttempts = 0;
+        this.maxReconnectAttempts = 5;
+        this.init();
+    }
+
+    init() {
+        this.connectWebSocket();
+        this.setupEventListeners();
+        this.updateUI();
+    }
+
+    connectWebSocket() {
+        this.socket = io();
+        
+        this.socket.on('connect', () => {
+            console.log('Connected to WebSocket server');
+            this.isConnected = true;
+            this.reconnectAttempts = 0;
+            this.subscribeToNotifications();
+            this.updateConnectionStatus(true);
+        });
+
+        this.socket.on('disconnect', () => {
+            console.log('Disconnected from WebSocket server');
+            this.isConnected = false;
+            this.updateConnectionStatus(false);
+            this.attemptReconnect();
+        });
+
+        this.socket.on('notification', (data) => {
+            this.handleNewNotification(data);
+        });
+
+        this.socket.on('unread_count', (data) => {
+            this.updateUnreadCount(data.unread_count);
+        });
+
+        this.socket.on('notification_marked_read', (data) => {
+            this.handleNotificationMarkedRead(data);
+        });
+
+        this.socket.on('all_notifications_marked_read', (data) => {
+            this.handleAllNotificationsMarkedRead(data);
+        });
+
+        this.socket.on('recent_notifications', (data) => {
+            this.updateRecentNotifications(data.notifications);
+        });
+
+        this.socket.on('error', (data) => {
+            console.error('WebSocket error:', data.message);
+            this.showError(data.message);
+        });
+    }
+
+    subscribeToNotifications() {
+        if (this.socket && this.isConnected) {
+            this.socket.emit('subscribe_notifications', {});
+        }
+    }
+
+    handleNewNotification(notification) {
+        console.log('New notification received:', notification);
+        
+        // Add to notifications array
+        this.notifications.unshift(notification);
+        
+        // Update unread count
+        this.unreadCount++;
+        this.updateUI();
+        
+        // Show browser notification if permitted
+        this.showBrowserNotification(notification);
+        
+        // Show toast notification
+        this.showToast(notification);
+    }
+
+    handleNotificationMarkedRead(data) {
+        console.log('Notification marked read:', data);
+        
+        // Update notification in array
+        const notification = this.notifications.find(n => n.id === data.notification_id);
+        if (notification) {
+            notification.is_read = true;
+        }
+        
+        // Update unread count
+        this.unreadCount = data.unread_count;
+        this.updateUI();
+    }
+
+    handleAllNotificationsMarkedRead(data) {
+        console.log('All notifications marked read:', data);
+        
+        // Mark all notifications as read
+        this.notifications.forEach(n => n.is_read = true);
+        
+        // Update unread count
+        this.unreadCount = 0;
+        this.updateUI();
+    }
+
+    updateRecentNotifications(notifications) {
+        console.log('Recent notifications updated:', notifications);
+        this.notifications = notifications;
+        this.updateUI();
+    }
+
+    updateUnreadCount(count) {
+        this.unreadCount = count;
+        this.updateUI();
+    }
+
+    updateUI() {
+        // Update unread count display
+        const unreadCountElement = document.querySelector('.hero p');
+        if (unreadCountElement) {
+            unreadCountElement.textContent = `${this.unreadCount} unread notifications`;
+        }
+
+        // Update page title if there are unread notifications
+        if (this.unreadCount > 0) {
+            document.title = `(${this.unreadCount}) Notifications - AutoBot Solutions Forum`;
+        } else {
+            document.title = 'Notifications - AutoBot Solutions Forum';
+        }
+
+        // Update notification list
+        this.updateNotificationList();
+    }
+
+    updateNotificationList() {
+        const container = document.querySelector('.notifications-container');
+        if (!container) return;
+
+        const notificationsHtml = this.notifications.map(notification => 
+            this.createNotificationHTML(notification)
+        ).join('');
+
+        if (this.notifications.length === 0) {
+            container.innerHTML = `
+                <div style="text-align: center; padding: 4rem; color: var(--text-secondary);">
+                    <p style="font-size: 1.2rem;">No notifications yet.</p>
+                </div>
+            `;
+        } else {
+            container.innerHTML = `
+                <div class="notifications-header">
+                    <a href="/notifications/read_all" class="btn-primary" style="font-size: 0.9rem; padding: 0.5rem 1.5rem;">Mark All Read</a>
+                </div>
+                ${notificationsHtml}
+            `;
+        }
+    }
+
+    createNotificationHTML(notification) {
+        const createdDate = new Date(notification.created_at);
+        const formattedDate = createdDate.toLocaleString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+
+        return `
+            <div class="notification-item ${!notification.is_read ? 'unread' : ''}" data-id="${notification.id}">
+                <div class="notification-content">
+                    ${notification.content}
+                </div>
+                <div class="notification-meta">
+                    <span class="notification-date">${formattedDate}</span>
+                    ${notification.link ? 
+                        `<a href="${notification.link}" class="notification-link">View →</a>` :
+                        `<a href="/notifications/${notification.id}/read" class="notification-link">Mark Read</a>`
+                    }
+                </div>
+            </div>
+        `;
+    }
+
+    showBrowserNotification(notification) {
+        if ('Notification' in window && Notification.permission === 'granted') {
+            new Notification('AutoBot Solutions Forum', {
+                body: notification.content,
+                icon: '/static/images/favicon.ico',
+                tag: notification.id
+            });
+        } else if ('Notification' in window && Notification.permission !== 'denied') {
+            Notification.requestPermission().then(permission => {
+                if (permission === 'granted') {
+                    this.showBrowserNotification(notification);
+                }
+            });
+        }
+    }
+
+    showToast(notification) {
+        // Create toast element
+        const toast = document.createElement('div');
+        toast.className = 'notification-toast';
+        toast.innerHTML = `
+            <div class="toast-content">
+                <strong>New Notification</strong>
+                <p>${notification.content}</p>
+            </div>
+            <button class="toast-close">&times;</button>
+        `;
+
+        // Add styles
+        toast.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--dark-card);
+            border: 1px solid var(--neon-cyan);
+            border-radius: 8px;
+            padding: 1rem;
+            z-index: 1000;
+            max-width: 300px;
+            box-shadow: 0 4px 12px rgba(0, 245, 255, 0.3);
+            animation: slideInRight 0.3s ease;
+        `;
+
+        document.body.appendChild(toast);
+
+        // Auto remove after 5 seconds
+        setTimeout(() => {
+            if (toast.parentNode) {
+                toast.remove();
+            }
+        }, 5000);
+
+        // Manual close
+        const closeBtn = toast.querySelector('.toast-close');
+        closeBtn.addEventListener('click', () => toast.remove());
+    }
+
+    updateConnectionStatus(connected) {
+        const statusElement = document.querySelector('.connection-status');
+        if (!statusElement) {
+            const statusDiv = document.createElement('div');
+            statusDiv.className = 'connection-status';
+            statusDiv.style.cssText = `
+                position: fixed;
+                top: 10px;
+                right: 10px;
+                padding: 5px 10px;
+                border-radius: 5px;
+                font-size: 0.8rem;
+                z-index: 1000;
+            `;
+            document.body.appendChild(statusDiv);
+        }
+
+        const statusElement2 = document.querySelector('.connection-status');
+        if (connected) {
+            statusElement2.textContent = 'Connected';
+            statusElement2.style.background = '#00ff00';
+            statusElement2.style.color = '#000';
+        } else {
+            statusElement2.textContent = 'Disconnected';
+            statusElement2.style.background = '#ff0000';
+            statusElement2.style.color = '#fff';
+        }
+    }
+
+    showError(message) {
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'error-toast';
+        errorDiv.textContent = message;
+        errorDiv.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #ff4444;
+            color: white;
+            padding: 1rem;
+            border-radius: 5px;
+            z-index: 1000;
+        `;
+        document.body.appendChild(errorDiv);
+        setTimeout(() => errorDiv.remove(), 3000);
+    }
+
+    attemptReconnect() {
+        if (this.reconnectAttempts < this.maxReconnectAttempts) {
+            this.reconnectAttempts++;
+            console.log(`Attempting to reconnect... (${this.reconnectAttempts}/${this.maxReconnectAttempts})`);
+            setTimeout(() => {
+                this.connectWebSocket();
+            }, 2000 * this.reconnectAttempts);
+        } else {
+            console.error('Max reconnection attempts reached');
+            this.showError('Unable to connect to real-time notifications');
+        }
+    }
+
+    setupEventListeners() {
+        // Handle notification clicks
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('notification-link')) {
+                e.preventDefault();
+                const href = e.target.getAttribute('href');
+                if (href.includes('/read')) {
+                    this.markNotificationRead(href.split('/')[2]);
+                } else {
+                    window.location.href = href;
+                }
+            }
+        });
+
+        // Handle mark all read
+        const markAllReadBtn = document.querySelector('.btn-primary');
+        if (markAllReadBtn) {
+            markAllReadBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.markAllRead();
+            });
+        }
+    }
+
+    markNotificationRead(notificationId) {
+        if (this.socket && this.isConnected) {
+            this.socket.emit('mark_notification_read', {
+                notification_id: parseInt(notificationId)
+            });
+        }
+    }
+
+    markAllRead() {
+        if (this.socket && this.isConnected) {
+            this.socket.emit('mark_all_notifications_read', {});
+        }
+    }
+}
+
+// Add CSS animations
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes slideInRight {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+    
+    .notification-toast .toast-content {
+        margin-bottom: 0.5rem;
+    }
+    
+    .notification-toast .toast-close {
+        position: absolute;
+        top: 5px;
+        right: 10px;
+        background: none;
+        border: none;
+        color: var(--text-primary);
+        font-size: 1.2rem;
+        cursor: pointer;
+    }
+`;
+document.head.appendChild(style);
+
+// Initialize notification manager
+document.addEventListener('DOMContentLoaded', () => {
+    new NotificationManager();
+});
+</script>
 {% endblock %}

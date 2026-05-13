@@ -1,0 +1,28 @@
+Newly Implemented Components Debugging Report
+Generated: 2026-05-12 00:40:46.349817
+============================================================
+
+NOTIFICATION_TEMPLATE_SERVICE:
+  import_instantiation: FAILED: No module named 'email.utils'
+
+MODERATION_QUEUE_FILTER_FORM:
+  import_instantiation: FAILED: No module named 'email.utils'
+
+INTEGRATION_WITH_EXISTING_SYSTEMS:
+  notification_service_integration: FAILED: No module named 'email.utils'
+  moderation_form_integration: FAILED: No module named 'email.utils'
+  notifications_module_structure: FAILED: No module named 'email.utils'
+  moderation_module_structure: FAILED: No module named 'email.utils'
+  conflict_check: FAILED: No module named 'email.utils'
+
+DATABASE_COMPATIBILITY:
+  notification_template_model: FAILED: No module named 'email.utils'
+  moderation_queue_model: FAILED: No module named 'email.utils'
+  template_field_compatibility: FAILED: No module named 'email.utils'
+  service_model_compatibility: FAILED: No module named 'email.utils'
+
+============================================================
+Total Tests: 11
+Passed: 0
+Failed: 11
+Success Rate: 0.0%

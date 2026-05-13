@@ -1,0 +1,641 @@
+{% extends "base.html" %}
+
+{% block title %}Moderation Queue{% endblock %}
+
+{% block extra_css %}
+<style>
+.moderation-queue {
+    padding: 20px;
+}
+
+.queue-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.filters-section {
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+}
+
+.queue-container {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+
+.queue-header-bar {
+    padding: 20px;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.queue-item {
+    padding: 20px;
+    border-bottom: 1px solid #eee;
+    transition: background-color 0.2s;
+}
+
+.queue-item:hover {
+    background-color: #f8f9fa;
+}
+
+.queue-item:last-child {
+    border-bottom: none;
+}
+
+.queue-item-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.queue-main {
+    flex: 1;
+}
+
+.queue-header-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.queue-title {
+    font-weight: bold;
+    color: #333;
+    font-size: 1.1rem;
+    margin-bottom: 5px;
+}
+
+.queue-meta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.queue-text {
+    color: #555;
+    line-height: 1.5;
+    margin-bottom: 10px;
+    max-height: 100px;
+    overflow-y: auto;
+}
+
+.queue-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.queue-sidebar {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 10px;
+    margin-left: 20px;
+    min-width: 120px;
+}
+
+.priority-badge {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.priority-low {
+    background: #d4edda;
+    color: #155724;
+}
+
+.priority-medium {
+    background: #cce5ff;
+    color: #004085;
+}
+
+.priority-high {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.priority-critical {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.status-badge {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.status-pending {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.status-approved {
+    background: #d4edda;
+    color: #155724;
+}
+
+.status-rejected {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.status-flagged {
+    background: #fd7e14;
+    color: white;
+}
+
+.score-indicator {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.8rem;
+}
+
+.score-bar {
+    width: 60px;
+    height: 6px;
+    background: #e9ecef;
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.score-fill {
+    height: 100%;
+    transition: width 0.3s ease;
+}
+
+.spam-score .score-fill {
+    background: #dc3545;
+}
+
+.quality-score .score-fill {
+    background: #28a745;
+}
+
+.btn-group-sm .btn {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+}
+
+.queue-time {
+    font-size: 0.8rem;
+    color: #999;
+    text-align: right;
+}
+
+.bulk-actions {
+    padding: 20px;
+    border-top: 1px solid #eee;
+    background: #f8f9fa;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.pagination-container {
+    padding: 20px;
+    border-top: 1px solid #eee;
+    display: flex;
+    justify-content: center;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: #666;
+}
+
+.empty-state i {
+    font-size: 4rem;
+    margin-bottom: 20px;
+    color: #ddd;
+}
+
+@media (max-width: 768px) {
+    .queue-item-content {
+        flex-direction: column;
+    }
+    
+    .queue-sidebar {
+        flex-direction: row;
+        margin-left: 0;
+        margin-top: 10px;
+        min-width: auto;
+        justify-content: flex-end;
+    }
+    
+    .queue-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="moderation-queue">
+    <div class="queue-header">
+        <div>
+            <h1>Moderation Queue</h1>
+            <p class="text-muted">Review and moderate content</p>
+        </div>
+        <div>
+            <a href="{{ url_for('moderation.index') }}" class="btn btn-outline-secondary me-2">Dashboard</a>
+            <a href="{{ url_for('moderation.search') }}" class="btn btn-outline-primary me-2">Advanced Search</a>
+            <button class="btn btn-primary" onclick="toggleBulkActions()">Bulk Actions</button>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="filters-section">
+        <form method="GET" id="filterForm">
+            <div class="row">
+                <div class="col-md-2">
+                    {{ form.status.label(class="form-label") }}
+                    {{ form.status(class="form-select") }}
+                </div>
+                <div class="col-md-2">
+                    {{ form.priority.label(class="form-label") }}
+                    {{ form.priority(class="form-select") }}
+                </div>
+                <div class="col-md-2">
+                    {{ form.content_type.label(class="form-label") }}
+                    {{ form.content_type(class="form-select") }}
+                </div>
+                <div class="col-md-2">
+                    {{ form.limit.label(class="form-label") }}
+                    {{ form.limit(class="form-select") }}
+                </div>
+                <div class="col-md-2">
+                    {{ form.search.label(class="form-label") }}
+                    {{ form.search(class="form-control", placeholder="Search...") }}
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary me-2">Apply Filters</button>
+                    <a href="{{ url_for('moderation.queue') }}" class="btn btn-outline-secondary">Clear</a>
+                </div>
+            </div>
+            
+            <!-- Advanced Filters -->
+            <div class="row mt-3">
+                <div class="col-md-3">
+                    {{ form.date_from.label(class="form-label") }}
+                    {{ form.date_from(class="form-control") }}
+                </div>
+                <div class="col-md-3">
+                    {{ form.date_to.label(class="form-label") }}
+                    {{ form.date_to(class="form-control") }}
+                </div>
+                <div class="col-md-2">
+                    {{ form.min_spam_score.label(class="form-label") }}
+                    {{ form.min_spam_score(class="form-control", placeholder="Min") }}
+                </div>
+                <div class="col-md-2">
+                    {{ form.max_spam_score.label(class="form-label") }}
+                    {{ form.max_spam_score(class="form-control", placeholder="Max") }}
+                </div>
+                <div class="col-md-2">
+                    {{ form.min_quality_score.label(class="form-label") }}
+                    {{ form.min_quality_score(class="form-control", placeholder="Min") }}
+                </div>
+                <div class="col-md-2">
+                    {{ form.max_quality_score.label(class="form-label") }}
+                    {{ form.max_quality_score(class="form-control", placeholder="Max") }}
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Queue Items -->
+    <div class="queue-container">
+        <div class="queue-header-bar">
+            <div>
+                <h5>Queue Items</h5>
+                <small class="text-muted">{{ items.total }} items</small>
+            </div>
+            <div class="d-flex gap-2">
+                <button class="btn btn-sm btn-outline-secondary" onclick="toggleSelectAll()">Select All</button>
+                <button class="btn btn-sm btn-outline-primary" onclick="bulkApprove()">Approve Selected</button>
+                <button class="btn btn-sm btn-outline-warning" onclick="bulkReject()">Reject Selected</button>
+                <button class="btn btn-sm btn-outline-danger" onclick="bulkDelete()">Delete Selected</button>
+            </div>
+        </div>
+
+        {% if items.items %}
+            {% for item in items.items %}
+            <div class="queue-item" data-queue-id="{{ item.id }}">
+                <div class="queue-item-content">
+                    <div class="queue-main">
+                        <div class="queue-header-info">
+                            <div>
+                                <div class="queue-title">
+                                    {{ item.content_type|title }} #{{ item.content_id }}
+                                    <input type="checkbox" class="queue-checkbox" value="{{ item.id }}" style="margin-left: 10px;">
+                                </div>
+                                <div class="queue-meta">
+                                    <span class="priority-badge priority-{{ item.priority }}">{{ item.priority }}</span>
+                                    <span class="status-badge status-{{ item.status }}">{{ item.status }}</span>
+                                    <span class="category-badge">{{ item.content_type|title }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="queue-text">
+                            {% if item.content_data and item.content_data.text %}
+                                {{ item.content_data.text }}
+                            {% else %}
+                                No content preview available
+                            {% endif %}
+                        </div>
+                        
+                        <div class="queue-actions">
+                            <div class="btn-group btn-group-sm" role="group">
+                                <a href="{{ url_for('moderation.queue_detail', queue_id=item.id) }}" class="btn btn-outline-primary" title="View Details">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                {% if item.status == 'pending' %}
+                                <a href="{{ url_for('moderation.review_queue_item', queue_id=item.id) }}" class="btn btn-outline-success" title="Review">
+                                    <i class="fas fa-check"></i>
+                                </a>
+                                <button class="btn btn-outline-warning" onclick="quickApprove({{ item.id }})" title="Quick Approve">
+                                    <i class="fas fa-thumbs-up"></i>
+                                </button>
+                                <button class="btn btn-outline-danger" onclick="quickReject({{ item.id }})" title="Quick Reject">
+                                    <i class="fas fa-thumbs-down"></i>
+                                </button>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="queue-sidebar">
+                        {% if item.spam_score is not none %}
+                        <div class="score-indicator spam-score">
+                            <span>Spam</span>
+                            <div class="score-bar">
+                                <div class="score-fill" style="width: {{ item.spam_score * 100 }}%"></div>
+                            </div>
+                            <span>{{ "%.0f"|format(item.spam_score * 100) }}%</span>
+                        </div>
+                        {% endif %}
+                        
+                        {% if item.quality_score is not none %}
+                        <div class="score-indicator quality-score">
+                            <span>Quality</span>
+                            <div class="score-bar">
+                                <div class="score-fill" style="width: {{ item.quality_score * 100 }}%"></div>
+                            </div>
+                            <span>{{ "%.0f"|format(item.quality_score * 100) }}%</span>
+                        </div>
+                        {% endif %}
+                        
+                        <div class="queue-time">
+                            {{ item.created_at.strftime('%b %d, %H:%M') }}
+                        </div>
+                        
+                        {% if item.auto_action_taken %}
+                        <div class="text-muted small">
+                            <i class="fas fa-robot"></i> Auto
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty-state">
+                <i class="fas fa-inbox"></i>
+                <h5>No queue items found</h5>
+                <p>
+                    {% if form.status.data or form.priority.data or form.search.data %}
+                        No items match your current filters. Try adjusting your filter criteria.
+                    {% else %}
+                        No items in the moderation queue. All content has been processed.
+                    {% endif %}
+                </p>
+                {% if form.status.data or form.priority.data or form.search.data %}
+                    <a href="{{ url_for('moderation.queue') }}" class="btn btn-outline-primary">Clear Filters</a>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Bulk Actions -->
+    {% if items.items %}
+    <div class="bulk-actions" id="bulkActions" style="display: none;">
+        <div>
+            <span id="selectedCount">0</span> items selected
+        </div>
+        <div>
+            <button class="btn btn-sm btn-outline-secondary" onclick="clearSelection()">Clear Selection</button>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Pagination -->
+    {% if items.items %}
+    <div class="pagination-container">
+        {{ pagination.links() }}
+    </div>
+    {% endif %}
+</div>
+
+<script>
+let selectedItems = new Set();
+
+function toggleSelectAll() {
+    const checkboxes = document.querySelectorAll('.queue-checkbox');
+    const selectAllBtn = event.target;
+    
+    if (selectAllBtn.textContent === 'Select All') {
+        checkboxes.forEach(cb => {
+            cb.checked = true;
+            selectedItems.add(parseInt(cb.value));
+        });
+        selectAllBtn.textContent = 'Deselect All';
+    } else {
+        checkboxes.forEach(cb => {
+            cb.checked = false;
+        });
+        selectedItems.clear();
+        selectAllBtn.textContent = 'Select All';
+    }
+    
+    updateSelectedCount();
+}
+
+function updateSelectedCount() {
+    document.getElementById('selectedCount').textContent = selectedItems.size;
+    
+    // Show/hide bulk actions
+    const bulkActions = document.getElementById('bulkActions');
+    if (selectedItems.size > 0) {
+        bulkActions.style.display = 'flex';
+    } else {
+        bulkActions.style.display = 'none';
+    }
+}
+
+function toggleBulkActions() {
+    const bulkActions = document.getElementById('bulkActions');
+    if (bulkActions.style.display === 'none') {
+        bulkActions.style.display = 'flex';
+    } else {
+        bulkActions.style.display = 'none';
+    }
+}
+
+function clearSelection() {
+    selectedItems.clear();
+    document.querySelectorAll('.queue-checkbox').forEach(cb => {
+        cb.checked = false;
+    });
+    updateSelectedCount();
+}
+
+function bulkApprove() {
+    if (selectedItems.size === 0) {
+        alert('Please select items to approve');
+        return;
+    }
+    
+    if (confirm(`Are you sure you want to approve ${selectedItems.size} items?`)) {
+        bulkAction('approve');
+    }
+}
+
+function bulkReject() {
+    if (selectedItems.size === 0) {
+        alert('Please select items to reject');
+        return;
+    }
+    
+    if (confirm(`Are you sure you want to reject ${selectedItems.size} items?`)) {
+        bulkAction('reject');
+    }
+}
+
+function bulkDelete() {
+    if (selectedItems.size === 0) {
+        alert('Please select items to delete');
+        return;
+    }
+    
+    if (confirm(`Are you sure you want to delete ${selectedItems.size} items? This action cannot be undone.`)) {
+        bulkAction('delete');
+    }
+}
+
+function bulkAction(action) {
+    const queueIds = Array.from(selectedItems).join(',');
+    
+    fetch('/moderation/queue/bulk-action', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: JSON.stringify({
+            action_type: action,
+            action_reason: action === 'approve' ? 'approved' : 'rejected',
+            action_description: `Bulk ${action} by moderator`,
+            severity: 'medium',
+            confidence: 0.8,
+            selected_items: queueIds
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        } else {
+            alert('Action failed: ' + data.error);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Action failed');
+    });
+}
+
+function quickApprove(queueId) {
+    fetch(`/moderation/queue/${queueId}/approve`, {
+        method: 'POST',
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        } else {
+            alert('Action failed: ' + data.error);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Action failed');
+    });
+}
+
+function quickReject(queueId) {
+    fetch(`/moderation/queue/${queueId}/reject`, {
+        method: 'POST',
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        } else {
+            alert('Action failed: ' + data.error);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Action failed');
+    });
+}
+
+// Add checkbox event listeners
+document.addEventListener('DOMContentLoaded', function() {
+    const checkboxes = document.querySelectorAll('.queue-checkbox');
+    
+    checkboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            const queueId = parseInt(this.value);
+            if (this.checked) {
+                selectedItems.add(queueId);
+            } else {
+                selectedItems.delete(queueId);
+            }
+            updateSelectedCount();
+        });
+    });
+});
+</script>
+{% endblock %}

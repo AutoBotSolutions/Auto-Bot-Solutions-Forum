@@ -1,0 +1,256 @@
+{% extends "base.html" %}
+
+{% block title %}Roles - Admin{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1><i class="fas fa-user-shield"></i> Roles Management</h1>
+                <a href="{{ url_for('admin.create_role') }}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Create Role
+                </a>
+            </div>
+            
+            <!-- Roles Overview Cards -->
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <h5 class="card-title text-primary">{{ roles|length }}</h5>
+                            <p class="card-text">Total Roles</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <h5 class="card-title text-success">{{ roles|selectattr('is_active')|list|length }}</h5>
+                            <p class="card-text">Active Roles</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <h5 class="card-title text-warning">{{ roles|selectattr('is_system')|list|length }}</h5>
+                            <p class="card-text">System Roles</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <h5 class="card-title text-info">{{ roles|selectattr('is_system')|rejectattr('is_system')|list|length }}</h5>
+                            <p class="card-text">Custom Roles</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Search and Filter -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <input type="text" class="form-control" id="searchInput" placeholder="Search roles...">
+                        </div>
+                        <div class="col-md-3">
+                            <select class="form-control" id="levelFilter">
+                                <option value="">All Levels</option>
+                                {% for level in [0, 20, 40, 60, 80, 100] %}
+                                <option value="{{ level }}">Level {{ level }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <select class="form-control" id="statusFilter">
+                                <option value="">All Status</option>
+                                <option value="active">Active</option>
+                                <option value="inactive">Inactive</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Roles Table -->
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-list"></i> System Roles</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover" id="rolesTable">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Display Name</th>
+                                    <th>Level</th>
+                                    <th>Users</th>
+                                    <th>Permissions</th>
+                                    <th>Status</th>
+                                    <th>System</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for role in roles|sort(attribute='level', reverse=true) %}
+                                <tr data-level="{{ role.level }}" data-status="{{ 'active' if role.is_active else 'inactive' }}">
+                                    <td>
+                                        <code>{{ role.name }}</code>
+                                    </td>
+                                    <td>
+                                        <strong>{{ role.display_name }}</strong>
+                                        {% if role.description %}
+                                        <br><small class="text-muted">{{ role.description[:50] }}{% if role.description|length > 50 %}...{% endif %}</small>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="progress me-2" style="width: 60px; height: 20px;">
+                                                <div class="progress-bar" style="width: {{ role.level }}%;" data-level="{{ role.level }}"></div>
+                                            </div>
+                                            <span class="badge bg-secondary">{{ role.level }}</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-info">{{ role.user_count }}</span>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-primary">{{ role.permission_count }}</span>
+                                    </td>
+                                    <td>
+                                        {% if role.is_active %}
+                                            <span class="badge bg-success">Active</span>
+                                        {% else %}
+                                            <span class="badge bg-danger">Inactive</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if role.is_system %}
+                                            <span class="badge bg-warning">System</span>
+                                        {% else %}
+                                            <span class="badge bg-light">Custom</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm">
+                                            <a href="{{ url_for('admin.role_permissions', role_id=role.id) }}" 
+                                               class="btn btn-outline-info" title="Manage Permissions">
+                                                <i class="fas fa-key"></i>
+                                            </a>
+                                            <a href="{{ url_for('admin.edit_role', role_id=role.id) }}" 
+                                               class="btn btn-outline-primary" title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            {% if not role.is_system %}
+                                            <a href="{{ url_for('admin.delete_role', role_id=role.id) }}" 
+                                               class="btn btn-outline-danger" title="Delete"
+                                               onclick="return confirm('Are you sure you want to delete this role?')">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Quick Actions -->
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h6><i class="fas fa-users"></i> User Role Assignments</h6>
+                        </div>
+                        <div class="card-body">
+                            <a href="{{ url_for('admin.user_roles') }}" class="btn btn-outline-primary btn-sm">
+                                <i class="fas fa-list"></i> View All User Roles
+                            </a>
+                            <a href="{{ url_for('admin.assign_user_role') }}" class="btn btn-outline-success btn-sm">
+                                <i class="fas fa-plus"></i> Assign Role to User
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h6><i class="fas fa-users-cog"></i> User Groups</h6>
+                        </div>
+                        <div class="card-body">
+                            <a href="{{ url_for('admin.user_groups') }}" class="btn btn-outline-primary btn-sm">
+                                <i class="fas fa-list"></i> View User Groups
+                            </a>
+                            <a href="{{ url_for('admin.create_user_group') }}" class="btn btn-outline-success btn-sm">
+                                <i class="fas fa-plus"></i> Create User Group
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('searchInput');
+    const levelFilter = document.getElementById('levelFilter');
+    const statusFilter = document.getElementById('statusFilter');
+    const table = document.getElementById('rolesTable');
+    const rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+
+    // Set progress bar colors based on level
+    const progressBars = document.querySelectorAll('.progress-bar[data-level]');
+    progressBars.forEach(bar => {
+        const level = parseInt(bar.getAttribute('data-level'));
+        let color;
+        if (level >= 80) {
+            color = '#dc3545';  // Red
+        } else if (level >= 60) {
+            color = '#fd7e14';  // Orange
+        } else if (level >= 40) {
+            color = '#ffc107';  // Yellow
+        } else if (level >= 20) {
+            color = '#20c997';  // Teal
+        } else {
+            color = '#6c757d';  // Gray
+        }
+        bar.style.backgroundColor = color;
+    });
+
+    function filterTable() {
+        const searchTerm = searchInput.value.toLowerCase();
+        const levelValue = levelFilter.value;
+        const statusValue = statusFilter.value;
+
+        for (let row of rows) {
+            const text = row.textContent.toLowerCase();
+            const level = row.getAttribute('data-level');
+            const status = row.getAttribute('data-status');
+            
+            const matchesSearch = text.includes(searchTerm);
+            const matchesLevel = !levelValue || level === levelValue;
+            const matchesStatus = !statusValue || status === statusValue;
+            
+            if (matchesSearch && matchesLevel && matchesStatus) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        }
+    }
+
+    searchInput.addEventListener('input', filterTable);
+    levelFilter.addEventListener('change', filterTable);
+    statusFilter.addEventListener('change', filterTable);
+});
+</script>
+{% endblock %}

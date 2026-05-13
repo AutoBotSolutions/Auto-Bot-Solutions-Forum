@@ -1,0 +1,511 @@
+# Analytics Infrastructure Monitoring Configuration
+# Auto Bot Solutions Forum
+
+version: "1.0"
+environment: "production"
+
+# Monitoring Configuration
+monitoring:
+  enabled: true
+  interval: 15  # seconds
+  retention_days: 30
+  
+  # Metrics Collection
+  metrics:
+    # Database Metrics
+    database:
+      enabled: true
+      host: "localhost"
+      port: 5432
+      database: "forum_analytics"
+      username: "analytics_user"
+      password: "analytics_password"
+      
+      metrics:
+        - name: "database_connections"
+          query: "SELECT count(*) as value FROM pg_stat_activity WHERE datname = current_database()"
+          interval: 30
+          unit: "connections"
+          
+        - name: "database_size"
+          query: "SELECT pg_database_size(current_database()) / 1024 / 1024 as value"
+          interval: 300
+          unit: "MB"
+          
+        - name: "table_sizes"
+          query: |
+            SELECT 
+              schemaname || '.' || tablename as table_name,
+              pg_total_relation_size(schemaname||'.'||tablename) / 1024 / 1024 as size_mb
+            FROM pg_tables 
+            WHERE schemaname IN ('analytics', 'pipeline', 'monitoring')
+          interval: 300
+          unit: "MB"
+          
+        - name: "query_performance"
+          query: |
+            SELECT 
+              query,
+              calls,
+              total_exec_time / 1000 as total_time_sec,
+              mean_exec_time / 1000 as mean_time_sec,
+              rows
+            FROM pg_stat_statements 
+            ORDER BY total_exec_time DESC 
+            LIMIT 10
+          interval: 60
+          unit: "seconds"
+    
+    # Redis Metrics
+    redis:
+      enabled: true
+      host: "localhost"
+      port: 6379
+      password: null
+      
+      metrics:
+        - name: "redis_memory"
+          command: "INFO memory"
+          interval: 30
+          unit: "bytes"
+          
+        - name: "redis_connections"
+          command: "INFO clients"
+          interval: 30
+          unit: "connections"
+          
+        - name: "redis_keys"
+          command: "INFO keyspace"
+          interval: 60
+          unit: "keys"
+          
+        - name: "redis_performance"
+          command: "INFO stats"
+          interval: 30
+          unit: "operations"
+    
+    # System Metrics
+    system:
+      enabled: true
+      interval: 15
+      
+      metrics:
+        - name: "cpu_usage"
+          type: "cpu_percent"
+          interval: 15
+          unit: "percent"
+          
+        - name: "memory_usage"
+          type: "virtual_memory"
+          interval: 15
+          unit: "percent"
+          
+        - name: "disk_usage"
+          type: "disk_usage"
+          path: "/var/lib/analytics"
+          interval: 300
+          unit: "percent"
+          
+        - name: "network_io"
+          type: "network_io"
+          interval: 30
+          unit: "bytes"
+          
+        - name: "process_count"
+          type: "process_count"
+          interval: 60
+          unit: "processes"
+    
+    # Application Metrics
+    application:
+      enabled: true
+      port: 8080
+      path: "/metrics"
+      interval: 15
+      
+      metrics:
+        - name: "pipeline_success_rate"
+          query: "rate(pipeline_success_total[5m])"
+          interval: 60
+          unit: "rate"
+          
+        - name: "pipeline_failure_rate"
+          query: "rate(pipeline_failure_total[5m])"
+          interval: 60
+          unit: "rate"
+          
+        - name: "pipeline_duration"
+          query: "histogram_quantile(0.95, pipeline_duration_seconds)"
+          interval: 60
+          unit: "seconds"
+          
+        - name: "data_quality_score"
+          query: "avg(data_quality_score)"
+          interval: 300
+          unit: "score"
+          
+        - name: "records_processed"
+          query: "increase(records_processed_total[1h])"
+          interval: 300
+          unit: "records"
+
+# Alerting Configuration
+alerting:
+  enabled: true
+  evaluation_interval: 30  # seconds
+  evaluation_timeout: 10  # seconds
+  
+  # Alert Rules
+  rules:
+    # Database Alerts
+    - name: "database_connections_high"
+      expr: "database_connections > 80"
+      for: "5m"
+      labels:
+        severity: "warning"
+        service: "analytics"
+        component: "database"
+      annotations:
+        summary: "High database connections"
+        description: "Database connections are {{ $value }} which is above the threshold of 80"
+      
+    - name: "database_size_high"
+      expr: "database_size_mb > 50000"  # 50GB
+      for: "10m"
+      labels:
+        severity: "warning"
+        service: "analytics"
+        component: "database"
+      annotations:
+        summary: "Database size is high"
+        description: "Database size is {{ $value }}MB which is above the threshold of 50GB"
+    
+    - name: "query_performance_slow"
+      expr: "avg_query_time_sec > 5"
+      for: "5m"
+      labels:
+        severity: "warning"
+        service: "analytics"
+        component: "database"
+      annotations:
+        summary: "Slow database queries detected"
+        description: "Average query time is {{ $value }}s which is above the threshold of 5s"
+    
+    # Redis Alerts
+    - name: "redis_memory_high"
+      expr: "redis_memory_usage_percent > 85"
+      for: "5m"
+      labels:
+        severity: "warning"
+        service: "analytics"
+        component: "redis"
+      annotations:
+        summary: "Redis memory usage is high"
+        description: "Redis memory usage is {{ $value }}% which is above the threshold of 85%"
+    
+    - name: "redis_connections_high"
+      expr: "redis_connected_clients > 100"
+      for: "5m"
+      labels:
+        severity: "warning"
+        service: "analytics"
+        component: "redis"
+      annotations:
+        summary: "Redis connections are high"
+        description: "Redis connections are {{ $value }} which is above the threshold of 100"
+    
+    # System Alerts
+    - name: "cpu_usage_high"
+      expr: "cpu_usage_percent > 85"
+      for: "5m"
+      labels:
+        severity: "warning"
+        service: "analytics"
+        component: "system"
+      annotations:
+        summary: "High CPU usage"
+        description: "CPU usage is {{ $value }}% which is above the threshold of 85%"
+    
+    - name: "memory_usage_high"
+      expr: "memory_usage_percent > 90"
+      for: "5m"
+      labels:
+        severity: "critical"
+        service: "analytics"
+        component: "system"
+      annotations:
+        summary: "High memory usage"
+        description: "Memory usage is {{ $value }}% which is above the threshold of 90%"
+    
+    - name: "disk_usage_high"
+      expr: "disk_usage_percent > 85"
+      for: "10m"
+      labels:
+        severity: "warning"
+        service: "analytics"
+        component: "system"
+      annotations:
+        summary: "High disk usage"
+        description: "Disk usage is {{ $value }}% which is above the threshold of 85%"
+    
+    # Application Alerts
+    - name: "pipeline_failure_rate_high"
+      expr: "rate(pipeline_failure_total[5m]) > 0.1"
+      for: "5m"
+      labels:
+        severity: "critical"
+        service: "analytics"
+        component: "pipeline"
+      annotations:
+        summary: "High pipeline failure rate"
+        description: "Pipeline failure rate is {{ $value }} which is above the threshold of 0.1"
+    
+    - name: "pipeline_duration_high"
+      expr: "histogram_quantile(0.95, pipeline_duration_seconds) > 300"
+      for: "5m"
+      labels:
+        severity: "warning"
+        service: "analytics"
+        component: "pipeline"
+      annotations:
+        summary: "Pipeline duration is high"
+        description: "95th percentile pipeline duration is {{ $value }}s which is above the threshold of 300s"
+    
+    - name: "data_quality_low"
+      expr: "data_quality_score < 0.9"
+      for: "10m"
+      labels:
+        severity: "warning"
+        service: "analytics"
+        component: "data_quality"
+      annotations:
+        summary: "Data quality is low"
+        description: "Data quality score is {{ $value }} which is below the threshold of 0.9"
+    
+    - name: "records_processed_low"
+      expr: "increase(records_processed_total[1h]) < 1000"
+      for: "15m"
+      labels:
+        severity: "warning"
+        service: "analytics"
+        component: "pipeline"
+      annotations:
+        summary: "Low record processing rate"
+        description: "Records processed in the last hour is {{ $value }} which is below the threshold of 1000"
+  
+  # Notification Channels
+  channels:
+    email:
+      enabled: true
+      smtp_host: "smtp.example.com"
+      smtp_port: 587
+      smtp_username: "analytics@example.com"
+      smtp_password: "email_password"
+      from_address: "analytics@example.com"
+      to_addresses:
+        - "admin@example.com"
+        - "ops@example.com"
+      
+      templates:
+        subject: "[ALERT] {{ .Labels.severity | toUpper }}: {{ .Annotations.summary }}"
+        body: |
+          Alert: {{ .Annotations.summary }}
+          Description: {{ .Annotations.description }}
+          Severity: {{ .Labels.severity | toUpper }}
+          Service: {{ .Labels.service }}
+          Component: {{ .Labels.component }}
+          Time: {{ .StartsAt.Format "2006-01-02 15:04:05" }}
+          Value: {{ .Value }}
+          
+          View in Grafana: https://grafana.example.com/d/analytics
+    
+    slack:
+      enabled: true
+      webhook_url: "https://hooks.slack.com/services/YOUR/SLACK/WEBHOOK"
+      channel: "#analytics-alerts"
+      username: "Analytics Monitor"
+      
+      templates:
+        title: "{{ .Labels.severity | toUpper }}: {{ .Annotations.summary }}"
+        text: |
+          *Alert:* {{ .Annotations.summary }}
+          *Description:* {{ .Annotations.description }}
+          *Severity:* {{ .Labels.severity | toUpper }}
+          *Service:* {{ .Labels.service }}
+          *Component:* {{ .Labels.component }}
+          *Time:* {{ .StartsAt.Format "2006-01-02 15:04:05" }}
+          *Value:* {{ .Value }}
+          
+          <https://grafana.example.com/d/analytics|View in Grafana>
+    
+    webhook:
+      enabled: true
+      url: "https://api.example.com/alerts"
+      method: "POST"
+      headers:
+        "Content-Type": "application/json"
+        "Authorization": "Bearer YOUR_API_TOKEN"
+      
+      templates:
+        payload: |
+          {
+            "alert_name": "{{ .Labels.alertname }}",
+            "severity": "{{ .Labels.severity }}",
+            "summary": "{{ .Annotations.summary }}",
+            "description": "{{ .Annotations.description }}",
+            "service": "{{ .Labels.service }}",
+            "component": "{{ .Labels.component }}",
+            "timestamp": "{{ .StartsAt.Format \"2006-01-02T15:04:05Z\" }}",
+            "value": "{{ .Value }}"
+          }
+
+# Dashboard Configuration
+dashboards:
+  - name: "Analytics Overview"
+    description: "Overview of analytics infrastructure health and performance"
+    panels:
+      - title: "System Health"
+        type: "stat"
+        targets:
+          - expr: "up{job=\"analytics\"}"
+            legendFormat: "{{ instance }}"
+        
+      - title: "Database Connections"
+        type: "graph"
+        targets:
+          - expr: "database_connections"
+            legendFormat: "Connections"
+        
+      - title: "Pipeline Success Rate"
+        type: "graph"
+        targets:
+          - expr: "rate(pipeline_success_total[5m])"
+            legendFormat: "Success Rate"
+        
+      - title: "Data Quality Score"
+        type: "gauge"
+        targets:
+          - expr: "data_quality_score"
+            legendFormat: "Quality Score"
+    
+  - name: "Pipeline Performance"
+    description: "Detailed pipeline performance metrics"
+    panels:
+      - title: "Pipeline Duration"
+        type: "graph"
+        targets:
+          - expr: "histogram_quantile(0.50, pipeline_duration_seconds)"
+            legendFormat: "50th percentile"
+          - expr: "histogram_quantile(0.95, pipeline_duration_seconds)"
+            legendFormat: "95th percentile"
+          - expr: "histogram_quantile(0.99, pipeline_duration_seconds)"
+            legendFormat: "99th percentile"
+        
+      - title: "Records Processed"
+        type: "graph"
+        targets:
+          - expr: "increase(records_processed_total[1h])"
+            legendFormat: "Records/Hour"
+        
+      - title: "Pipeline Failures"
+        type: "graph"
+        targets:
+          - expr: "rate(pipeline_failure_total[5m])"
+            legendFormat: "Failure Rate"
+        
+      - title: "Pipeline Status"
+        type: "table"
+        targets:
+          - expr: "pipeline_status"
+            legendFormat: "Status"
+    
+  - name: "Resource Usage"
+    description: "System resource usage metrics"
+    panels:
+      - title: "CPU Usage"
+        type: "graph"
+        targets:
+          - expr: "cpu_usage_percent"
+            legendFormat: "CPU %"
+        
+      - title: "Memory Usage"
+        type: "graph"
+        targets:
+          - expr: "memory_usage_percent"
+            legendFormat: "Memory %"
+        
+      - title: "Disk Usage"
+        type: "graph"
+        targets:
+          - expr: "disk_usage_percent"
+            legendFormat: "Disk %"
+        
+      - title: "Network I/O"
+        type: "graph"
+        targets:
+          - expr: "rate(network_io_bytes_sent[5m])"
+            legendFormat: "Sent"
+          - expr: "rate(network_io_bytes_recv[5m])"
+            legendFormat: "Received"
+
+# Health Checks
+health_checks:
+  enabled: true
+  interval: 30  # seconds
+  timeout: 10  # seconds
+  
+  checks:
+    - name: "database_connection"
+      type: "database"
+      config:
+        host: "localhost"
+        port: 5432
+        database: "forum_analytics"
+        username: "analytics_user"
+        password: "analytics_password"
+        query: "SELECT 1"
+      
+    - name: "redis_connection"
+      type: "redis"
+      config:
+        host: "localhost"
+        port: 6379
+        command: "PING"
+      
+    - name: "pipeline_service"
+      type: "http"
+      config:
+        url: "http://localhost:8080/health"
+        method: "GET"
+        expected_status: 200
+      
+    - name: "disk_space"
+      type: "system"
+      config:
+        path: "/var/lib/analytics"
+        threshold: 85  # percent
+
+# Performance Optimization
+performance:
+  enabled: true
+  
+  # Query Optimization
+  query_optimization:
+    enabled: true
+    slow_query_threshold: 1000  # milliseconds
+    query_cache_size: 1000
+    index_monitoring: true
+  
+  # Caching
+  caching:
+    enabled: true
+    backend: "redis"
+    ttl: 300  # seconds
+    max_size: "1GB"
+    
+  # Connection Pooling
+  connection_pooling:
+    enabled: true
+    max_connections: 50
+    connection_timeout: 30
+    idle_timeout: 300

@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block title %}Search{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8">
+            <h2>Search</h2>
+            <p class="text-muted">Find posts, users, and content across the forum.</p>
+            
+            <form method="POST" class="mb-4">
+                {{ form.hidden_tag() }}
+                
+                <div class="input-group">
+                    {{ form.query(class="form-control", placeholder="Search for anything...") }}
+                    {{ form.per_page(class="form-select", style="max-width: 150px;") }}
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-search"></i> Search
+                    </button>
+                </div>
+                
+                {% if form.query.errors %}
+                    <div class="text-danger mt-2">
+                        {% for error in form.query.errors %}
+                            <small>{{ error }}</small>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </form>
+            
+            <div class="mb-3">
+                <a href="{{ url_for('search.advanced') }}" class="btn btn-outline-secondary">
+                    <i class="fas fa-cog"></i> Advanced Search
+                </a>
+            </div>
+            
+            {% if popular_searches %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>Popular Searches</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex flex-wrap gap-2">
+                        {% for search in popular_searches %}
+                            <a href="{{ url_for('search.index') }}?q={{ search.query }}" class="badge bg-secondary text-decoration-none">
+                                {{ search.query }}
+                            </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Search Tips</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled">
+                        <li><i class="fas fa-check text-success"></i> Use specific keywords</li>
+                        <li><i class="fas fa-check text-success"></i> Try different combinations</li>
+                        <li><i class="fas fa-check text-success"></i> Use filters for better results</li>
+                        <li><i class="fas fa-check text-success"></i> Check spelling</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h5>Quick Links</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled">
+                        <li><a href="{{ url_for('search.advanced') }}">Advanced Search</a></li>
+                        <li><a href="{{ url_for('search.api_suggestions') }}">API Suggestions</a></li>
+                        <li><a href="{{ url_for('search.api_popular') }}">Popular Searches</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

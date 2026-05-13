@@ -1,0 +1,39 @@
+Admin Systems Debugging Report
+Generated: 2026-05-12 00:22:10.067435
+============================================================
+
+IMPORTS:
+  analytics: FAILED: No module named 'email.utils'
+  notifications: FAILED: No module named 'email.utils'
+  moderation: FAILED: No module named 'email.utils'
+  admin: FAILED: No module named 'email.utils'
+
+MODELS:
+  analytics_models: FAILED: No module named 'email.utils'
+  notifications_models: FAILED: cannot access local variable 'app' where it is not associated with a value
+  moderation_models: FAILED: cannot access local variable 'app' where it is not associated with a value
+  admin_models: FAILED: cannot access local variable 'app' where it is not associated with a value
+
+SERVICES:
+  analytics_services: FAILED: No module named 'email.utils'
+  notification_services: FAILED: cannot access local variable 'app' where it is not associated with a value
+  moderation_services: FAILED: cannot access local variable 'app' where it is not associated with a value
+  admin_services: FAILED: cannot access local variable 'app' where it is not associated with a value
+
+FORMS:
+  analytics_forms: FAILED: No module named 'email.utils'
+  notification_forms: FAILED: cannot access local variable 'app' where it is not associated with a value
+  moderation_forms: FAILED: cannot access local variable 'app' where it is not associated with a value
+  admin_forms: FAILED: cannot access local variable 'app' where it is not associated with a value
+
+ROUTES:
+  analytics_routes: FAILED: No module named 'email.utils'
+  notification_routes: FAILED: cannot access local variable 'app' where it is not associated with a value
+  moderation_routes: FAILED: cannot access local variable 'app' where it is not associated with a value
+  admin_routes: FAILED: cannot access local variable 'app' where it is not associated with a value
+
+============================================================
+Total Tests: 20
+Passed: 0
+Failed: 20
+Success Rate: 0.0%

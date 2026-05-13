@@ -1,0 +1,224 @@
+{% extends "base.html" %}
+
+{% block title %}Session Preferences - {{ config.SITE_NAME or 'Forum' }}{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3>
+                        <i class="fas fa-cog"></i> Session Preferences
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        {{ form.hidden_tag() }}
+                        
+                        <!-- Session Management -->
+                        <div class="mb-4">
+                            <h5>Session Management</h5>
+                            
+                            <div class="mb-3">
+                                <div class="form-check form-switch">
+                                    {{ form.auto_revoke_inactive(class="form-check-input") }}
+                                    <label class="form-check-label" for="{{ form.auto_revoke_inactive.id }}">
+                                        Automatically revoke inactive sessions
+                                    </label>
+                                </div>
+                                <small class="form-text text-muted">
+                                    Automatically log out from inactive sessions after a period of time
+                                </small>
+                            </div>
+                            
+                            <div class="mb-3">
+                                {{ form.inactive_timeout.label(class="form-label") }}
+                                <div class="input-group">
+                                    {{ form.inactive_timeout(class="form-control") }}
+                                    <span class="input-group-text">minutes</span>
+                                </div>
+                                <small class="form-text text-muted">
+                                    How long sessions can remain inactive before being automatically revoked
+                                </small>
+                                {% if form.inactive_timeout.errors %}
+                                    <div class="text-danger">
+                                        {% for error in form.inactive_timeout.errors %}
+                                            <small>{{ error }}</small>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="mb-3">
+                                {{ form.max_concurrent_sessions.label(class="form-label") }}
+                                {{ form.max_concurrent_sessions(class="form-control") }}
+                                <small class="form-text text-muted">
+                                    Maximum number of concurrent sessions allowed
+                                </small>
+                                {% if form.max_concurrent_sessions.errors %}
+                                    <div class="text-danger">
+                                        {% for error in form.max_concurrent_sessions.errors %}
+                                            <small>{{ error }}</small>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <!-- Device Security -->
+                        <div class="mb-4">
+                            <h5>Device Security</h5>
+                            
+                            <div class="mb-3">
+                                <div class="form-check form-switch">
+                                    {{ form.require_device_verification(class="form-check-input") }}
+                                    <label class="form-check-label" for="{{ form.require_device_verification.id }}">
+                                        Require verification for new devices
+                                    </label>
+                                </div>
+                                <small class="form-text text-muted">
+                                    Require additional verification when logging in from a new device
+                                </small>
+                            </div>
+                        </div>
+                        
+                        <!-- Notifications -->
+                        <div class="mb-4">
+                            <h5>Notifications</h5>
+                            
+                            <div class="mb-3">
+                                <div class="form-check form-switch">
+                                    {{ form.session_notifications(class="form-check-input") }}
+                                    <label class="form-check-label" for="{{ form.session_notifications.id }}">
+                                        Email notifications for new sessions
+                                    </label>
+                                </div>
+                                <small class="form-text text-muted">
+                                    Receive email notifications when new sessions are created
+                                </small>
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Save Preferences
+                            </button>
+                            <a href="{{ url_for('session.manage_sessions') }}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left"></i> Back to Sessions
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5>
+                        <i class="fas fa-info-circle"></i> Preference Guide
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <h6>Session Settings</h6>
+                    <ul class="list-unstyled small">
+                        <li class="mb-2">
+                            <i class="fas fa-clock text-primary"></i>
+                            <strong>Inactive Timeout:</strong> Auto-logout after inactivity
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-desktop text-info"></i>
+                            <strong>Concurrent Sessions:</strong> Limit simultaneous logins
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-mobile-alt text-success"></i>
+                            <strong>Device Verification:</strong> Extra security for new devices
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-envelope text-warning"></i>
+                            <strong>Notifications:</strong> Stay informed about activity
+                        </li>
+                    </ul>
+                    
+                    <hr>
+                    
+                    <h6>Recommended Settings</h6>
+                    <div class="alert alert-info">
+                        <h6><i class="fas fa-lightbulb"></i> For Most Users</h6>
+                        <ul class="mb-0 small">
+                            <li>Auto-revoke inactive: <strong>Enabled</strong></li>
+                            <li>Inactive timeout: <strong>30 minutes</strong></li>
+                            <li>Max sessions: <strong>3</strong></li>
+                            <li>Device verification: <strong>Disabled</strong></li>
+                            <li>Notifications: <strong>Enabled</strong></li>
+                        </ul>
+                    </div>
+                    
+                    <div class="alert alert-warning">
+                        <h6><i class="fas fa-shield-alt"></i> For High Security</h6>
+                        <ul class="mb-0 small">
+                            <li>Auto-revoke inactive: <strong>Enabled</strong></li>
+                            <li>Inactive timeout: <strong>15 minutes</strong></li>
+                            <li>Max sessions: <strong>1</strong></li>
+                            <li>Device verification: <strong>Enabled</strong></li>
+                            <li>Notifications: <strong>Enabled</strong></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h5>
+                        <i class="fas fa-question-circle"></i> Help
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <h6>Common Questions</h6>
+                    <div class="accordion" id="helpAccordion">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#help1">
+                                    What is an inactive session?
+                                </button>
+                            </h2>
+                            <div id="help1" class="accordion-collapse collapse" data-bs-parent="#helpAccordion">
+                                <div class="accordion-body">
+                                    An inactive session is a session that hasn't been used for a period of time. You can set it to automatically log out for security.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#help2">
+                                    How do concurrent sessions work?
+                                </button>
+                            </h2>
+                            <div id="help2" class="accordion-collapse collapse" data-bs-parent="#helpAccordion">
+                                <div class="accordion-body">
+                                    Concurrent sessions allow you to be logged in on multiple devices at once. You can limit this number for security.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#help3">
+                                    What is device verification?
+                                </button>
+                            </h2>
+                            <div id="help3" class="accordion-collapse collapse" data-bs-parent="#helpAccordion">
+                                <div class="accordion-body">
+                                    Device verification adds an extra security step when logging in from a new device or browser.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

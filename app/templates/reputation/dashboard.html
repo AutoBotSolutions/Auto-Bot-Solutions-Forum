@@ -1,0 +1,341 @@
+{% extends "base.html" %}
+
+{% block title %}Reputation Dashboard{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="mb-4">
+                <i class="fas fa-trophy"></i>
+                Reputation Dashboard
+            </h1>
+        </div>
+    </div>
+
+    <!-- Reputation Overview -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <div class="mb-3">
+                        <span class="badge bg-{{ get_reputation_badge_color(reputation.current_level) }} fs-6 p-3">
+                            <i class="fas fa-{{ get_reputation_icon(reputation.current_level) }} fa-2x"></i>
+                        </span>
+                    </div>
+                    <h5 class="card-title">{{ reputation.current_level }}</h5>
+                    <p class="card-text text-muted">Level {{ reputation.level_order if reputation.level_order else 'N/A' }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h3 class="text-primary">{{ reputation.reputation_score }}</h3>
+                    <p class="card-text">Reputation Score</p>
+                    <div class="progress mt-2">
+                        <div class="progress-bar bg-primary" data-progress="{{ (reputation.level_progress * 100)|round(0) }}"></div>
+                    </div>
+                    <small class="text-muted">{{ (reputation.level_progress * 100)|round }}% to next level</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h3 class="text-info">{{ reputation.voting_power|round(2) }}</h3>
+                    <p class="card-text">Voting Power</p>
+                    <small class="text-muted">{{ (reputation.voting_power * 100)|round }}% weight</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h3 class="text-success">{{ reputation.trust_score|round(2) }}</h3>
+                    <p class="card-text">Trust Score</p>
+                    <small class="text-muted">{{ (reputation.trust_score * 100)|round }}% trust</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Activity Statistics -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Voting Activity</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-4">
+                            <h4 class="text-primary">{{ reputation.total_votes_cast }}</h4>
+                            <small class="text-muted">Total Votes</small>
+                        </div>
+                        <div class="col-4">
+                            <h4 class="text-success">{{ reputation.upvotes_given }}</h4>
+                            <small class="text-muted">Upvotes Given</small>
+                        </div>
+                        <div class="col-4">
+                            <h4 class="text-danger">{{ reputation.downvotes_given }}</h4>
+                            <small class="text-muted">Downvotes Given</small>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row text-center">
+                        <div class="col-6">
+                            <h5>{{ reputation.votes_received }}</h5>
+                            <small class="text-muted">Votes Received</small>
+                        </div>
+                        <div class="col-6">
+                            <h5>{{ reputation.helpful_votes_received }}</h5>
+                            <small class="text-muted">Helpful Votes</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Content Activity</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-4">
+                            <h4 class="text-info">{{ reputation.posts_created }}</h4>
+                            <small class="text-muted">Posts Created</small>
+                        </div>
+                        <div class="col-4">
+                            <h4 class="text-warning">{{ reputation.comments_created }}</h4>
+                            <small class="text-muted">Comments Created</small>
+                        </div>
+                        <div class="col-4">
+                            <h4 class="text-secondary">{{ reputation.days_active }}</h4>
+                            <small class="text-muted">Days Active</small>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row text-center">
+                        <div class="col-6">
+                            <h5>{{ reputation.current_streak }}</h5>
+                            <small class="text-muted">Current Streak</small>
+                        </div>
+                        <div class="col-6">
+                            <h5>{{ reputation.longest_streak }}</h5>
+                            <small class="text-muted">Longest Streak</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Voting Analytics -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Voting Analytics (Last 30 Days)</h5>
+                </div>
+                <div class="card-body">
+                    {% if analytics %}
+                    <div class="row text-center mb-3">
+                        <div class="col-6">
+                            <h4 class="text-primary">{{ analytics.total_votes }}</h4>
+                            <small class="text-muted">Total Votes</small>
+                        </div>
+                        <div class="col-6">
+                            <h4 class="text-info">{{ analytics.vote_weight_avg|round(2) }}</h4>
+                            <small class="text-muted">Avg Vote Weight</small>
+                        </div>
+                    </div>
+                    
+                    <div class="row text-center mb-3">
+                        <div class="col-6">
+                            <h5 class="text-success">{{ analytics.upvotes }}</h5>
+                            <small class="text-muted">Upvotes</small>
+                        </div>
+                        <div class="col-6">
+                            <h5 class="text-danger">{{ analytics.downvotes }}</h5>
+                            <small class="text-muted">Downvotes</small>
+                        </div>
+                    </div>
+                    
+                    {% if analytics.reason_categories %}
+                    <h6>Reason Categories:</h6>
+                    <div class="small">
+                        {% for category, count in analytics.reason_categories.items() %}
+                        <span class="badge bg-secondary me-1">{{ category }}: {{ count }}</span>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                    {% else %}
+                    <p class="text-muted">No voting activity in the last 30 days</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Voting Patterns</h5>
+                </div>
+                <div class="card-body">
+                    {% if patterns %}
+                    <div class="mb-3">
+                        <h6>Consistency</h6>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span>{{ patterns.consistency.description }}</span>
+                            <span class="badge bg-info">{{ (patterns.consistency.pattern_value * 100)|round }}%</span>
+                        </div>
+                        {% if patterns.consistency.upvote_ratio is defined %}
+                        <small class="text-muted">Upvote ratio: {{ patterns.consistency.upvote_ratio }}</small>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <h6>Bias Detection</h6>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span>{{ patterns.bias.description }}</span>
+                            <span class="badge bg-warning">{{ (patterns.bias.pattern_value * 100)|round }}%</span>
+                        </div>
+                        {% if patterns.bias.unique_targets is defined %}
+                        <small class="text-muted">Unique targets: {{ patterns.bias.unique_targets }}</small>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <h6>Timing Pattern</h6>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span>{{ patterns.timing.description }}</span>
+                            <span class="badge bg-success">{{ (patterns.timing.pattern_value * 100)|round }}%</span>
+                        </div>
+                        {% if patterns.timing.business_hours_ratio is defined %}
+                        <small class="text-muted">Business hours: {{ (patterns.timing.business_hours_ratio * 100)|round }}%</small>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <h6>Quality Assessment</h6>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span>{{ patterns.quality.description }}</span>
+                            <span class="badge bg-primary">{{ (patterns.quality.pattern_value * 100)|round }}%</span>
+                        </div>
+                        {% if patterns.quality.quality_ratio is defined %}
+                        <small class="text-muted">Quality ratio: {{ (patterns.quality.quality_ratio * 100)|round }}%</small>
+                        {% endif %}
+                    </div>
+                    {% else %}
+                    <p class="text-muted">Insufficient data for pattern analysis</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Recent Voting Activity</h5>
+                </div>
+                <div class="card-body">
+                    {% if recent_votes %}
+                    <div class="list-group list-group-flush">
+                        {% for vote in recent_votes %}
+                        <div class="list-group-item">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <span class="badge bg-{{ 'success' if vote.vote_type == 'upvote' else 'danger' }}">
+                                        {{ vote.vote_type.title() }}
+                                    </span>
+                                    {% if vote.target_type == 'post' %}
+                                    <span class="ms-2">Post: {{ vote.target_id }}</span>
+                                    {% else %}
+                                    <span class="ms-2">Comment: {{ vote.target_id }}</span>
+                                    {% endif %}
+                                    {% if vote.reason_category %}
+                                    <span class="badge bg-secondary ms-2">{{ vote.reason_category }}</span>
+                                    {% endif %}
+                                </div>
+                                <small class="text-muted">{{ vote.created_at.strftime('%Y-%m-%d %H:%M') }}</small>
+                            </div>
+                            {% if vote.reason %}
+                            <small class="text-muted d-block mt-1">{{ vote.reason }}</small>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="text-muted">No recent voting activity</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+// Reputation dashboard functionality
+document.addEventListener('DOMContentLoaded', function() {
+    // Set progress bar widths from data attributes
+    const progressBars = document.querySelectorAll('[data-progress]');
+    progressBars.forEach(bar => {
+        const progress = bar.getAttribute('data-progress');
+        bar.style.width = progress + '%';
+    });
+    
+    // Auto-refresh analytics every 5 minutes
+    setInterval(function() {
+        fetch('/reputation/api/voting_analytics/{{ current_user.id }}')
+            .then(response => response.json())
+            .then(data => {
+                // Update analytics display
+                updateAnalyticsDisplay(data);
+            })
+            .catch(error => console.error('Error updating analytics:', error));
+    }, 300000); // 5 minutes
+});
+
+function updateAnalyticsDisplay(data) {
+    // Update analytics values
+    const totalVotesElement = document.querySelector('.analytics-total-votes');
+    if (totalVotesElement) {
+        totalVotesElement.textContent = data.total_votes;
+    }
+    
+    // Update other analytics elements as needed
+    console.log('Analytics updated:', data);
+}
+
+function get_reputation_icon(level) {
+    const icons = {
+        'Newcomer': 'fa-user',
+        'Member': 'fa-user-check',
+        'Trusted': 'fa-shield-alt',
+        'Expert': 'fa-star',
+        'Master': 'fa-crown',
+        'Legend': 'fa-trophy'
+    };
+    return icons[level] || 'fa-user';
+}
+
+function get_reputation_badge_color(level) {
+    const colors = {
+        'Newcomer': 'secondary',
+        'Member': 'primary',
+        'Trusted': 'success',
+        'Expert': 'info',
+        'Master': 'warning',
+        'Legend': 'danger'
+    };
+    return colors[level] || 'secondary';
+}
+</script>
+{% endblock %}

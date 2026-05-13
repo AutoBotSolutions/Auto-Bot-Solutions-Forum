@@ -1,0 +1,119 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Email Management{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">📧 Email Management</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <div class="btn-group me-2">
+            <a href="{{ url_for('admin_email.email_preview') }}" class="btn btn-outline-secondary">
+                <i class="fas fa-eye"></i> Preview Templates
+            </a>
+            <a href="{{ url_for('admin_email.email_config') }}" class="btn btn-outline-secondary">
+                <i class="fas fa-cog"></i> Configuration
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Queue Status</h5>
+            </div>
+            <div class="card-body">
+                {% if queue_stats.error %}
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle"></i> {{ queue_stats.error }}
+                    </div>
+                {% else %}
+                    <div class="mb-3">
+                        <small class="text-muted">High Priority</small>
+                        <h4 class="text-danger">{{ queue_stats.queue_status.high or 0 }}</h4>
+                    </div>
+                    <div class="mb-3">
+                        <small class="text-muted">Normal Priority</small>
+                        <h4 class="text-warning">{{ queue_stats.queue_status.normal or 0 }}</h4>
+                    </div>
+                    <div class="mb-3">
+                        <small class="text-muted">Low Priority</small>
+                        <h4 class="text-info">{{ queue_stats.queue_status.low or 0 }}</h4>
+                    </div>
+                    <div class="mb-3">
+                        <small class="text-muted">Failed</small>
+                        <h4 class="text-secondary">{{ queue_stats.queue_status.failed or 0 }}</h4>
+                    </div>
+                    <form method="POST" action="{{ url_for('admin_email.process_queue') }}">
+                        <button type="submit" class="btn btn-primary btn-sm w-100">
+                            <i class="fas fa-play"></i> Process Queue
+                        </button>
+                    </form>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-9">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Send Test Email</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('admin_email.send_test_email') }}">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="recipient" class="form-label">Recipient Email</label>
+                                <input type="email" class="form-control" id="recipient" name="recipient" 
+                                       placeholder="test@example.com" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="template" class="form-label">Template</label>
+                                <select class="form-select" id="template" name="template" required>
+                                    <option value="">Select template...</option>
+                                    <option value="verification">Email Verification</option>
+                                    <option value="password_reset">Password Reset</option>
+                                    <option value="welcome">Welcome Email</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-paper-plane"></i> Send Test Email
+                    </button>
+                </form>
+            </div>
+        </div>
+        
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Email System Information</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Available Templates</h6>
+                        <ul class="list-unstyled">
+                            <li><i class="fas fa-check text-success"></i> Email Verification</li>
+                            <li><i class="fas fa-check text-success"></i> Password Reset</li>
+                            <li><i class="fas fa-check text-success"></i> Welcome Email</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Queue Features</h6>
+                        <ul class="list-unstyled">
+                            <li><i class="fas fa-check text-success"></i> Priority-based queuing</li>
+                            <li><i class="fas fa-check text-success"></i> Automatic retry logic</li>
+                            <li><i class="fas fa-check text-success"></i> Error handling</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

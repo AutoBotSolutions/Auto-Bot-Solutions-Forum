@@ -1,0 +1,46 @@
+Newly Implemented Components Structural Debugging Report
+Generated: 2026-05-12 00:41:25.029178
+============================================================
+
+NOTIFICATION_TEMPLATE_SERVICE:
+  class_structure: SUCCESS: Class structure correct
+  method_implementations: SUCCESS: All methods implemented
+  database_operations: SUCCESS: All database operations present
+  template_placeholder_logic: SUCCESS: Placeholder logic correct
+  template_replacement_logic: SUCCESS: Replacement logic correct
+  regex_import: SUCCESS: Regex import present
+  variable_extraction_regex: SUCCESS: Variable extraction regex correct
+  error_handling: SUCCESS: Error handling implemented
+  service_docstring: SUCCESS: Documentation present
+
+MODERATION_QUEUE_FILTER_FORM:
+  class_structure: SUCCESS: Class structure correct
+  field_implementations: SUCCESS: All fields implemented
+  method_implementations: SUCCESS: All methods implemented
+  status_choices: SUCCESS: All status choices present
+  priority_choices: SUCCESS: All priority choices present
+  validation_error_import: SUCCESS: ValidationError import present
+  date_range_validation: SUCCESS: Date range validation logic present
+  score_range_validation: SUCCESS: Score range validation present
+  filter_params_method: SUCCESS: Method implemented
+  reset_form_data_method: SUCCESS: Method implemented
+  form_docstring: SUCCESS: Documentation present
+
+CODE_QUALITY_AND_PATTERNS:
+  service_docstrings: SUCCESS: Docstrings present
+  service_method_signatures: SUCCESS: Method signatures correct
+  form_validator_imports: SUCCESS: Validator imports correct
+  form_field_validators: SUCCESS: Field validators present
+  service_naming_conventions: SUCCESS: Naming conventions correct
+  form_naming_conventions: SUCCESS: Naming conventions correct
+
+INTEGRATION_PATTERNS:
+  service_pattern_consistency: SUCCESS: Service pattern consistent
+  form_pattern_consistency: SUCCESS: Form pattern consistent
+  integration_patterns_debug: FAILED: list index out of range
+
+============================================================
+Total Tests: 29
+Passed: 28
+Failed: 1
+Success Rate: 96.6%

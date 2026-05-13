@@ -1,0 +1,30 @@
+Welcome to Auto Bot Solutions Forum
+===================================
+
+Hello {{ user.username }},
+
+Welcome to Auto Bot Solutions Forum! Your email has been successfully verified and your account is now active. We're excited to have you join our community of developers, engineers, and tech enthusiasts.
+
+Login to get started:
+{{ login_url }}
+
+What You Can Do Now:
+📝 Create and participate in forum discussions
+🔗 Share and discuss GitHub repositories
+💬 Send private messages to other members
+👍 Vote on posts and comments
+🏆 Earn badges and build your reputation
+📊 Track your activity and statistics
+
+Quick Tips:
+- Complete your profile to help others know you better
+- Introduce yourself in the welcome section
+- Check out the latest discussions and join the conversation
+- Don't hesitate to ask questions - our community is here to help!
+
+If you have any questions or need assistance, feel free to reach out to our support team or post in the help section of the forum.
+
+Thank you for joining Auto Bot Solutions Forum!
+We look forward to your contributions to our community.
+
+© 2026 Auto Bot Solutions. All rights reserved.

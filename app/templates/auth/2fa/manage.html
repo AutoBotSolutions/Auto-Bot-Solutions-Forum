@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Two-Factor Authentication - AutoBot Solutions Forum{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="text-center">🔐 Two-Factor Authentication Settings</h3>
+                </div>
+                <div class="card-body">
+                    <!-- Status -->
+                    <div class="alert alert-success">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-check-circle fa-2x me-3"></i>
+                            <div>
+                                <h5 class="mb-1">Two-Factor Authentication is Enabled</h5>
+                                <p class="mb-0">Your account is protected with 2FA</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Statistics -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="card bg-light">
+                                <div class="card-body text-center">
+                                    <h6 class="text-muted">Backup Codes Available</h6>
+                                    <h3 class="text-primary">{{ backup_codes_count }}</h3>
+                                    <small class="text-muted">out of 10</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card bg-light">
+                                <div class="card-body text-center">
+                                    <h6 class="text-muted">Last 2FA Used</h6>
+                                    <h3 class="text-info">
+                                        {% if last_2fa_used %}
+                                            {{ last_2fa_used.strftime('%b %d, %Y') }}
+                                        {% else %}
+                                            Never
+                                        {% endif %}
+                                    </h3>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="d-grid gap-2">
+                        {% if backup_codes_count < 3 %}
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle"></i> 
+                            You have less than 3 backup codes remaining. Consider regenerating them.
+                        </div>
+                        {% endif %}
+
+                        <a href="{{ url_for('auth.two_factor.regenerate_codes') }}" class="btn btn-outline-primary">
+                            <i class="fas fa-sync"></i> Regenerate Backup Codes
+                        </a>
+                        
+                        <a href="{{ url_for('auth.two_factor.show_backup_codes') }}" class="btn btn-outline-info">
+                            <i class="fas fa-eye"></i> View Backup Codes
+                        </a>
+                        
+                        <hr>
+                        
+                        <div class="text-center">
+                            <a href="{{ url_for('auth.two_factor.disable') }}" class="btn btn-outline-danger">
+                                <i class="fas fa-times"></i> Disable Two-Factor Authentication
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Information -->
+                    <div class="mt-4">
+                        <h6><i class="fas fa-info-circle"></i> About Two-Factor Authentication</h6>
+                        <div class="alert alert-info">
+                            <p class="mb-2"><strong>What is 2FA?</strong></p>
+                            <p class="mb-2">Two-factor authentication adds an extra layer of security to your account by requiring a second form of verification in addition to your password.</p>
+                            
+                            <p class="mb-2"><strong>Backup Codes</strong></p>
+                            <p class="mb-2">Backup codes are one-time use codes that can be used if you lose access to your authenticator app. Keep them in a secure location.</p>
+                            
+                            <p class="mb-0"><strong>Device Remembering</strong></p>
+                            <p class="mb-0">You can choose to remember trusted devices for 30 days to avoid entering 2FA codes on devices you use frequently.</p>
+                        </div>
+                    </div>
+
+                    <!-- Security Tips -->
+                    <div class="mt-4">
+                        <h6><i class="fas fa-shield-alt"></i> Security Tips</h6>
+                        <ul class="list-unstyled">
+                            <li><i class="fas fa-check text-success"></i> Keep your backup codes in a secure, offline location</li>
+                            <li><i class="fas fa-check text-success"></i> Don't share your backup codes with anyone</li>
+                            <li><i class="fas fa-check text-success"></i> Regenerate backup codes if you think they may have been compromised</li>
+                            <li><i class="fas fa-check text-success"></i> Enable 2FA on all your important accounts</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

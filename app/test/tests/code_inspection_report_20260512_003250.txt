@@ -1,0 +1,89 @@
+Admin Systems Code Inspection Report
+Generated: 2026-05-12 00:32:50.488779
+============================================================
+
+ANALYTICS_SYSTEM:
+  analytics_analyticsevent: SUCCESS: Model class found
+  analytics_userbehavior: SUCCESS: Model class found
+  analytics_contentperformance: SUCCESS: Model class found
+  analytics_systemmetrics: SUCCESS: Model class found
+  analytics_trendanalysis: SUCCESS: Model class found
+  analytics_predictivemodel: SUCCESS: Model class found
+  analytics_sqlalchemy_patterns: SUCCESS: SQLAlchemy patterns found
+  analytics_analyticsservice: SUCCESS: Service class found
+  analytics_userbehaviorservice: SUCCESS: Service class found
+  analytics_contentperformanceservice: SUCCESS: Service class found
+  analytics_systemmetricsservice: SUCCESS: Service class found
+  analytics_trendanalysisservice: SUCCESS: Service class found
+  analytics_predictiveanalyticsservice: SUCCESS: Service class found
+  analytics_track_event: SUCCESS: Event tracking method found
+  analytics_analyticsfilterform: SUCCESS: Form class found
+  analytics_userbehaviorfilterform: SUCCESS: Form class found
+  analytics_contentperformancefilterform: SUCCESS: Form class found
+  analytics_systemmetricsfilterform: SUCCESS: Form class found
+  analytics_flask_wtf_patterns: SUCCESS: Flask-WTF patterns found
+  analytics_route_decorators: SUCCESS: Route decorators found
+  analytics_api_routes: SUCCESS: API routes found
+
+NOTIFICATIONS_SYSTEM:
+  notifications_adminnotification: SUCCESS: Model class found
+  notifications_notificationtemplate: SUCCESS: Model class found
+  notifications_notificationpreference: SUCCESS: Model class found
+  notifications_notificationdelivery: SUCCESS: Model class found
+  notifications_notificationcategory: SUCCESS: Model class found
+  notifications_notificationservice: SUCCESS: Service class found
+  notifications_adminnotificationservice: SUCCESS: Service class found
+  notifications_notificationtemplateservice: FAILED: Service class not found
+  notifications_notificationpreferenceservice: SUCCESS: Service class found
+  notifications_create_notification: SUCCESS: Notification creation method found
+  notifications_notificationfilterform: SUCCESS: Form class found
+  notifications_notificationtemplateform: SUCCESS: Form class found
+  notifications_notificationpreferenceform: SUCCESS: Form class found
+  notifications_route_decorators: SUCCESS: Route decorators found
+
+MODERATION_SYSTEM:
+  moderation_moderationqueue: SUCCESS: Model class found
+  moderation_contentanalysis: SUCCESS: Model class found
+  moderation_moderationaction: SUCCESS: Model class found
+  moderation_spamdetection: SUCCESS: Model class found
+  moderation_contentquality: SUCCESS: Model class found
+  moderation_moderationrule: SUCCESS: Model class found
+  moderation_moderationhistory: SUCCESS: Model class found
+  moderation_moderationpattern: SUCCESS: Model class found
+  moderation_contentanalysisservice: SUCCESS: Service class found
+  moderation_spamdetectionservice: SUCCESS: Service class found
+  moderation_contentqualityservice: SUCCESS: Service class found
+  moderation_moderationqueueservice: SUCCESS: Service class found
+  moderation_moderationqueuefilterform: FAILED: Form class not found
+  moderation_contentanalysisform: SUCCESS: Form class found
+  moderation_spamdetectionform: SUCCESS: Form class found
+  moderation_route_decorators: SUCCESS: Route decorators found
+
+ADMIN_SYSTEM:
+  admin_permission: SUCCESS: Model class found
+  admin_adminrole: SUCCESS: Model class found
+  admin_rolepermission: SUCCESS: Model class found
+  admin_userrole: SUCCESS: Model class found
+  admin_usergroup: SUCCESS: Model class found
+  admin_usergroupmember: SUCCESS: Model class found
+  admin_securityevent: SUCCESS: Model class found
+  admin_accesslog: SUCCESS: Model class found
+  admin_permissionservice: SUCCESS: Service class found
+  admin_roleservice: SUCCESS: Service class found
+  admin_userroleservice: SUCCESS: Service class found
+  admin_securityeventservice: SUCCESS: Service class found
+  admin_permissionform: SUCCESS: Form class found
+  admin_roleform: SUCCESS: Form class found
+  admin_userroleform: SUCCESS: Form class found
+  admin_route_decorators: SUCCESS: Route decorators found
+
+CODE_QUALITY:
+  documentation_quality: SUCCESS: 74 docstrings for 29 classes
+  error_handling: SUCCESS: 0 error handling blocks found
+  type_hints: SUCCESS: 8 type hints found
+
+============================================================
+Total Tests: 70
+Passed: 68
+Failed: 2
+Success Rate: 97.1%

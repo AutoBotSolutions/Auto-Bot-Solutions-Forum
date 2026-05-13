@@ -1,0 +1,526 @@
+{% extends "base.html" %}
+
+{% block title %}User Behavior Analytics{% endblock %}
+
+{% block extra_css %}
+<style>
+.user-behavior {
+    padding: 20px;
+}
+
+.filter-section {
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+}
+
+.behavior-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.behavior-card {
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.behavior-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.behavior-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #007bff;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+.user-details h5 {
+    margin: 0;
+    color: #333;
+}
+
+.user-details small {
+    color: #666;
+}
+
+.engagement-badge {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.engagement-badge.highly_engaged {
+    background: #d4edda;
+    color: #155724;
+}
+
+.engagement-badge.engaged {
+    background: #cce5ff;
+    color: #004085;
+}
+
+.engagement-badge.moderately_engaged {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.engagement-badge.minimally_engaged {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.engagement-badge.disengaged {
+    background: #e2e3e5;
+    color: #383d41;
+}
+
+.behavior-metrics {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.metric-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px;
+    background: #f8f9fa;
+    border-radius: 4px;
+}
+
+.metric-label {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.metric-value {
+    font-weight: bold;
+    color: #333;
+}
+
+.activity-patterns {
+    margin-top: 15px;
+}
+
+.pattern-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.pattern-item:last-child {
+    border-bottom: none;
+}
+
+.pattern-label {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.pattern-value {
+    font-weight: bold;
+    color: #007bff;
+}
+
+.engagement-progress {
+    margin-top: 15px;
+}
+
+.progress-bar-container {
+    background: #e9ecef;
+    border-radius: 4px;
+    height: 8px;
+    overflow: hidden;
+    margin-bottom: 5px;
+}
+
+.progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #dc3545, #ffc107, #28a745);
+    transition: width 0.3s ease;
+}
+
+.progress-label {
+    font-size: 0.8rem;
+    color: #666;
+}
+
+.insights-section {
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+}
+
+.insight-item {
+    padding: 10px;
+    margin-bottom: 10px;
+    border-left: 4px solid #007bff;
+    background: #f8f9fa;
+    border-radius: 4px;
+}
+
+.insight-title {
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.insight-description {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.recommendations {
+    margin-top: 15px;
+}
+
+.recommendation-item {
+    padding: 8px 12px;
+    margin-bottom: 5px;
+    background: #e3f2fd;
+    border-radius: 4px;
+    border-left: 3px solid #2196f3;
+}
+
+.recommendation-item:before {
+    content: "💡";
+    margin-right: 8px;
+}
+
+.summary-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.summary-card {
+    text-align: center;
+    padding: 20px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.summary-number {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #007bff;
+}
+
+.summary-label {
+    color: #666;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+@media (max-width: 768px) {
+    .behavior-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .behavior-metrics {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="user-behavior">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>User Behavior Analytics</h1>
+        <div>
+            <a href="{{ url_for('analytics.dashboard') }}" class="btn btn-outline-secondary me-2">Dashboard</a>
+            <button class="btn btn-primary" onclick="toggleFilters()">Filters</button>
+        </div>
+    </div>
+
+    <!-- Filter Section -->
+    <div class="filter-section" id="filterSection" style="display: none;">
+        <form method="GET">
+            <div class="row">
+                <div class="col-md-3">
+                    {{ form.user_id.label(class="form-label") }}
+                    {{ form.user_id(class="form-control") }}
+                </div>
+                <div class="col-md-3">
+                    {{ form.username.label(class="form-label") }}
+                    {{ form.username(class="form-control") }}
+                </div>
+                <div class="col-md-3">
+                    {{ form.engagement_level.label(class="form-label") }}
+                    {{ form.engagement_level(class="form-select") }}
+                </div>
+                <div class="col-md-3">
+                    {{ form.activity_pattern.label(class="form-label") }}
+                    {{ form.activity_pattern(class="form-select") }}
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col-md-3">
+                    {{ form.min_engagement_score.label(class="form-label") }}
+                    {{ form.min_engagement_score(class="form-control") }}
+                </div>
+                <div class="col-md-3">
+                    {{ form.max_engagement_score.label(class="form-label") }}
+                    {{ form.max_engagement_score(class="form-control") }}
+                </div>
+                <div class="col-md-3">
+                    {{ form.min_sessions.label(class="form-label") }}
+                    {{ form.min_sessions(class="form-control") }}
+                </div>
+                <div class="col-md-3">
+                    {{ form.max_sessions.label(class="form-label") }}
+                    {{ form.max_sessions(class="form-control") }}
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col-md-3">
+                    {{ form.sort_by.label(class="form-label") }}
+                    {{ form.sort_by(class="form-select") }}
+                </div>
+                <div class="col-md-3">
+                    {{ form.sort_order.label(class="form-label") }}
+                    {{ form.sort_order(class="form-select") }}
+                </div>
+                <div class="col-md-3">
+                    {{ form.limit.label(class="form-label") }}
+                    {{ form.limit(class="form-control") }}
+                </div>
+                <div class="col-md-6 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary me-2">Apply Filters</button>
+                    <a href="{{ url_for('analytics.user_behavior') }}" class="btn btn-outline-secondary">Clear</a>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Summary Statistics -->
+    {% if behaviors %}
+    <div class="summary-stats">
+        <div class="summary-card">
+            <div class="summary-number">{{ behaviors|length }}</div>
+            <div class="summary-label">Total Users</div>
+        </div>
+        <div class="summary-card">
+            <div class="summary-number">{{ behaviors|selectattr('engagement_score')|map(attribute='engagement_score')|sum / behaviors|length|round(1) }}</div>
+            <div class="summary-label">Avg Engagement</div>
+        </div>
+        <div class="summary-card">
+            <div class="summary-number">{{ behaviors|selectattr('total_sessions')|map(attribute='total_sessions')|sum }}</div>
+            <div class="summary-label">Total Sessions</div>
+        </div>
+        <div class="summary-card">
+            <div class="summary-number">{{ behaviors|selectattr('posts_created')|map(attribute='posts_created')|sum }}</div>
+            <div class="summary-label">Total Posts</div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- User Behavior Cards -->
+    {% if behaviors %}
+    <div class="behavior-grid">
+        {% for behavior in behaviors %}
+        <div class="behavior-card">
+            <div class="behavior-header">
+                <div class="user-info">
+                    <div class="user-avatar">
+                        {{ behavior.user.username[0].upper() if behavior.user else 'U' }}
+                    </div>
+                    <div class="user-details">
+                        <h5>{{ behavior.user.username if behavior.user else 'Unknown User' }}</h5>
+                        <small>User ID: {{ behavior.user_id }}</small>
+                    </div>
+                </div>
+                <div class="engagement-badge {{ behavior.engagement_score|engagement_level_class }}">
+                    {{ behavior.engagement_score|engagement_level_text }}
+                </div>
+            </div>
+
+            <div class="behavior-metrics">
+                <div class="metric-item">
+                    <span class="metric-label">Sessions</span>
+                    <span class="metric-value">{{ behavior.total_sessions }}</span>
+                </div>
+                <div class="metric-item">
+                    <span class="metric-label">Avg Duration</span>
+                    <span class="metric-value">{{ "%.1f"|format(behavior.avg_session_duration) }}m</span>
+                </div>
+                <div class="metric-item">
+                    <span class="metric-label">Posts</span>
+                    <span class="metric-value">{{ behavior.posts_created }}</span>
+                </div>
+                <div class="metric-item">
+                    <span class="metric-label">Comments</span>
+                    <span class="metric-value">{{ behavior.comments_created }}</span>
+                </div>
+                <div class="metric-item">
+                    <span class="metric-label">Votes</span>
+                    <span class="metric-value">{{ behavior.votes_cast }}</span>
+                </div>
+                <div class="metric-item">
+                    <span class="metric-label">Views</span>
+                    <span class="metric-value">{{ behavior.posts_viewed }}</span>
+                </div>
+            </div>
+
+            <div class="engagement-progress">
+                <div class="progress-bar-container">
+                    <div class="progress-bar-fill" style="width: {{ behavior.engagement_score }}%"></div>
+                </div>
+                <div class="progress-label">Engagement Score: {{ "%.1f"|format(behavior.engagement_score) }}/100</div>
+            </div>
+
+            <div class="activity-patterns">
+                <h6>Activity Patterns</h6>
+                <div class="pattern-item">
+                    <span class="pattern-label">Most Active Hour</span>
+                    <span class="pattern-value">{{ behavior.most_active_hour or 'N/A' }}:00</span>
+                </div>
+                <div class="pattern-item">
+                    <span class="pattern-label">Most Active Day</span>
+                    <span class="pattern-value">{{ behavior.most_active_day|weekday_name if behavior.most_active_day is not none else 'N/A' }}</span>
+                </div>
+                <div class="pattern-item">
+                    <span class="pattern-label">Consistency</span>
+                    <span class="pattern-value">{{ "%.1f"|format(behavior.activity_consistency * 100) }}%</span>
+                </div>
+                <div class="pattern-item">
+                    <span class="pattern-label">Primary Device</span>
+                    <span class="pattern-value">{{ behavior.primary_device_type|title if behavior.primary_device_type else 'Unknown' }}</span>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center p-4">
+        <i class="fas fa-users fa-3x text-muted mb-3"></i>
+        <h5>No User Behavior Data Found</h5>
+        <p class="text-muted">
+            {% if form.user_id.data or form.username.data or form.engagement_level.data %}
+                No user behavior data matches your current filters. Try adjusting your filter criteria.
+            {% else %}
+                No user behavior data has been collected yet. Data will appear here as users interact with the system.
+            {% endif %}
+        </p>
+        {% if form.user_id.data or form.username.data or form.engagement_level.data %}
+            <a href="{{ url_for('analytics.user_behavior') }}" class="btn btn-outline-primary">Clear Filters</a>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <!-- Insights Section -->
+    {% if behaviors %}
+    <div class="insights-section">
+        <h3>Behavior Insights</h3>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="insight-item">
+                    <div class="insight-title">Engagement Distribution</div>
+                    <div class="insight-description">
+                        {% set engagement_levels = behaviors|groupby('engagement_score|engagement_level_class') %}
+                        {% for level_class, group in engagement_levels %}
+                            {{ group|length }} users are {{ level_class.replace('_', ' ') }}<br>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="insight-item">
+                    <div class="insight-title">Activity Patterns</div>
+                    <div class="insight-description">
+                        {% set peak_hours = behaviors|selectattr('most_active_hour')|map(attribute='most_active_hour')|list %}
+                        {% if peak_hours %}
+                            Peak activity hour: {{ peak_hours|most_common }}:00<br>
+                            {% set most_active_day = behaviors|selectattr('most_active_day')|map(attribute='most_active_day')|list %}
+                            {% if most_active_day %}
+                                Most active day: {{ most_active_day|most_common|weekday_name }}
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="recommendations">
+            <h4>Recommendations</h4>
+            <div class="recommendation-item">
+                Focus on users with low engagement scores to improve overall community participation
+            </div>
+            <div class="recommendation-item">
+                Consider implementing engagement campaigns during peak activity hours
+            </div>
+            <div class="recommendation-item">
+                Monitor users with declining activity patterns and provide targeted interventions
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function toggleFilters() {
+    const filterSection = document.getElementById('filterSection');
+    filterSection.style.display = filterSection.style.display === 'none' ? 'block' : 'none';
+}
+
+// Auto-refresh every 60 seconds
+setInterval(() => {
+    if (!document.hidden) {
+        location.reload();
+    }
+}, 60000);
+
+// Add smooth scrolling to behavior cards
+document.addEventListener('DOMContentLoaded', function() {
+    const cards = document.querySelectorAll('.behavior-card');
+    cards.forEach(card => {
+        card.addEventListener('click', function() {
+            // Could expand card or show more details
+            console.log('Card clicked:', this);
+        });
+    });
+});
+</script>
+{% endblock %}

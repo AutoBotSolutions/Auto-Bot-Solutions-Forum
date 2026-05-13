@@ -10,7 +10,27 @@ The AutoBot Solutions Forum provides a comprehensive RESTful API for integrating
 
 ## Authentication
 
-Currently, the API does not require authentication for read operations. Write operations should be protected in production by implementing proper authentication. Rate limiting is implemented on sensitive endpoints.
+The API uses Flask-Login for authentication and supports session-based authentication. Two-factor authentication (2FA) is required for users who have enabled it. Rate limiting is implemented on sensitive endpoints.
+
+### Authentication Methods
+
+- **Session-Based**: Login via `/auth/login` endpoint
+- **2FA Support**: Automatic 2FA verification for enabled users
+- **Device Remembering**: 30-day device remembering option
+- **Admin Protection**: Admin-only endpoints require admin privileges
+
+### Authentication Headers
+
+```
+Cookie: session=<session_cookie>
+```
+
+### Authentication Flow
+
+1. Login via `/auth/login`
+2. If 2FA enabled, verify via `/auth/2fa/verify`
+3. Use session cookie for authenticated requests
+4. Admin endpoints require admin privileges
 
 ## Base URL
 
@@ -29,6 +49,188 @@ The API endpoints are fully integrated with the comprehensive testing framework:
 - **Load Testing:** Performance benchmarking capabilities
 
 ## Endpoints
+
+### Authentication Endpoints
+
+#### User Login
+**Endpoint:** `POST /auth/login`
+
+**Description:** Authenticate user and create session.
+
+**Request Body:**
+```json
+{
+  "username": "string",
+  "password": "string",
+  "remember_me": "boolean"
+}
+```
+
+**Rate Limit:** 10 requests per minute
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Login successful",
+  "redirect": "/auth/2fa/verify"  // If 2FA enabled
+}
+```
+
+#### 2FA Verification
+**Endpoint:** `POST /auth/2fa/verify`
+
+**Description:** Verify 2FA token during login.
+
+**Request Body:**
+```json
+{
+  "token": "string",
+  "remember_device": "boolean"
+}
+```
+
+**Rate Limit:** 10 requests per minute
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "2FA verification successful"
+}
+```
+
+#### 2FA Setup
+**Endpoint:** `POST /auth/2fa/setup`
+
+**Description:** Setup 2FA for authenticated user.
+
+**Request Body:**
+```json
+{
+  "token": "string"
+}
+```
+
+**Rate Limit:** 3 requests per hour
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "2FA setup successful"
+}
+```
+
+#### 2FA Status
+**Endpoint:** `GET /auth/2fa/status`
+
+**Description:** Get user's 2FA status.
+
+**Rate Limit:** 30 requests per minute
+
+**Response:**
+```json
+{
+  "enabled": true,
+  "backup_codes_count": 8,
+  "last_used": "2026-05-11T21:00:00Z"
+}
+```
+
+### Email Management Endpoints
+
+#### Email Queue Status
+**Endpoint:** `GET /admin/email/queue/status`
+
+**Description:** Get email queue processing status.
+
+**Rate Limit:** 30 requests per minute
+
+**Response:**
+```json
+{
+  "queue_status": {
+    "high": 0,
+    "normal": 5,
+    "low": 2,
+    "failed": 1
+  },
+  "processor_status": {
+    "running": true,
+    "thread_alive": true
+  }
+}
+```
+
+#### Email Preview
+**Endpoint:** `POST /admin/email/preview/render`
+
+**Description:** Render email template preview.
+
+**Request Body:**
+```json
+{
+  "template": "verification",
+  "format": "html",
+  "context": {
+    "user": {
+      "username": "testuser",
+      "email": "test@example.com"
+    },
+    "verification_url": "http://localhost:5000/verify/token"
+  }
+}
+```
+
+**Rate Limit:** 10 requests per minute
+
+**Response:**
+```json
+{
+  "preview": "<html>...</html>",
+  "template": "verification",
+  "format": "html"
+}
+```
+
+#### Send Test Email
+**Endpoint:** `POST /admin/email/test/send`
+
+**Description:** Send test email for verification.
+
+**Request Body:**
+```json
+{
+  "recipient": "test@example.com",
+  "template": "verification"
+}
+```
+
+**Rate Limit:** 3 requests per minute
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Test email sent successfully"
+}
+```
+
+#### Process Email Queue
+**Endpoint:** `POST /admin/email/queue/process`
+
+**Description:** Manually process email queue.
+
+**Rate Limit:** 5 requests per minute
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Processed 7 emails from queue"
+}
+```
 
 ### Sync Repositories
 

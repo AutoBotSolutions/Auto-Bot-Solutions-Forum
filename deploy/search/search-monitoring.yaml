@@ -1,0 +1,724 @@
+# Search Infrastructure Monitoring Configuration
+# Auto Bot Solutions Forum
+
+version: "1.0"
+environment: "production"
+
+# Monitoring Configuration
+monitoring:
+  enabled: true
+  interval: 15  # seconds
+  retention_days: 30
+  
+  # Elasticsearch Metrics Collection
+  elasticsearch:
+    enabled: true
+    host: "localhost"
+    port: 9200
+    username: null
+    password: null
+    
+    metrics:
+      # Cluster Health
+      - name: "cluster_health"
+        endpoint: "/_cluster/health"
+        interval: 30
+        metrics:
+          - "status"
+          - "number_of_nodes"
+          - "number_of_data_nodes"
+          - "active_primary_shards"
+          - "active_shards"
+          - "relocating_shards"
+          - "initializing_shards"
+          - "unassigned_shards"
+          - "delayed_unassigned_shards"
+          - "number_of_pending_tasks"
+          - "number_of_in_flight_fetch"
+          - "task_max_waiting_in_queue_millis"
+          - "active_shards_percent_as_number"
+      
+      # Node Stats
+      - name: "node_stats"
+        endpoint: "/_nodes/stats"
+        interval: 30
+        metrics:
+          - "indices.docs.count"
+          - "indices.docs.deleted"
+          - "indices.store.size_in_bytes"
+          - "indices.indexing.index_total"
+          - "indices.indexing.index_time_in_millis"
+          - "indices.indexing.index_current"
+          - "indices.indexing.delete_total"
+          - "indices.indexing.delete_time_in_millis"
+          - "indices.indexing.delete_current"
+          - "indices.get.total"
+          - "indices.get.time_in_millis"
+          - "indices.get.exists_total"
+          - "indices.get.exists_time_in_millis"
+          - "indices.get.missing_total"
+          - "indices.get.missing_time_in_millis"
+          - "indices.get.current"
+          - "indices.search.query_total"
+          - "indices.search.query_time_in_millis"
+          - "indices.search.query_current"
+          - "indices.search.fetch_total"
+          - "indices.search.fetch_time_in_millis"
+          - "indices.search.fetch_current"
+          - "indices.search.scroll_total"
+          - "indices.search.scroll_time_in_millis"
+          - "indices.search.scroll_current"
+          - "indices.search.suggest_total"
+          - "indices.search.suggest_time_in_millis"
+          - "indices.search.suggest_current"
+          - "indices.merges.total"
+          - "indices.merges.total_time_in_millis"
+          - "indices.merges.total_docs"
+          - "indices.merges.total_size_in_bytes"
+          - "indices.refresh.total"
+          - "indices.refresh.total_time_in_millis"
+          - "indices.refresh.external_total"
+          - "indices.refresh.external_total_time_in_millis"
+          - "indices.flush.total"
+          - "indices.flush.total_time_in_millis"
+          - "indices.warmer.total"
+          - "indices.warmer.total_time_in_millis"
+          - "indices.query_cache.hit_count"
+          - "indices.query_cache.miss_count"
+          - "indices.query_cache.cache_size"
+          - "indices.query_cache.cache_count"
+          - "indices.query_cache.evictions"
+          - "indices.request_cache.hit_count"
+          - "indices.request_cache.miss_count"
+          - "indices.request_cache.cache_size"
+          - "indices.request_cache.evictions"
+          - "indices.fielddata.memory_size_in_bytes"
+          - "indices.fielddata.evictions"
+          - "indices.completion.size_in_bytes"
+          - "indices.segments.count"
+          - "indices.segments.memory_in_bytes"
+          - "indices.segments.index_writer_memory_in_bytes"
+          - "indices.segments.version_map_memory_in_bytes"
+          - "indices.segments.fixed_bit_set_memory_in_bytes"
+          - "indices.translog.operations"
+          - "indices.translog.size_in_bytes"
+          - "indices.translog.uncommitted_operations"
+          - "indices.translog.uncommitted_size_in_bytes"
+          - "indices.suggest.total"
+          - "indices.suggest.time_in_millis"
+          - "indices.suggest.current"
+          - "indices.query_total"
+          - "indices.query_time_in_millis"
+          - "indices.query_current"
+          - "indices.fetch_total"
+          - "indices.fetch_time_in_millis"
+          - "indices.fetch_current"
+      
+      # Index Stats
+      - name: "index_stats"
+        endpoint: "/_stats"
+        interval: 60
+        metrics:
+          - "indices.docs.count"
+          - "indices.docs.deleted"
+          - "indices.store.size_in_bytes"
+          - "indices.indexing.index_total"
+          - "indices.indexing.index_time_in_millis"
+          - "indices.search.query_total"
+          - "indices.search.query_time_in_millis"
+          - "indices.get.total"
+          - "indices.get.time_in_millis"
+          - "indices.merges.total"
+          - "indices.merges.total_time_in_millis"
+          - "indices.refresh.total"
+          - "indices.refresh.total_time_in_millis"
+          - "indices.flush.total"
+          - "indices.flush.total_time_in_millis"
+      
+      # JVM Stats
+      - name: "jvm_stats"
+        endpoint: "/_nodes/stats/jvm"
+        interval: 30
+        metrics:
+          - "jvm.mem.heap_used_percent"
+          - "jvm.mem.heap_used_in_bytes"
+          - "jvm.mem.heap_committed_in_bytes"
+          - "jvm.mem.non_heap_used_in_bytes"
+          - "jvm.mem.non_heap_committed_in_bytes"
+          - "jvm.threads.count"
+          - "jvm.threads.peak_count"
+          - "jvm.gc.collectors.old.collection_count"
+          - "jvm.gc.collectors.old.collection_time_in_millis"
+          - "jvm.gc.collectors.young.collection_count"
+          - "jvm.gc.collectors.young.collection_time_in_millis"
+          - "jvm.buffer_pools.direct.count"
+          - "jvm.buffer_pools.direct.used_in_bytes"
+          - "jvm.buffer_pools.direct.total_capacity_in_bytes"
+          - "jvm.buffer_pools.mapped.count"
+          - "jvm.buffer_pools.mapped.used_in_bytes"
+          - "jvm.buffer_pools.mapped.total_capacity_in_bytes"
+          - "jvm.uptime_in_millis"
+      
+      # Process Stats
+      - name: "process_stats"
+        endpoint: "/_nodes/stats/process"
+        interval: 30
+        metrics:
+          - "process.cpu.percent"
+          - "process.cpu.total_in_millis"
+          - "process.mem.total_virtual_in_bytes"
+          - "process.open_file_descriptors"
+          - "process.max_file_descriptors"
+      
+      # OS Stats
+      - name: "os_stats"
+        endpoint: "/_nodes/stats/os"
+        interval: 60
+        metrics:
+          - "os.cpu.percent"
+          - "os.cpu.load_average.1m"
+          - "os.cpu.load_average.5m"
+          - "os.cpu.load_average.15m"
+          - "os.mem.total_in_bytes"
+          - "os.mem.free_in_bytes"
+          - "os.mem.used_in_bytes"
+          - "os.mem.free_percent"
+          - "os.mem.used_percent"
+          - "os.swap.total_in_bytes"
+          - "os.swap.free_in_bytes"
+          - "os.swap.used_in_bytes"
+  
+  # Kibana Metrics
+  kibana:
+    enabled: true
+    host: "localhost"
+    port: 5601
+    username: null
+    password: null
+    
+    metrics:
+      - name: "kibana_status"
+        endpoint: "/api/status"
+        interval: 30
+        metrics:
+          - "status.overall.state"
+          - "status.overall.title"
+      
+      - name: "kibana_metrics"
+        endpoint: "/api/status/metrics"
+        interval: 60
+        metrics:
+          - "metrics.collection.interval_in_millis"
+          - "metrics.last_collection"
+          - "metrics.os.load.1m"
+          - "metrics.os.load.5m"
+          - "metrics.os.load.15m"
+          - "metrics.os.memory.free_in_bytes"
+          - "metrics.os.memory.total_in_bytes"
+          - "metrics.os.memory.used_in_bytes"
+          - "metrics.process.cpu.percent"
+          - "metrics.process.memory.resident_set_size_in_bytes"
+          - "metrics.requests.total"
+          - "metrics.requests.disconnects"
+          - "metrics.responses.average"
+          - "metrics.responses.max"
+          - "metrics.concurrent_connections"
+
+# Alerting Configuration
+alerting:
+  enabled: true
+  evaluation_interval: 30  # seconds
+  evaluation_timeout: 10  # seconds
+  
+  # Alert Rules
+  rules:
+    # Elasticsearch Cluster Alerts
+    - name: "elasticsearch_cluster_red"
+      expr: "elasticsearch_cluster_health_status == 3"
+      for: "1m"
+      labels:
+        severity: "critical"
+        service: "search"
+        component: "elasticsearch"
+      annotations:
+        summary: "Elasticsearch cluster is in RED status"
+        description: "Elasticsearch cluster status is RED which indicates serious issues"
+    
+    - name: "elasticsearch_cluster_yellow"
+      expr: "elasticsearch_cluster_health_status == 2"
+      for: "5m"
+      labels:
+        severity: "warning"
+        service: "search"
+        component: "elasticsearch"
+      annotations:
+        summary: "Elasticsearch cluster is in YELLOW status"
+        description: "Elasticsearch cluster status is YELLOW which indicates some issues"
+    
+    - name: "elasticsearch_unassigned_shards"
+      expr: "elasticsearch_cluster_health_unassigned_shards > 0"
+      for: "5m"
+      labels:
+        severity: "warning"
+        service: "search"
+        component: "elasticsearch"
+      annotations:
+        summary: "Elasticsearch has unassigned shards"
+        description: "Elasticsearch has {{ $value }} unassigned shards"
+    
+    - name: "elasticsearch_relocating_shards"
+      expr: "elasticsearch_cluster_health_relocating_shards > 0"
+      for: "10m"
+      labels:
+        severity: "warning"
+        service: "search"
+        component: "elasticsearch"
+      annotations:
+        summary: "Elasticsearch has relocating shards"
+        description: "Elasticsearch has {{ $value }} relocating shards for more than 10 minutes"
+    
+    - name: "elasticsearch_initializing_shards"
+      expr: "elasticsearch_cluster_health_initializing_shards > 0"
+      for: "10m"
+      labels:
+        severity: "warning"
+        service: "search"
+        component: "elasticsearch"
+      annotations:
+        summary: "Elasticsearch has initializing shards"
+        description: "Elasticsearch has {{ $value }} initializing shards for more than 10 minutes"
+    
+    # JVM Memory Alerts
+    - name: "elasticsearch_jvm_heap_usage_high"
+      expr: "elasticsearch_jvm_mem_heap_used_percent > 85"
+      for: "5m"
+      labels:
+        severity: "warning"
+        service: "search"
+        component: "elasticsearch"
+      annotations:
+        summary: "Elasticsearch JVM heap usage is high"
+        description: "Elasticsearch JVM heap usage is {{ $value }}% which is above the threshold of 85%"
+    
+    - name: "elasticsearch_jvm_heap_usage_critical"
+      expr: "elasticsearch_jvm_mem_heap_used_percent > 95"
+      for: "2m"
+      labels:
+        severity: "critical"
+        service: "search"
+        component: "elasticsearch"
+      annotations:
+        summary: "Elasticsearch JVM heap usage is critical"
+        description: "Elasticsearch JVM heap usage is {{ $value }}% which is above the threshold of 95%"
+    
+    - name: "elasticsearch_jvm_gc_time_high"
+      expr: "rate(elasticsearch_jvm_gc_collectors_old_collection_time_in_millis[5m]) > 1000"
+      for: "5m"
+      labels:
+        severity: "warning"
+        service: "search"
+        component: "elasticsearch"
+      annotations:
+        summary: "Elasticsearch JVM GC time is high"
+        description: "Elasticsearch JVM GC time is {{ $value }}ms which is above the threshold of 1000ms"
+    
+    # Index Performance Alerts
+    - name: "elasticsearch_indexing_rate_low"
+      expr: "rate(elasticsearch_indices_indexing_index_total[5m]) < 10"
+      for: "10m"
+      labels:
+        severity: "warning"
+        service: "search"
+        component: "elasticsearch"
+      annotations:
+        summary: "Elasticsearch indexing rate is low"
+        description: "Elasticsearch indexing rate is {{ $value }} docs/sec which is below the threshold of 10 docs/sec"
+    
+    - name: "elasticsearch_search_latency_high"
+      expr: "rate(elasticsearch_indices_search_query_time_in_millis[5m]) / rate(elasticsearch_indices_search_query_total[5m]) > 1000"
+      for: "5m"
+      labels:
+        severity: "warning"
+        service: "search"
+        component: "elasticsearch"
+      annotations:
+        summary: "Elasticsearch search latency is high"
+        description: "Elasticsearch search latency is {{ $value }}ms which is above the threshold of 1000ms"
+    
+    - name: "elasticsearch_search_latency_critical"
+      expr: "rate(elasticsearch_indices_search_query_time_in_millis[5m]) / rate(elasticsearch_indices_search_query_total[5m]) > 5000"
+      for: "2m"
+      labels:
+        severity: "critical"
+        service: "search"
+        component: "elasticsearch"
+      annotations:
+        summary: "Elasticsearch search latency is critical"
+        description: "Elasticsearch search latency is {{ $value }}ms which is above the threshold of 5000ms"
+    
+    # Disk Usage Alerts
+    - name: "elasticsearch_disk_usage_high"
+      expr: "elasticsearch_filesystem_data_free_bytes / elasticsearch_filesystem_data_total_bytes < 0.15"
+      for: "5m"
+      labels:
+        severity: "warning"
+        service: "search"
+        component: "elasticsearch"
+      annotations:
+        summary: "Elasticsearch disk usage is high"
+        description: "Elasticsearch disk usage is {{ $value }}% which is above the threshold of 85%"
+    
+    - name: "elasticsearch_disk_usage_critical"
+      expr: "elasticsearch_filesystem_data_free_bytes / elasticsearch_filesystem_data_total_bytes < 0.05"
+      for: "2m"
+      labels:
+        severity: "critical"
+        service: "search"
+        component: "elasticsearch"
+      annotations:
+        summary: "Elasticsearch disk usage is critical"
+        description: "Elasticsearch disk usage is {{ $value }}% which is above the threshold of 95%"
+    
+    # CPU Usage Alerts
+    - name: "elasticsearch_cpu_usage_high"
+      expr: "elasticsearch_process_cpu_percent > 80"
+      for: "5m"
+      labels:
+        severity: "warning"
+        service: "search"
+        component: "elasticsearch"
+      annotations:
+        summary: "Elasticsearch CPU usage is high"
+        description: "Elasticsearch CPU usage is {{ $value }}% which is above the threshold of 80%"
+    
+    - name: "elasticsearch_cpu_usage_critical"
+      expr: "elasticsearch_process_cpu_percent > 95"
+      for: "2m"
+      labels:
+        severity: "critical"
+        service: "search"
+        component: "elasticsearch"
+      annotations:
+        summary: "Elasticsearch CPU usage is critical"
+        description: "Elasticsearch CPU usage is {{ $value }}% which is above the threshold of 95%"
+    
+    # File Descriptors Alerts
+    - name: "elasticsearch_file_descriptors_high"
+      expr: "elasticsearch_process_open_file_descriptors / elasticsearch_process_max_file_descriptors > 0.8"
+      for: "5m"
+      labels:
+        severity: "warning"
+        service: "search"
+        component: "elasticsearch"
+      annotations:
+        summary: "Elasticsearch file descriptors usage is high"
+        description: "Elasticsearch file descriptors usage is {{ $value }}% which is above the threshold of 80%"
+    
+    - name: "elasticsearch_file_descriptors_critical"
+      expr: "elasticsearch_process_open_file_descriptors / elasticsearch_process_max_file_descriptors > 0.95"
+      for: "2m"
+      labels:
+        severity: "critical"
+        service: "search"
+        component: "elasticsearch"
+      annotations:
+        summary: "Elasticsearch file descriptors usage is critical"
+        description: "Elasticsearch file descriptors usage is {{ $value }}% which is above the threshold of 95%"
+    
+    # Kibana Alerts
+    - name: "kibana_status_not_green"
+      expr: "kibana_status_overall_state != 1"
+      for: "2m"
+      labels:
+        severity: "warning"
+        service: "search"
+        component: "kibana"
+      annotations:
+        summary: "Kibana status is not green"
+        description: "Kibana status is {{ $value }} which is not green"
+    
+    - name: "kibana_cpu_usage_high"
+      expr: "kibana_metrics_process_cpu_percent > 80"
+      for: "5m"
+      labels:
+        severity: "warning"
+        service: "search"
+        component: "kibana"
+      annotations:
+        summary: "Kibana CPU usage is high"
+        description: "Kibana CPU usage is {{ $value }}% which is above the threshold of 80%"
+    
+    - name: "kibana_memory_usage_high"
+      expr: "kibana_metrics_process_memory_resident_set_size_in_bytes / 1000000000 > 1"
+      for: "5m"
+      labels:
+        severity: "warning"
+        service: "search"
+        component: "kibana"
+      annotations:
+        summary: "Kibana memory usage is high"
+        description: "Kibana memory usage is {{ $value }}GB which is above the threshold of 1GB"
+
+# Notification Channels
+notification_channels:
+  email:
+    enabled: true
+    smtp_host: "smtp.example.com"
+    smtp_port: 587
+    smtp_username: "search-alerts@example.com"
+    smtp_password: "email_password"
+    from_address: "search-alerts@example.com"
+    to_addresses:
+      - "admin@example.com"
+      - "ops@example.com"
+    
+    templates:
+      subject: "[SEARCH ALERT] {{ .Labels.severity | toUpper }}: {{ .Annotations.summary }}"
+      body: |
+        Search Alert: {{ .Annotations.summary }}
+        Description: {{ .Annotations.description }}
+        Severity: {{ .Labels.severity | toUpper }}
+        Service: {{ .Labels.service }}
+        Component: {{ .Labels.component }}
+        Time: {{ .StartsAt.Format "2006-01-02 15:04:05" }}
+        Value: {{ .Value }}
+        
+        View in Kibana: https://kibana.example.com/app/kibana#/dashboard/search-monitoring
+  
+  slack:
+    enabled: true
+    webhook_url: "https://hooks.slack.com/services/YOUR/SLACK/WEBHOOK"
+    channel: "#search-alerts"
+    username: "Search Monitor"
+    
+    templates:
+      title: "{{ .Labels.severity | toUpper }}: {{ .Annotations.summary }}"
+      text: |
+        *Search Alert:* {{ .Annotations.summary }}
+        *Description:* {{ .Annotations.description }}
+        *Severity:* {{ .Labels.severity | toUpper }}
+        *Service:* {{ .Labels.service }}
+        *Component:* {{ .Labels.component }}
+        *Time:* {{ .StartsAt.Format "2006-01-02 15:04:05" }}
+        *Value:* {{ .Value }}
+        
+        <https://kibana.example.com/app/kibana#/dashboard/search-monitoring|View in Kibana>
+  
+  webhook:
+    enabled: true
+    url: "https://api.example.com/alerts"
+    method: "POST"
+    headers:
+      "Content-Type": "application/json"
+      "Authorization": "Bearer YOUR_API_TOKEN"
+    
+    templates:
+      payload: |
+        {
+          "alert_name": "{{ .Labels.alertname }}",
+          "severity": "{{ .Labels.severity }}",
+          "summary": "{{ .Annotations.summary }}",
+          "description": "{{ .Annotations.description }}",
+          "service": "{{ .Labels.service }}",
+          "component": "{{ .Labels.component }}",
+          "timestamp": "{{ .StartsAt.Format \"2006-01-02T15:04:05Z\" }}",
+          "value": "{{ .Value }}"
+        }
+
+# Dashboard Configuration
+dashboards:
+  - name: "Search Infrastructure Overview"
+    description: "Overview of search infrastructure health and performance"
+    panels:
+      - title: "Cluster Health"
+        type: "stat"
+        targets:
+          - expr: "elasticsearch_cluster_health_status"
+            legendFormat: "Cluster Status"
+        
+      - title: "Node Count"
+        type: "stat"
+        targets:
+          - expr: "elasticsearch_cluster_health_number_of_nodes"
+            legendFormat: "Nodes"
+        
+      - title: "JVM Heap Usage"
+        type: "gauge"
+        targets:
+          - expr: "elasticsearch_jvm_mem_heap_used_percent"
+            legendFormat: "Heap Usage %"
+        
+      - title: "Search Query Rate"
+        type: "graph"
+        targets:
+          - expr: "rate(elasticsearch_indices_search_query_total[5m])"
+            legendFormat: "Queries/sec"
+        
+      - title: "Search Latency"
+        type: "graph"
+        targets:
+          - expr: "rate(elasticsearch_indices_search_query_time_in_millis[5m]) / rate(elasticsearch_indices_search_query_total[5m])"
+            legendFormat: "Latency (ms)"
+        
+      - title: "Indexing Rate"
+        type: "graph"
+        targets:
+          - expr: "rate(elasticsearch_indices_indexing_index_total[5m])"
+            legendFormat: "Docs/sec"
+        
+      - title: "Disk Usage"
+        type: "graph"
+        targets:
+          - expr: "elasticsearch_filesystem_data_free_bytes / elasticsearch_filesystem_data_total_bytes * 100"
+            legendFormat: "Free Disk %"
+        
+      - title: "CPU Usage"
+        type: "graph"
+        targets:
+          - expr: "elasticsearch_process_cpu_percent"
+            legendFormat: "CPU %"
+  
+  - name: "Search Performance"
+    description: "Detailed search performance metrics"
+    panels:
+      - title: "Search Query Time Distribution"
+        type: "graph"
+        targets:
+          - expr: "histogram_quantile(0.50, rate(elasticsearch_indices_search_query_time_in_millis_sum[5m]) / rate(elasticsearch_indices_search_query_time_in_millis_count[5m]))"
+            legendFormat: "50th percentile"
+          - expr: "histogram_quantile(0.95, rate(elasticsearch_indices_search_query_time_in_millis_sum[5m]) / rate(elasticsearch_indices_search_query_time_in_millis_count[5m]))"
+            legendFormat: "95th percentile"
+          - expr: "histogram_quantile(0.99, rate(elasticsearch_indices_search_query_time_in_millis_sum[5m]) / rate(elasticsearch_indices_search_query_time_in_millis_count[5m]))"
+            legendFormat: "99th percentile"
+        
+      - title: "Index Performance"
+        type: "graph"
+        targets:
+          - expr: "rate(elasticsearch_indices_indexing_index_time_in_millis[5m])"
+            legendFormat: "Index Time (ms)"
+          - expr: "rate(elasticsearch_indices_indexing_index_total[5m])"
+            legendFormat: "Index Rate (docs/sec)"
+        
+      - title: "Cache Hit Rates"
+        type: "graph"
+        targets:
+          - expr: "rate(elasticsearch_indices_query_cache_hit_count[5m]) / (rate(elasticsearch_indices_query_cache_hit_count[5m]) + rate(elasticsearch_indices_query_cache_miss_count[5m])) * 100"
+            legendFormat: "Query Cache Hit %"
+          - expr: "rate(elasticsearch_indices_request_cache_hit_count[5m]) / (rate(elasticsearch_indices_request_cache_hit_count[5m]) + rate(elasticsearch_indices_request_cache_miss_count[5m])) * 100"
+            legendFormat: "Request Cache Hit %"
+        
+      - title: "GC Performance"
+        type: "graph"
+        targets:
+          - expr: "rate(elasticsearch_jvm_gc_collectors_old_collection_time_in_millis[5m])"
+            legendFormat: "Old Gen GC (ms)"
+          - expr: "rate(elasticsearch_jvm_gc_collectors_young_collection_time_in_millis[5m])"
+            legendFormat: "Young Gen GC (ms)"
+  
+  - name: "Search Analytics"
+    description: "Search usage and analytics metrics"
+    panels:
+      - title: "Search Queries Over Time"
+        type: "graph"
+        targets:
+          - expr: "rate(search_analytics_query_total[5m])"
+            legendFormat: "Queries/sec"
+        
+      - title: "Popular Search Terms"
+        type: "table"
+        targets:
+          - expr: "topk(10, increase(search_analytics_query_total[1h]))"
+            legendFormat: "Query Terms"
+        
+      - title: "Search Conversion Rate"
+        type: "gauge"
+        targets:
+          - expr: "rate(search_analytics_converted_queries[5m]) / rate(search_analytics_query_total[5m]) * 100"
+            legendFormat: "Conversion %"
+        
+      - title: "Average Search Results"
+        type: "graph"
+        targets:
+          - expr: "avg(search_analytics_results_count)"
+            legendFormat: "Avg Results"
+
+# Health Checks
+health_checks:
+  enabled: true
+  interval: 30  # seconds
+  timeout: 10  # seconds
+  
+  checks:
+    - name: "elasticsearch_cluster_health"
+      type: "elasticsearch"
+      config:
+        host: "localhost"
+        port: 9200
+        endpoint: "/_cluster/health"
+        expected_status: 200
+        timeout: 10
+      
+    - name: "elasticsearch_search_test"
+      type: "elasticsearch"
+      config:
+        host: "localhost"
+        port: 9200
+        endpoint: "/forum_posts/_search"
+        query: '{"query": {"match_all": {}}, "size": 1}'
+        expected_status: 200
+        timeout: 10
+      
+    - name: "kibana_status"
+      type: "http"
+      config:
+        url: "http://localhost:5601/api/status"
+        method: "GET"
+        expected_status: 200
+        timeout: 10
+      
+    - name: "disk_space"
+      type: "system"
+      config:
+        path: "/var/lib/elasticsearch"
+        threshold: 85  # percent
+
+# Performance Optimization
+performance:
+  enabled: true
+  
+  # Index Optimization
+  index_optimization:
+    enabled: true
+    refresh_interval: "5s"
+    number_of_shards: 1
+    number_of_replicas: 0
+    max_result_window: 10000
+    
+  # Query Optimization
+  query_optimization:
+    enabled: true
+    query_timeout: 30
+    max_clauses: 1024
+    max_expansions: 50
+    minimum_should_match: "75%"
+    
+  # Cache Optimization
+  cache_optimization:
+    enabled: true
+    query_cache_size: "10%"
+    field_data_cache_size: "30%"
+    request_cache_enabled: true
+    
+  # JVM Optimization
+  jvm_optimization:
+    enabled: true
+    heap_size: "1g"
+    gc_type: "G1GC"
+    gc_pause_target: 200
+    
+  # Network Optimization
+  network_optimization:
+    enabled: true
+    tcp_keep_alive: true
+    tcp_no_delay: true
+    compression: true

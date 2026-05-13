@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}AutoBot Solutions Forum{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/realtime.css') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;500;700&display=swap" rel="stylesheet">
@@ -137,6 +138,9 @@
         </div>
     </footer>
 
+    <!-- Socket.IO client for real-time features -->
+    <script src="https://cdn.socket.io/4.7.4/socket.io.min.js"></script>
+    <script src="{{ url_for('static', filename='js/realtime/websocket.js') }}"></script>
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
     <script>
         // Close dropdowns when clicking outside
@@ -168,5 +172,59 @@
             event.stopPropagation();
         }
     </script>
+<!-- Real-time features UI elements -->
+<div class="notifications-container"></div>
+<div class="system-messages"></div>
+
+<!-- Online users sidebar (for logged-in users) -->
+{% if current_user.is_authenticated %}
+<div class="online-users-sidebar" id="onlineUsersSidebar">
+    <div class="online-users-header">
+        <h3>Online Users</h3>
+        <button class="close-btn" onclick="toggleOnlineUsers()">×</button>
+    </div>
+    <div class="online-users-content">
+        <div class="online-users-count">
+            <span id="onlineUsersCount">0</span> users online
+        </div>
+        <div class="online-users-list" id="onlineUsersList">
+            <!-- Online users will be populated here -->
+        </div>
+    </div>
+</div>
+
+<!-- Online users toggle button -->
+<div class="online-users-toggle" id="onlineUsersToggle" onclick="toggleOnlineUsers()">
+    <i class="fas fa-users"></i>
+    <span class="online-users-count-badge" id="onlineUsersCountBadge">0</span>
+</div>
+{% endif %}
+
+<script>
+// Toggle online users sidebar
+function toggleOnlineUsers() {
+    const sidebar = document.getElementById('onlineUsersSidebar');
+    const toggle = document.getElementById('onlineUsersToggle');
+    
+    if (sidebar.style.display === 'block') {
+        sidebar.style.display = 'none';
+        toggle.classList.remove('active');
+    } else {
+        sidebar.style.display = 'block';
+        toggle.classList.add('active');
+    }
+}
+
+// Initialize online users sidebar
+document.addEventListener('DOMContentLoaded', function() {
+    const sidebar = document.getElementById('onlineUsersSidebar');
+    const toggle = document.getElementById('onlineUsersToggle');
+    
+    if (sidebar && toggle) {
+        sidebar.style.display = 'none';
+    }
+});
+</script>
+
 </body>
 </html>

@@ -1,0 +1,215 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Email Preview{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">👁️ Email Preview</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <div class="btn-group me-2">
+            <a href="{{ url_for('admin_email.email_dashboard') }}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Preview Settings</h5>
+            </div>
+            <div class="card-body">
+                <form id="previewForm">
+                    <div class="mb-3">
+                        <label for="template" class="form-label">Template</label>
+                        <select class="form-select" id="template" name="template" required>
+                            <option value="">Select template...</option>
+                            <option value="verification">Email Verification</option>
+                            <option value="password_reset">Password Reset</option>
+                            <option value="welcome">Welcome Email</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="format" class="form-label">Format</label>
+                        <select class="form-select" id="format" name="format">
+                            <option value="html">HTML</option>
+                            <option value="text">Plain Text</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-eye"></i> Generate Preview
+                    </button>
+                </form>
+            </div>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-header">
+                <h6 class="card-title mb-0">Template Info</h6>
+            </div>
+            <div class="card-body">
+                <small class="text-muted">
+                    <strong>Email Verification:</strong><br>
+                    Sent to new users to verify their email address.<br><br>
+                    
+                    <strong>Password Reset:</strong><br>
+                    Sent when users request to reset their password.<br><br>
+                    
+                    <strong>Welcome Email:</strong><br>
+                    Sent after successful email verification.
+                </small>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0">Preview</h5>
+                <div id="previewActions" class="btn-group btn-group-sm" style="display: none;">
+                    <button class="btn btn-outline-secondary" onclick="copyPreview()">
+                        <i class="fas fa-copy"></i> Copy
+                    </button>
+                    <button class="btn btn-outline-secondary" onclick="openInNewWindow()">
+                        <i class="fas fa-external-link-alt"></i> New Window
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                <div id="previewLoading" style="display: none;" class="text-center">
+                    <div class="spinner-border" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-2">Generating preview...</p>
+                </div>
+                
+                <div id="previewError" class="alert alert-danger" style="display: none;">
+                    <i class="fas fa-exclamation-triangle"></i> <span id="errorMessage"></span>
+                </div>
+                
+                <div id="previewContent">
+                    <div class="text-center text-muted">
+                        <i class="fas fa-envelope fa-3x mb-3"></i>
+                        <p>Select a template and format to generate a preview.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Hidden iframe for opening preview in new window -->
+<iframe id="previewFrame" style="display: none;"></iframe>
+
+<script>
+document.getElementById('previewForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    generatePreview();
+});
+
+function generatePreview() {
+    const template = document.getElementById('template').value;
+    const format = document.getElementById('format').value;
+    
+    if (!template) {
+        showError('Please select a template');
+        return;
+    }
+    
+    // Show loading
+    document.getElementById('previewLoading').style.display = 'block';
+    document.getElementById('previewError').style.display = 'none';
+    document.getElementById('previewContent').style.display = 'none';
+    document.getElementById('previewActions').style.display = 'none';
+    
+    // Send request
+    fetch('{{ url_for("admin_email.render_email_preview") }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({
+            template: template,
+            format: format
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+            showError(data.error);
+        } else {
+            showPreview(data.preview, data.format);
+        }
+    })
+    .catch(error => {
+        showError('Error generating preview: ' + error.message);
+    })
+    .finally(() => {
+        document.getElementById('previewLoading').style.display = 'none';
+    });
+}
+
+function showPreview(content, format) {
+    const previewContent = document.getElementById('previewContent');
+    
+    if (format === 'html') {
+        previewContent.innerHTML = content;
+    } else {
+        previewContent.innerHTML = '<pre class="bg-light p-3 rounded"><code>' + content + '</code></pre>';
+    }
+    
+    previewContent.style.display = 'block';
+    document.getElementById('previewActions').style.display = 'flex';
+    
+    // Store current preview for copy functionality
+    window.currentPreview = content;
+}
+
+function showError(message) {
+    document.getElementById('errorMessage').textContent = message;
+    document.getElementById('previewError').style.display = 'block';
+    document.getElementById('previewContent').style.display = 'none';
+    document.getElementById('previewActions').style.display = 'none';
+}
+
+function copyPreview() {
+    if (window.currentPreview) {
+        navigator.clipboard.writeText(window.currentPreview).then(() => {
+            // Show success feedback
+            const btn = event.target.closest('button');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+            btn.classList.remove('btn-outline-secondary');
+            btn.classList.add('btn-success');
+            
+            setTimeout(() => {
+                btn.innerHTML = originalText;
+                btn.classList.remove('btn-success');
+                btn.classList.add('btn-outline-secondary');
+            }, 2000);
+        });
+    }
+}
+
+function openInNewWindow() {
+    if (window.currentPreview) {
+        const format = document.getElementById('format').value;
+        const template = document.getElementById('template').value;
+        
+        if (format === 'html') {
+            // Create a new window with HTML content
+            const newWindow = window.open('', '_blank');
+            newWindow.document.write(window.currentPreview);
+            newWindow.document.close();
+        } else {
+            // Create a new window with text content
+            const newWindow = window.open('', '_blank');
+            newWindow.document.write('<pre>' + window.currentPreview + '</pre>');
+            newWindow.document.close();
+        }
+    }
+}
+</script>
+{% endblock %}

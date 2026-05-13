@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block title %}Revoke All Sessions - {{ config.SITE_NAME or 'Forum' }}{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="text-center">
+                        <i class="fas fa-ban"></i> Revoke All Sessions
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <strong>Warning:</strong> You are about to revoke all your active sessions.
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h5>What this means:</h5>
+                        <ul class="list-unstyled">
+                            <li>
+                                <i class="fas fa-sign-out-alt text-danger"></i>
+                                You will be logged out from all devices
+                            </li>
+                            <li>
+                                <i class="fas fa-mobile-alt text-danger"></i>
+                                All mobile sessions will be terminated
+                            </li>
+                            <li>
+                                <i class="fas fa-laptop text-danger"></i>
+                                All desktop sessions will be terminated
+                            </li>
+                            <li>
+                                <i class="fas fa-shield-alt text-success"></i>
+                                This enhances your account security
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <form method="POST">
+                        {{ form.hidden_tag() }}
+                        
+                        <div class="mb-3">
+                            <div class="form-check">
+                                {{ form.confirm(class="form-check-input") }}
+                                <label class="form-check-label" for="{{ form.confirm.id }}">
+                                    I understand that all sessions will be revoked
+                                </label>
+                            </div>
+                            {% if form.confirm.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.confirm.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <div class="form-check">
+                                {{ form.current_session_only(class="form-check-input") }}
+                                <label class="form-check-label" for="{{ form.current_session_only.id }}">
+                                    Keep current session active (recommended)
+                                </label>
+                                <small class="form-text text-muted">
+                                    You'll stay logged in on this device
+                                </small>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            {{ form.reason.label(class="form-label") }}
+                            {{ form.reason(class="form-control", rows="3", placeholder="Optional: Reason for revoking all sessions") }}
+                            {% if form.reason.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.reason.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-ban"></i> Revoke All Sessions
+                            </button>
+                            <a href="{{ url_for('session.manage_sessions') }}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left"></i> Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

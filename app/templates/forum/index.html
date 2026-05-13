@@ -18,6 +18,11 @@
 {% if current_user.is_authenticated %}
 <div style="text-align: center; margin-bottom: 2rem;">
     <a href="{{ url_for('forum.create_post') }}" class="btn-primary">INITIATE NEW DISCUSSION</a>
+    {% if current_user.is_admin %}
+    <a href="{{ url_for('forum.moderate_posts') }}" class="btn-secondary ms-2">
+        <i class="fas fa-shield-alt me-1"></i>MODERATE POSTS
+    </a>
+    {% endif %}
 </div>
 {% endif %}
 

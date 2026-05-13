@@ -1,0 +1,497 @@
+/**
+ * CSS for Real-time Features
+ * 
+ * This file contains styles for real-time features including:
+ * - Online user indicators
+ * - Typing indicators
+ * - Notifications
+ * - System messages
+ * - WebSocket connection status
+ */
+
+/* Notifications Container */
+.notifications-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+    max-width: 400px;
+}
+
+.notification {
+    background: linear-gradient(135deg, var(--neon-blue), var(--neon-purple));
+    color: white;
+    padding: 15px 20px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 255, 255, 0.3);
+    border: 1px solid rgba(0, 255, 255, 0.5);
+    animation: slideInRight 0.3s ease-out;
+    position: relative;
+}
+
+.notification-close {
+    position: absolute;
+    top: 5px;
+    right: 10px;
+    background: none;
+    border: none;
+    color: white;
+    font-size: 18px;
+    cursor: pointer;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+}
+
+.notification-close:hover {
+    opacity: 1;
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* System Messages */
+.system-messages {
+    position: fixed;
+    top: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 999;
+    max-width: 600px;
+    width: 90%;
+}
+
+.system-message {
+    padding: 15px 20px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    text-align: center;
+    font-weight: 500;
+    animation: slideInDown 0.3s ease-out;
+}
+
+.system-message.info {
+    background: linear-gradient(135deg, #17a2b8, #138496);
+    color: white;
+    border: 1px solid rgba(23, 162, 184, 0.5);
+}
+
+.system-message.warning {
+    background: linear-gradient(135deg, #ffc107, #e0a800);
+    color: #212529;
+    border: 1px solid rgba(255, 193, 7, 0.5);
+}
+
+.system-message.error {
+    background: linear-gradient(135deg, #dc3545, #c82333);
+    color: white;
+    border: 1px solid rgba(220, 53, 69, 0.5);
+}
+
+.system-message.success {
+    background: linear-gradient(135deg, #28a745, #218838);
+    color: white;
+    border: 1px solid rgba(40, 167, 69, 0.5);
+}
+
+@keyframes slideInDown {
+    from {
+        transform: translate(-50%, -100%);
+        opacity: 0;
+    }
+    to {
+        transform: translate(-50%, 0);
+        opacity: 1;
+    }
+}
+
+/* Online Users Sidebar */
+.online-users-sidebar {
+    position: fixed;
+    right: -300px;
+    top: 0;
+    width: 300px;
+    height: 100vh;
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.95), rgba(0, 255, 255, 0.1));
+    border-left: 1px solid var(--neon-cyan);
+    z-index: 998;
+    transition: right 0.3s ease;
+    overflow-y: auto;
+}
+
+.online-users-sidebar.show {
+    right: 0;
+}
+
+.online-users-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    border-bottom: 1px solid rgba(0, 255, 255, 0.3);
+    background: rgba(0, 255, 255, 0.1);
+}
+
+.online-users-header h3 {
+    color: var(--neon-cyan);
+    margin: 0;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.2rem;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    color: var(--neon-cyan);
+    font-size: 24px;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.close-btn:hover {
+    color: var(--neon-purple);
+}
+
+.online-users-content {
+    padding: 20px;
+}
+
+.online-users-count {
+    color: var(--neon-cyan);
+    margin-bottom: 20px;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.9rem;
+}
+
+.online-users-list {
+    max-height: calc(100vh - 200px);
+    overflow-y: auto;
+}
+
+.online-user {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    margin-bottom: 10px;
+    background: rgba(0, 255, 255, 0.05);
+    border-radius: 6px;
+    border: 1px solid rgba(0, 255, 255, 0.2);
+    transition: all 0.2s;
+}
+
+.online-user:hover {
+    background: rgba(0, 255, 255, 0.1);
+    transform: translateX(-5px);
+}
+
+.online-indicator {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-right: 10px;
+    background: #6c757d;
+    transition: all 0.2s;
+}
+
+.online-indicator.online {
+    background: #28a745;
+    box-shadow: 0 0 10px #28a745;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.7);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(40, 167, 69, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(40, 167, 69, 0);
+    }
+}
+
+.username {
+    color: var(--text-primary);
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.9rem;
+}
+
+/* Online Users Toggle Button */
+.online-users-toggle {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, var(--neon-cyan), var(--neon-blue));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 20px rgba(0, 255, 255, 0.4);
+    border: 2px solid var(--neon-cyan);
+    transition: all 0.3s;
+    z-index: 997;
+}
+
+.online-users-toggle:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 30px rgba(0, 255, 255, 0.6);
+}
+
+.online-users-toggle.active {
+    background: linear-gradient(135deg, var(--neon-purple), var(--neon-pink));
+    border-color: var(--neon-purple);
+}
+
+.online-users-toggle i {
+    color: white;
+    font-size: 20px;
+}
+
+.online-users-count-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: var(--neon-red);
+    color: white;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: bold;
+    border: 2px solid white;
+}
+
+/* Typing Indicators */
+.typing-indicators {
+    padding: 10px;
+    background: rgba(0, 255, 255, 0.05);
+    border-radius: 6px;
+    border: 1px solid rgba(0, 255, 255, 0.2);
+    margin-bottom: 15px;
+    min-height: 30px;
+    display: flex;
+    align-items: center;
+    font-style: italic;
+    color: var(--neon-cyan);
+    font-size: 0.9rem;
+}
+
+.typing-indicator {
+    display: inline-flex;
+    align-items: center;
+    margin-right: 15px;
+    animation: fadeIn 0.3s ease-out;
+}
+
+.typing-indicator strong {
+    color: var(--neon-purple);
+    margin-right: 5px;
+}
+
+.typing-indicator::after {
+    content: '';
+    display: inline-block;
+    width: 20px;
+    height: 10px;
+    margin-left: 5px;
+    background-image: radial-gradient(circle, var(--neon-cyan) 1px, transparent 1px);
+    background-size: 4px 4px;
+    background-position: 0 0, 8px 0, 16px 0;
+    animation: typing 1.5s infinite;
+}
+
+@keyframes typing {
+    0%, 60%, 100% {
+        background-position: 0 0, 8px 0, 16px 0;
+    }
+    30% {
+        background-position: 8px 0, 16px 0, 24px 0;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Comment Animation */
+.new-comment {
+    animation: slideInUp 0.5s ease-out;
+    border-left: 3px solid var(--neon-cyan);
+    background: rgba(0, 255, 255, 0.05);
+}
+
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Vote Button Updates */
+.vote-btn.updating {
+    animation: voteUpdate 0.3s ease-out;
+}
+
+@keyframes voteUpdate {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.2);
+        color: var(--neon-cyan);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+/* WebSocket Connection Status */
+.connection-status {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    padding: 8px 15px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    z-index: 1001;
+    transition: all 0.3s;
+}
+
+.connection-status.connected {
+    background: linear-gradient(135deg, #28a745, #218838);
+    color: white;
+    border: 1px solid rgba(40, 167, 69, 0.5);
+}
+
+.connection-status.disconnected {
+    background: linear-gradient(135deg, #dc3545, #c82333);
+    color: white;
+    border: 1px solid rgba(220, 53, 69, 0.5);
+}
+
+.connection-status.connecting {
+    background: linear-gradient(135deg, #ffc107, #e0a800);
+    color: #212529;
+    border: 1px solid rgba(255, 193, 7, 0.5);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .notifications-container {
+        right: 10px;
+        left: 10px;
+        max-width: none;
+    }
+    
+    .online-users-sidebar {
+        width: 250px;
+        right: -250px;
+    }
+    
+    .online-users-toggle {
+        width: 50px;
+        height: 50px;
+        right: 10px;
+        bottom: 10px;
+    }
+    
+    .online-users-toggle i {
+        font-size: 18px;
+    }
+    
+    .system-messages {
+        width: 95%;
+    }
+    
+    .typing-indicators {
+        font-size: 0.8rem;
+    }
+}
+
+/* Dark theme adjustments */
+@media (prefers-color-scheme: dark) {
+    .notification {
+        background: linear-gradient(135deg, rgba(0, 123, 255, 0.9), rgba(128, 0, 255, 0.9));
+    }
+    
+    .online-users-sidebar {
+        background: linear-gradient(135deg, rgba(0, 0, 0, 0.98), rgba(0, 255, 255, 0.05));
+    }
+    
+    .typing-indicators {
+        background: rgba(0, 255, 255, 0.03);
+        border-color: rgba(0, 255, 255, 0.1);
+    }
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+    .notification,
+    .system-message,
+    .online-user,
+    .typing-indicator,
+    .new-comment,
+    .vote-btn.updating,
+    .connection-status {
+        animation: none;
+        transition: none;
+    }
+    
+    .online-indicator.online {
+        animation: none;
+    }
+}
+
+/* Focus styles for accessibility */
+.notification-close:focus,
+.close-btn:focus,
+.online-users-toggle:focus {
+    outline: 2px solid var(--neon-cyan);
+    outline-offset: 2px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .notification {
+        border: 2px solid white;
+    }
+    
+    .system-message {
+        border: 2px solid currentColor;
+    }
+    
+    .online-users-sidebar {
+        border-left: 2px solid var(--neon-cyan);
+    }
+    
+    .online-users-toggle {
+        border: 3px solid var(--neon-cyan);
+    }
+}

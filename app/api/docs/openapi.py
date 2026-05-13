@@ -1,0 +1,639 @@
+"""
+OpenAPI Specification Service
+Generates OpenAPI 3.0 specification for API documentation
+"""
+
+import json
+from datetime import datetime
+from typing import Dict, Any, List, Optional
+from flask import current_app, request, g
+from flask_restx import Api, Resource, fields
+import inspect
+
+class OpenAPIService:
+    """OpenAPI specification generator and manager"""
+    
+    def __init__(self, title: str = "Auto Bot Solutions Forum API", 
+                 version: str = "1.0.0", description: str = None):
+        """Initialize OpenAPI service"""
+        self.title = title
+        self.version = version
+        self.description = description or "RESTful API for Auto Bot Solutions Forum"
+        self.spec = {
+            "openapi": "3.0.3",
+            "info": {
+                "title": title,
+                "version": version,
+                "description": description,
+                "contact": {
+                    "name": "API Support",
+                    "email": "support@autobotsolutions.com",
+                    "url": "https://autobotsolutions.com/support"
+                },
+                "license": {
+                    "name": "MIT",
+                    "url": "https://opensource.org/licenses/MIT"
+                }
+            },
+            "servers": [
+                {
+                    "url": "http://localhost:5000",
+                    "description": "Development server"
+                },
+                {
+                    "url": "https://api.autobotsolutions.com",
+                    "description": "Production server"
+                }
+            ],
+            "paths": {},
+            "components": {
+                "schemas": {},
+                "securitySchemes": {},
+                "responses": {},
+                "parameters": {},
+                "examples": {}
+            },
+            "tags": []
+        }
+        self.endpoints = {}
+        self.schemas = {}
+        self.security_schemes = {}
+    
+    def add_server(self, url: str, description: str):
+        """Add server to OpenAPI spec"""
+        server = {
+            "url": url,
+            "description": description
+        }
+        self.spec["servers"].append(server)
+    
+    def add_tag(self, name: str, description: str = None):
+        """Add tag to OpenAPI spec"""
+        tag = {
+            "name": name
+        }
+        if description:
+            tag["description"] = description
+        
+        # Check if tag already exists
+        existing_tags = [t["name"] for t in self.spec["tags"]]
+        if name not in existing_tags:
+            self.spec["tags"].append(tag)
+    
+    def add_security_scheme(self, name: str, scheme_type: str, **kwargs):
+        """Add security scheme to OpenAPI spec"""
+        scheme = {
+            "type": scheme_type
+        }
+        scheme.update(kwargs)
+        
+        self.spec["components"]["securitySchemes"][name] = scheme
+        self.security_schemes[name] = scheme
+    
+    def add_schema(self, name: str, schema: Dict[str, Any]):
+        """Add schema to OpenAPI spec"""
+        self.spec["components"]["schemas"][name] = schema
+        self.schemas[name] = schema
+    
+    def add_response(self, name: str, response: Dict[str, Any]):
+        """Add response to OpenAPI spec"""
+        self.spec["components"]["responses"][name] = response
+    
+    def add_parameter(self, name: str, parameter: Dict[str, Any]):
+        """Add parameter to OpenAPI spec"""
+        self.spec["components"]["parameters"][name] = parameter
+    
+    def add_example(self, name: str, example: Dict[str, Any]):
+        """Add example to OpenAPI spec"""
+        self.spec["components"]["examples"][name] = example
+    
+    def register_endpoint(self, path: str, method: str, operation: Dict[str, Any]):
+        """Register API endpoint"""
+        if path not in self.spec["paths"]:
+            self.spec["paths"][path] = {}
+        
+        self.spec["paths"][path][method.lower()] = operation
+        self.endpoints[f"{method.upper()} {path}"] = operation
+    
+    def generate_from_flask_routes(self, app):
+        """Generate OpenAPI spec from Flask routes"""
+        from flask import url_for
+        
+        for rule in app.url_map.iter_rules():
+            if rule.endpoint.startswith('static') or rule.endpoint == 'static':
+                continue
+            
+            # Get the view function
+            view_func = app.view_functions.get(rule.endpoint)
+            if not view_func:
+                continue
+            
+            # Get docstring
+            docstring = inspect.getdoc(view_func) or ""
+            
+            # Parse docstring for OpenAPI info
+            operation = self._parse_docstring(docstring, rule.endpoint, rule.methods)
+            
+            if operation:
+                # Add path and method
+                path = rule.rule
+                for method in rule.methods:
+                    if method in ['GET', 'POST', 'PUT', 'DELETE', 'PATCH']:
+                        self.register_endpoint(path, method, operation.copy())
+    
+    def _parse_docstring(self, docstring: str, endpoint: str, methods: List[str]) -> Optional[Dict[str, Any]]:
+        """Parse docstring to extract OpenAPI information"""
+        if not docstring:
+            return None
+        
+        lines = docstring.split('\n')
+        operation = {
+            "summary": "",
+            "description": "",
+            "tags": [],
+            "parameters": [],
+            "responses": {},
+            "security": []
+        }
+        
+        current_section = None
+        for line in lines:
+            line = line.strip()
+            
+            if not line:
+                continue
+            
+            # Section headers
+            if line.startswith('Summary:'):
+                current_section = 'summary'
+                operation['summary'] = line.replace('Summary:', '').strip()
+            elif line.startswith('Description:'):
+                current_section = 'description'
+                operation['description'] = line.replace('Description:', '').strip()
+            elif line.startswith('Tags:'):
+                current_section = 'tags'
+                tags = line.replace('Tags:', '').strip().split(',')
+                operation['tags'] = [tag.strip() for tag in tags]
+            elif line.startswith('Parameters:'):
+                current_section = 'parameters'
+            elif line.startswith('Responses:'):
+                current_section = 'responses'
+            elif line.startswith('Security:'):
+                current_section = 'security'
+            elif line.startswith('Example:'):
+                current_section = 'example'
+            else:
+                # Continue with current section
+                if current_section == 'description':
+                    operation['description'] += ' ' + line
+                elif current_section == 'parameters':
+                    # Parse parameter
+                    param = self._parse_parameter_line(line)
+                    if param:
+                        operation['parameters'].append(param)
+                elif current_section == 'responses':
+                    # Parse response
+                    response = self._parse_response_line(line)
+                    if response:
+                        operation['responses'].update(response)
+                elif current_section == 'security':
+                    # Parse security
+                    security = self._parse_security_line(line)
+                    if security:
+                        operation['security'].append(security)
+        
+        # Set defaults
+        if not operation['summary']:
+            operation['summary'] = f"{methods[0]} {endpoint}"
+        
+        if not operation['description']:
+            operation['description'] = docstring
+        
+        if not operation['tags']:
+            # Extract tag from endpoint
+            parts = endpoint.split('.')
+            if len(parts) > 1:
+                operation['tags'] = [parts[0]]
+            else:
+                operation['tags'] = ['default']
+        
+        # Add default responses
+        if not operation['responses']:
+            operation['responses'] = {
+                '200': {
+                    'description': 'Successful response'
+                }
+            }
+        
+        return operation
+    
+    def _parse_parameter_line(self, line: str) -> Optional[Dict[str, Any]]:
+        """Parse parameter line from docstring"""
+        # Format: name (type) in location - description
+        try:
+            parts = line.split('-', 1)
+            if len(parts) != 2:
+                return None
+            
+            param_info = parts[0].strip()
+            description = parts[1].strip()
+            
+            # Extract name, type, location
+            if '(' in param_info and ')' in param_info:
+                name_part = param_info[:param_info.index('(')].strip()
+                type_part = param_info[param_info.index('(')+1:param_info.index(')')].strip()
+                location_part = param_info[param_info.index(')')+1:].strip()
+                
+                if 'in' in location_part:
+                    location = location_part.replace('in', '').strip()
+                else:
+                    location = 'query'
+            else:
+                name_part = param_info
+                type_part = 'string'
+                location = 'query'
+                description = param_info
+            
+            # Map type to OpenAPI type
+            type_mapping = {
+                'string': 'string',
+                'int': 'integer',
+                'integer': 'integer',
+                'float': 'number',
+                'number': 'number',
+                'bool': 'boolean',
+                'boolean': 'boolean',
+                'array': 'array',
+                'object': 'object'
+            }
+            
+            param_type = type_mapping.get(type_part.lower(), 'string')
+            
+            return {
+                'name': name_part,
+                'in': location,
+                'description': description,
+                'required': location == 'path',
+                'schema': {
+                    'type': param_type
+                }
+            }
+            
+        except Exception:
+            return None
+    
+    def _parse_response_line(self, line: str) -> Optional[Dict[str, Any]]:
+        """Parse response line from docstring"""
+        # Format: status_code - description
+        try:
+            parts = line.split('-', 1)
+            if len(parts) != 2:
+                return None
+            
+            status_code = parts[0].strip()
+            description = parts[1].strip()
+            
+            return {
+                status_code: {
+                    'description': description
+                }
+            }
+            
+        except Exception:
+            return None
+    
+    def _parse_security_line(self, line: str) -> Optional[List[str]]:
+        """Parse security line from docstring"""
+        # Format: scheme_name [scope1, scope2]
+        try:
+            parts = line.split('[')
+            if len(parts) == 1:
+                return [{line.strip(): []}]
+            
+            scheme = parts[0].strip()
+            scopes = parts[1].replace(']', '').strip().split(',')
+            scopes = [scope.strip() for scope in scopes if scope.strip()]
+            
+            return [{scheme: scopes}]
+            
+        except Exception:
+            return None
+    
+    def get_spec(self) -> Dict[str, Any]:
+        """Get complete OpenAPI specification"""
+        return self.spec
+    
+    def get_spec_json(self) -> str:
+        """Get OpenAPI specification as JSON string"""
+        return json.dumps(self.spec, indent=2)
+    
+    def save_spec(self, filepath: str):
+        """Save OpenAPI specification to file"""
+        with open(filepath, 'w') as f:
+            json.dump(self.spec, f, indent=2)
+    
+    def validate_spec(self) -> Dict[str, Any]:
+        """Validate OpenAPI specification"""
+        validation_result = {
+            'valid': True,
+            'errors': [],
+            'warnings': []
+        }
+        
+        # Check required fields
+        if 'openapi' not in self.spec:
+            validation_result['errors'].append('Missing openapi version')
+            validation_result['valid'] = False
+        
+        if 'info' not in self.spec:
+            validation_result['errors'].append('Missing info section')
+            validation_result['valid'] = False
+        
+        if 'paths' not in self.spec:
+            validation_result['errors'].append('Missing paths section')
+            validation_result['valid'] = False
+        
+        # Check info section
+        info = self.spec.get('info', {})
+        required_info_fields = ['title', 'version']
+        for field in required_info_fields:
+            if field not in info:
+                validation_result['errors'].append(f'Missing required info field: {field}')
+                validation_result['valid'] = False
+        
+        # Check paths
+        paths = self.spec.get('paths', {})
+        for path, path_item in paths.items():
+            for method, operation in path_item.items():
+                if method not in ['get', 'post', 'put', 'delete', 'patch', 'head', 'options']:
+                    validation_result['warnings'].append(f'Invalid HTTP method: {method} for path {path}')
+                
+                # Check operation ID
+                if 'operationId' not in operation:
+                    validation_result['warnings'].append(f'Missing operationId for {method.upper()} {path}')
+                
+                # Check responses
+                if 'responses' not in operation:
+                    validation_result['errors'].append(f'Missing responses for {method.upper()} {path}')
+                    validation_result['valid'] = False
+        
+        return validation_result
+    
+    def add_common_schemas(self):
+        """Add common schemas to OpenAPI spec"""
+        # Error response schema
+        self.add_schema('Error', {
+            'type': 'object',
+            'properties': {
+                'error': {
+                    'type': 'string',
+                    'description': 'Error message'
+                },
+                'code': {
+                    'type': 'string',
+                    'description': 'Error code'
+                },
+                'details': {
+                    'type': 'object',
+                    'description': 'Additional error details'
+                }
+            }
+        })
+        
+        # Success response schema
+        self.add_schema('Success', {
+            'type': 'object',
+            'properties': {
+                'success': {
+                    'type': 'boolean',
+                    'description': 'Operation success status'
+                },
+                'message': {
+                    'type': 'string',
+                    'description': 'Success message'
+                },
+                'data': {
+                    'type': 'object',
+                    'description': 'Response data'
+                }
+            }
+        })
+        
+        # Pagination schema
+        self.add_schema('Pagination', {
+            'type': 'object',
+            'properties': {
+                'page': {
+                    'type': 'integer',
+                    'description': 'Current page number'
+                },
+                'per_page': {
+                    'type': 'integer',
+                    'description': 'Items per page'
+                },
+                'total': {
+                    'type': 'integer',
+                    'description': 'Total number of items'
+                },
+                'pages': {
+                    'type': 'integer',
+                    'description': 'Total number of pages'
+                },
+                'has_next': {
+                    'type': 'boolean',
+                    'description': 'Has next page'
+                },
+                'has_prev': {
+                    'type': 'boolean',
+                    'description': 'Has previous page'
+                }
+            }
+        })
+        
+        # User schema
+        self.add_schema('User', {
+            'type': 'object',
+            'properties': {
+                'id': {
+                    'type': 'integer',
+                    'description': 'User ID'
+                },
+                'username': {
+                    'type': 'string',
+                    'description': 'Username'
+                },
+                'email': {
+                    'type': 'string',
+                    'format': 'email',
+                    'description': 'Email address'
+                },
+                'is_active': {
+                    'type': 'boolean',
+                    'description': 'Account active status'
+                },
+                'created_at': {
+                    'type': 'string',
+                    'format': 'date-time',
+                    'description': 'Account creation date'
+                },
+                'last_login': {
+                    'type': 'string',
+                    'format': 'date-time',
+                    'description': 'Last login date'
+                }
+            }
+        })
+        
+        # Post schema
+        self.add_schema('Post', {
+            'type': 'object',
+            'properties': {
+                'id': {
+                    'type': 'integer',
+                    'description': 'Post ID'
+                },
+                'title': {
+                    'type': 'string',
+                    'description': 'Post title'
+                },
+                'content': {
+                    'type': 'string',
+                    'description': 'Post content'
+                },
+                'author': {
+                    '$ref': '#/components/schemas/User'
+                },
+                'upvotes': {
+                    'type': 'integer',
+                    'description': 'Number of upvotes'
+                },
+                'downvotes': {
+                    'type': 'integer',
+                    'description': 'Number of downvotes'
+                },
+                'created_at': {
+                    'type': 'string',
+                    'format': 'date-time',
+                    'description': 'Post creation date'
+                },
+                'updated_at': {
+                    'type': 'string',
+                    'format': 'date-time',
+                    'description': 'Post update date'
+                }
+            }
+        })
+    
+    def add_common_responses(self):
+        """Add common responses to OpenAPI spec"""
+        # Error responses
+        self.add_response('BadRequest', {
+            'description': 'Bad request',
+            'content': {
+                'application/json': {
+                    'schema': {
+                        '$ref': '#/components/schemas/Error'
+                    }
+                }
+            }
+        })
+        
+        self.add_response('Unauthorized', {
+            'description': 'Unauthorized',
+            'content': {
+                'application/json': {
+                    'schema': {
+                        '$ref': '#/components/schemas/Error'
+                    }
+                }
+            }
+        })
+        
+        self.add_response('Forbidden', {
+            'description': 'Forbidden',
+            'content': {
+                'application/json': {
+                    'schema': {
+                        '$ref': '#/components/schemas/Error'
+                    }
+                }
+            }
+        })
+        
+        self.add_response('NotFound', {
+            'description': 'Resource not found',
+            'content': {
+                'application/json': {
+                    'schema': {
+                        '$ref': '#/components/schemas/Error'
+                    }
+                }
+            }
+        })
+        
+        self.add_response('InternalServerError', {
+            'description': 'Internal server error',
+            'content': {
+                'application/json': {
+                    'schema': {
+                        '$ref': '#/components/schemas/Error'
+                    }
+                }
+            }
+        })
+    
+    def add_common_security_schemes(self):
+        """Add common security schemes to OpenAPI spec"""
+        # API Key authentication
+        self.add_security_scheme(name='ApiKeyAuth', scheme_type='apiKey', 
+                                name_param='X-API-Key',
+                                location='header',
+                                description='API key for authentication')
+        
+        # JWT authentication
+        self.add_security_scheme(name='JWTAuth', scheme_type='http',
+                                scheme='bearer',
+                                bearerFormat='JWT',
+                                description='JWT token for authentication')
+        
+        # OAuth2 authentication
+        self.add_security_scheme(name='OAuth2', scheme_type='oauth2',
+                                flows={
+                                    'authorizationCode': {
+                                        'authorizationUrl': '/api/auth/oauth2/authorize',
+                                        'tokenUrl': '/api/auth/oauth2/token',
+                                        'scopes': {
+                                            'read': 'Read access',
+                                            'write': 'Write access',
+                                            'admin': 'Admin access'
+                                        }
+                                    }
+                                },
+                                description='OAuth2 authentication')
+    
+    def initialize_default_components(self):
+        """Initialize default components for OpenAPI spec"""
+        self.add_common_schemas()
+        self.add_common_responses()
+        self.add_common_security_schemes()
+        
+        # Add default tags
+        self.add_tag('Authentication', 'Authentication and authorization endpoints')
+        self.add_tag('Posts', 'Post management endpoints')
+        self.add_tag('Users', 'User management endpoints')
+        self.add_tag('Admin', 'Admin-only endpoints')
+        self.add_tag('Public', 'Publicly accessible endpoints')
+
+
+def create_openapi_service() -> OpenAPIService:
+    """Create and initialize OpenAPI service"""
+    service = OpenAPIService(
+        title="Auto Bot Solutions Forum API",
+        version="1.0.0",
+        description="RESTful API for Auto Bot Solutions Forum with authentication, caching, and advanced features"
+    )
+    
+    # Initialize default components
+    service.initialize_default_components()
+    
+    return service

@@ -1,0 +1,215 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Email Configuration{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">⚙️ Email Configuration</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <div class="btn-group me-2">
+            <a href="{{ url_for('admin_email.email_dashboard') }}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">SMTP Configuration</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-sm">
+                    <tr>
+                        <th>Server</th>
+                        <td>{{ config.MAIL_SERVER or 'Not configured' }}</td>
+                    </tr>
+                    <tr>
+                        <th>Port</th>
+                        <td>{{ config.MAIL_PORT or 'Not configured' }}</td>
+                    </tr>
+                    <tr>
+                        <th>Use TLS</th>
+                        <td>
+                            {% if config.MAIL_USE_TLS is not none %}
+                                <span class="badge bg-{{ 'success' if config.MAIL_USE_TLS else 'secondary' }}">
+                                    {{ 'Enabled' if config.MAIL_USE_TLS else 'Disabled' }}
+                                </span>
+                            {% else %}
+                                <span class="badge bg-secondary">Not configured</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Use SSL</th>
+                        <td>
+                            {% if config.MAIL_USE_SSL is not none %}
+                                <span class="badge bg-{{ 'success' if config.MAIL_USE_SSL else 'secondary' }}">
+                                    {{ 'Enabled' if config.MAIL_USE_SSL else 'Disabled' }}
+                                </span>
+                            {% else %}
+                                <span class="badge bg-secondary">Not configured</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Username</th>
+                        <td>{{ config.MAIL_USERNAME or 'Not configured' }}</td>
+                    </tr>
+                    <tr>
+                        <th>Default Sender</th>
+                        <td>{{ config.MAIL_DEFAULT_SENDER or 'Not configured' }}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Queue Configuration</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-sm">
+                    <tr>
+                        <th>Queue Enabled</th>
+                        <td>
+                            {% if config.MAIL_QUEUE_ENABLED is not none %}
+                                <span class="badge bg-{{ 'success' if config.MAIL_QUEUE_ENABLED else 'secondary' }}">
+                                    {{ 'Enabled' if config.MAIL_QUEUE_ENABLED else 'Disabled' }}
+                                </span>
+                            {% else %}
+                                <span class="badge bg-secondary">Not configured</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Queue URL</th>
+                        <td>{{ config.MAIL_QUEUE_URL or 'Not configured' }}</td>
+                    </tr>
+                    <tr>
+                        <th>Retry Attempts</th>
+                        <td>{{ config.MAIL_RETRY_ATTEMPTS or 'Not configured' }}</td>
+                    </tr>
+                    <tr>
+                        <th>Retry Delay</th>
+                        <td>{{ config.MAIL_RETRY_DELAY or 'Not configured' }} seconds</td>
+                    </tr>
+                    <tr>
+                        <th>Max Emails</th>
+                        <td>{{ config.MAIL_MAX_EMAILS or 'Not configured' }}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">System Status</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <h6>Email Sending</h6>
+                        {% if config.MAIL_SUPPRESS_SEND %}
+                            <span class="badge bg-warning">
+                                <i class="fas fa-pause"></i> Suppressed (Development Mode)
+                            </span>
+                            <p class="text-muted mt-2">
+                                Emails are not being sent. Set MAIL_SUPPRESS_SEND=false to enable sending.
+                            </p>
+                        {% else %}
+                            <span class="badge bg-success">
+                                <i class="fas fa-check"></i> Enabled
+                            </span>
+                            <p class="text-muted mt-2">
+                                Emails will be sent to actual recipients.
+                            </p>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-4">
+                        <h6>Queue Processing</h6>
+                        {% if config.MAIL_QUEUE_ENABLED %}
+                            <span class="badge bg-success">
+                                <i class="fas fa-play"></i> Active
+                            </span>
+                            <p class="text-muted mt-2">
+                                Email queue is enabled and processing.
+                            </p>
+                        {% else %}
+                            <span class="badge bg-secondary">
+                                <i class="fas fa-stop"></i> Disabled
+                            </span>
+                            <p class="text-muted mt-2">
+                                Emails will be sent immediately without queuing.
+                            </p>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-4">
+                        <h6>Error Handling</h6>
+                        <span class="badge bg-info">
+                            <i class="fas fa-redo"></i> {{ config.MAIL_RETRY_ATTEMPTS or 'Default' }} Retries
+                        </span>
+                        <p class="text-muted mt-2">
+                            Failed emails will be retried {{ config.MAIL_RETRY_DELAY or 60 }} seconds apart.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Environment Variables</h5>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info">
+                    <h6><i class="fas fa-info-circle"></i> Configuration Setup</h6>
+                    <p class="mb-2">
+                        To configure email settings, set the following environment variables in your <code>.env</code> file:
+                    </p>
+                    <pre class="bg-light p-3 rounded"><code># SMTP Configuration
+MAIL_SERVER=smtp.gmail.com
+MAIL_PORT=587
+MAIL_USE_TLS=true
+MAIL_USE_SSL=false
+MAIL_USERNAME=your-email@gmail.com
+MAIL_PASSWORD=your-app-password
+MAIL_DEFAULT_SENDER=your-email@gmail.com
+
+# Queue Configuration
+MAIL_QUEUE_ENABLED=true
+MAIL_QUEUE_URL=redis://localhost:6379/0
+MAIL_RETRY_ATTEMPTS=3
+MAIL_RETRY_DELAY=60
+MAIL_MAX_EMAILS=10
+
+# Development/Production
+MAIL_SUPPRESS_SEND=false</code></pre>
+                </div>
+                
+                <div class="alert alert-warning mt-3">
+                    <h6><i class="fas fa-exclamation-triangle"></i> Important Notes</h6>
+                    <ul class="mb-0">
+                        <li>For Gmail, use an App Password instead of your regular password</li>
+                        <li>Ensure Redis is running if queue functionality is enabled</li>
+                        <li>Set MAIL_SUPPRESS_SEND=false in production environments</li>
+                        <li>Test email functionality before deploying to production</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

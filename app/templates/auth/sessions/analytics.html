@@ -1,0 +1,247 @@
+{% extends "base.html" %}
+
+{% block title %}Session Analytics - {{ config.SITE_NAME or 'Forum' }}{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3>
+                        <i class="fas fa-chart-line"></i> Session Analytics
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <!-- Filter Form -->
+                    <form method="GET" class="mb-4">
+                        <div class="row">
+                            <div class="col-md-4">
+                                {{ form.event_type(class="form-select") }}
+                            </div>
+                            <div class="col-md-4">
+                                {{ form.severity(class="form-select") }}
+                            </div>
+                            <div class="col-md-4">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-filter"></i> Filter
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                    
+                    <!-- Analytics Overview -->
+                    {% if analytics %}
+                        <div class="row mb-4">
+                            <div class="col-md-3">
+                                <div class="card bg-primary text-white">
+                                    <div class="card-body text-center">
+                                        <h4>{{ analytics.total_sessions }}</h4>
+                                        <small>Total Sessions</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card bg-success text-white">
+                                    <div class="card-body text-center">
+                                        <h4>{{ analytics.devices|length }}</h4>
+                                        <small>Devices</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card bg-info text-white">
+                                    <div class="card-body text-center">
+                                        <h4>{{ analytics.locations|length }}</h4>
+                                        <small>Locations</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card bg-warning text-white">
+                                    <div class="card-body text-center">
+                                        <h4>{{ security_events|length }}</h4>
+                                        <small>Security Events</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Device Usage -->
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5>Device Usage</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        {% for device, count in analytics.devices.items() %}
+                                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                                <span>{{ device[:40] + '...' if device|length > 40 else device }}</span>
+                                                <div>
+                                                    <span class="badge bg-primary">{{ count }}</span>
+                                                    <div class="progress" style="width: 100px; height: 8px;">
+                                                        <div class="progress-bar" style="width: {{ (count / analytics.total_sessions * 100)|round }}%"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Location Usage -->
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5>Location Usage</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        {% for location, count in analytics.locations.items() %}
+                                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                                <span>{{ location }}</span>
+                                                <div>
+                                                    <span class="badge bg-info">{{ count }}</span>
+                                                    <div class="progress" style="width: 100px; height: 8px;">
+                                                        <div class="progress-bar bg-info" style="width: {{ (count / analytics.total_sessions * 100)|round }}%"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="fas fa-chart-line fa-3x text-muted mb-3"></i>
+                            <h4 class="text-muted">No Analytics Data</h4>
+                            <p class="text-muted">
+                                No session analytics available for the selected period.
+                            </p>
+                        </div>
+                    {% endif %}
+                    
+                    <!-- Security Events -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h5>Recent Security Events</h5>
+                        </div>
+                        <div class="card-body">
+                            {% if security_events %}
+                                <div class="table-responsive">
+                                    <table class="table table-sm">
+                                        <thead>
+                                            <tr>
+                                                <th>Event</th>
+                                                <th>Severity</th>
+                                                <th>Description</th>
+                                                <th>IP Address</th>
+                                                <th>Time</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for event in security_events %}
+                                                <tr>
+                                                    <td>
+                                                        <span class="badge bg-{{ 'danger' if event.severity == 'critical' else 'warning' if event.severity == 'warning' else 'info' }}">
+                                                            {{ event.event_type.replace('_', ' ').title() }}
+                                                        </span>
+                                                    </td>
+                                                    <td>
+                                                        <span class="badge bg-{{ 'danger' if event.severity == 'critical' else 'warning' if event.severity == 'warning' else 'secondary' }}">
+                                                            {{ event.severity.upper() }}
+                                                        </span>
+                                                    </td>
+                                                    <td>
+                                                        <small>{{ event.description[:50] + '...' if event.description|length > 50 else event.description }}</small>
+                                                    </td>
+                                                    <td>
+                                                        <code>{{ event.ip_address or 'Unknown' }}</code>
+                                                    </td>
+                                                    <td>
+                                                        <small class="text-muted">
+                                                            {{ event.created_at.strftime('%b %d, %H:%M') }}
+                                                        </small>
+                                                    </td>
+                                                </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            {% else %}
+                                <p class="text-muted">No security events found.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5>
+                        <i class="fas fa-info-circle"></i> Analytics Info
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <h6>Session Metrics</h6>
+                    <ul class="list-unstyled">
+                        <li class="mb-2">
+                            <i class="fas fa-desktop text-primary"></i>
+                            <strong>Devices:</strong> Track all devices used
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-map-marker-alt text-info"></i>
+                            <strong>Locations:</strong> Monitor login locations
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-clock text-success"></i>
+                            <strong>Activity:</strong> Session duration tracking
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-shield-alt text-warning"></i>
+                            <strong>Security:</strong> Event monitoring
+                        </li>
+                    </ul>
+                    
+                    <hr>
+                    
+                    <h6>Data Privacy</h6>
+                    <p class="small text-muted">
+                        Your session data is stored securely and used only for security monitoring and improving your experience.
+                    </p>
+                    
+                    <div class="mt-3">
+                        <a href="{{ url_for('session.export_sessions') }}" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-download"></i> Export Data
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h5>
+                        <i class="fas fa-cog"></i> Quick Actions
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="{{ url_for('session.manage_sessions') }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-desktop"></i> Manage Sessions
+                        </a>
+                        <a href="{{ url_for('session.security_settings') }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-shield-alt"></i> Security Settings
+                        </a>
+                        <a href="{{ url_for('session.session_preferences') }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-cog"></i> Preferences
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

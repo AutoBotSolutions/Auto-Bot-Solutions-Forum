@@ -22,6 +22,8 @@ This guide provides detailed instructions for deploying the AutoBot Solutions Fo
 - Git
 - At least 2GB RAM
 - 1GB free disk space
+- Redis server (for email queue and session storage)
+- SMTP email provider (for email functionality)
 
 ### Quick Setup
 
@@ -42,13 +44,29 @@ This guide provides detailed instructions for deploying the AutoBot Solutions Fo
    pip install -r requirements.txt
    ```
 
-4. **Configure environment**
+4. **Install Redis server**
    ```bash
-   cp .env.example .env
-   # Edit .env if needed (defaults work for development)
+   # Ubuntu/Debian
+   sudo apt-get update
+   sudo apt-get install redis-server
+   sudo systemctl start redis-server
+   sudo systemctl enable redis-server
+   
+   # macOS
+   brew install redis
+   brew services start redis
+   
+   # Windows
+   # Download Redis for Windows or use WSL
    ```
 
-5. **Initialize database**
+5. **Configure environment**
+   ```bash
+   cp .env.example .env
+   # Edit .env with your configuration
+   ```
+
+6. **Initialize database**
    ```bash
    python init_db.py
    ```
@@ -56,6 +74,537 @@ This guide provides detailed instructions for deploying the AutoBot Solutions Fo
    This will:
    - Create SQLite database (forum.db)
    - Create default admin user (username: admin, password: admin123)
+
+7. **Run the application**
+   ```bash
+   python run.py
+   ```
+
+   The application will be available at `http://localhost:5000`
+
+## Environment Configuration
+
+### Required Environment Variables
+
+Create a `.env` file with the following configuration:
+
+```bash
+# Basic Flask Configuration
+SECRET_KEY=your-super-secret-key-here
+WTF_CSRF_SECRET_KEY=your-csrf-secret-key-here
+FLASK_ENV=production
+
+# Database Configuration
+DATABASE_URL=sqlite:///forum.db
+
+# Email Configuration (Required for email functionality)
+MAIL_SERVER=smtp.gmail.com
+MAIL_PORT=587
+MAIL_USE_TLS=true
+MAIL_USE_SSL=false
+MAIL_USERNAME=your-email@gmail.com
+MAIL_PASSWORD=your-app-password
+MAIL_DEFAULT_SENDER=your-email@gmail.com
+MAIL_MAX_EMAILS=10
+MAIL_SUPPRESS_SEND=false
+
+# Email Queue Configuration
+MAIL_QUEUE_ENABLED=true
+MAIL_QUEUE_URL=redis://localhost:6379/0
+MAIL_RETRY_ATTEMPTS=3
+MAIL_RETRY_DELAY=60
+
+# Two-Factor Authentication Configuration
+TWO_FA_ENABLED=true
+TWO_FA_ISSUER=AutoBotSolutions Forum
+TWO_FA_ENCRYPTION_KEY=your-encryption-key-here
+TWO_FA_REQUIRED_FOR_ADMIN=false
+TWO_FA_REMEMBER_DEVICE_DAYS=30
+
+# Session Security
+SESSION_COOKIE_SECURE=true
+SESSION_COOKIE_HTTPONLY=true
+SESSION_COOKIE_SAMESITE=Lax
+PERMANENT_SESSION_LIFETIME=3600
+```
+
+### Generate Security Keys
+
+```bash
+# Generate SECRET_KEY
+python -c "import secrets; print(f'SECRET_KEY={secrets.token_hex(32)}')"
+
+# Generate CSRF_SECRET_KEY
+python -c "import secrets; print(f'WTF_CSRF_SECRET_KEY={secrets.token_hex(32)}')"
+
+# Generate 2FA_ENCRYPTION_KEY
+python -c "from cryptography.fernet import Fernet; print(f'TWO_FA_ENCRYPTION_KEY={Fernet.generate_key().decode()}')"
+```
+
+### Email Provider Setup
+
+#### Gmail Configuration
+1. Enable 2FA on your Gmail account
+2. Generate an App Password:
+   - Go to Google Account settings
+   - Security → 2-Step Verification → App passwords
+   - Generate new app password for "AutoBot Forum"
+3. Use the app password in `MAIL_PASSWORD`
+
+#### SendGrid Configuration
+```bash
+MAIL_SERVER=smtp.sendgrid.net
+MAIL_PORT=587
+MAIL_USE_TLS=true
+MAIL_USERNAME=apikey
+MAIL_PASSWORD=your-sendgrid-api-key
+```
+
+#### Outlook Configuration
+```bash
+MAIL_SERVER=smtp-mail.outlook.com
+MAIL_PORT=587
+MAIL_USE_TLS=true
+MAIL_USERNAME=your-outlook@outlook.com
+MAIL_PASSWORD=your-password
+```
+
+## Dependencies
+
+### Core Authentication Dependencies
+```txt
+Flask==3.0.0
+Flask-SQLAlchemy==3.1.1
+Flask-Login==0.6.3
+Flask-WTF==1.2.1
+Flask-Migrate==4.0.5
+Flask-Limiter==3.5.0
+Werkzeug==3.0.1
+Jinja2==3.1.2
+```
+
+### Email Integration Dependencies
+```txt
+redis==5.0.1
+celery==5.3.4
+```
+
+### Two-Factor Authentication Dependencies
+```txt
+pyotp==2.9.0
+qrcode[pil]==7.4.2
+cryptography==41.0.7
+```
+
+### Additional Dependencies
+```txt
+requests==2.31.0
+gunicorn==21.2.0
+PyYAML==6.0.1
+psutil==5.9.6
+```
+
+### Install Dependencies
+```bash
+# Install all dependencies
+pip install -r requirements.txt
+
+# Or install specific authentication dependencies
+pip install Flask Flask-SQLAlchemy Flask-Login Flask-WTF Flask-Migrate Flask-Limiter
+pip install redis celery pyotp "qrcode[pil]" cryptography
+```
+
+## Production Deployment
+
+### System Requirements
+
+- **CPU**: 2+ cores recommended
+- **RAM**: 4GB+ recommended
+- **Storage**: 20GB+ SSD recommended
+- **OS**: Ubuntu 20.04+ / CentOS 8+ / Debian 11+
+- **Python**: 3.8+
+- **Redis**: 6.0+
+- **Database**: PostgreSQL 12+ (production) / SQLite (development)
+
+### Production Setup Steps
+
+1. **Server Preparation**
+   ```bash
+   # Update system
+   sudo apt update && sudo apt upgrade -y
+   
+   # Install Python and dependencies
+   sudo apt install python3 python3-pip python3-venv nginx redis-server postgresql
+   
+   # Create application user
+   sudo adduser --system --group appuser
+   ```
+
+2. **Application Setup**
+   ```bash
+   # Clone repository
+   cd /var/www
+   sudo git clone https://github.com/AutoBotSolutions/repo-forum.git
+   sudo chown -R appuser:appuser repo-forum
+   cd repo-forum
+   
+   # Create virtual environment
+   sudo -u appuser python3 -m venv venv
+   sudo -u appuser venv/bin/pip install -r requirements.txt
+   ```
+
+3. **Database Setup**
+   ```bash
+   # PostgreSQL setup
+   sudo -u postgres createuser appuser
+   sudo -u postgres createdb -O appuser forum_db
+   
+   # Configure database URL in .env
+   DATABASE_URL=postgresql://appuser:password@localhost/forum_db
+   ```
+
+4. **Redis Setup**
+   ```bash
+   # Configure Redis
+   sudo nano /etc/redis/redis.conf
+   
+   # Update configuration
+   bind 127.0.0.1
+   port 6379
+   requirepass your-redis-password
+   
+   # Restart Redis
+   sudo systemctl restart redis-server
+   sudo systemctl enable redis-server
+   ```
+
+5. **Environment Configuration**
+   ```bash
+   # Create production .env file
+   sudo -u appuser cp .env.example .env
+   sudo -u appuser nano .env
+   
+   # Set production values
+   FLASK_ENV=production
+   SECRET_KEY=your-production-secret-key
+   MAIL_SERVER=your-smtp-server
+   TWO_FA_ENCRYPTION_KEY=your-production-encryption-key
+   ```
+
+6. **Application Services**
+   ```bash
+   # Create systemd service file
+   sudo nano /etc/systemd/system/forum.service
+   ```
+
+   ```ini
+   [Unit]
+   Description=AutoBot Solutions Forum
+   After=network.target
+
+   [Service]
+   User=appuser
+   Group=appuser
+   WorkingDirectory=/var/www/repo-forum
+   Environment=PATH=/var/www/repo-forum/venv/bin
+   ExecStart=/var/www/repo-forum/venv/bin/gunicorn --workers 3 --bind unix:forum.sock -m 007 run:app
+   Restart=always
+
+   [Install]
+   WantedBy=multi-user.target
+   ```
+
+   ```bash
+   # Enable and start service
+   sudo systemctl daemon-reload
+   sudo systemctl enable forum
+   sudo systemctl start forum
+   ```
+
+7. **Nginx Configuration**
+   ```bash
+   sudo nano /etc/nginx/sites-available/forum
+   ```
+
+   ```nginx
+   server {
+       listen 80;
+       server_name your-domain.com;
+       return 301 https://$server_name$request_uri;
+   }
+
+   server {
+       listen 443 ssl http2;
+       server_name your-domain.com;
+
+       ssl_certificate /path/to/ssl/cert.pem;
+       ssl_certificate_key /path/to/ssl/key.pem;
+
+       location / {
+           include proxy_params;
+           proxy_pass http://unix:/var/www/repo-forum/forum.sock;
+       }
+
+       location /static {
+           alias /var/www/repo-forum/app/static;
+       }
+   }
+   ```
+
+   ```bash
+   # Enable site
+   sudo ln -s /etc/nginx/sites-available/forum /etc/nginx/sites-enabled/
+   sudo nginx -t
+   sudo systemctl restart nginx
+   ```
+
+## SSL Configuration
+
+### Let's Encrypt Setup
+```bash
+# Install Certbot
+sudo apt install certbot python3-certbot-nginx
+
+# Generate SSL certificate
+sudo certbot --nginx -d your-domain.com
+
+# Auto-renewal
+sudo crontab -e
+# Add: 0 12 * * * /usr/bin/certbot renew --quiet
+```
+
+## Security Hardening
+
+### Firewall Configuration
+```bash
+# Configure UFW
+sudo ufw enable
+sudo ufw allow ssh
+sudo ufw allow 'Nginx Full'
+sudo ufw deny 6379  # Redis (internal only)
+```
+
+### Security Headers
+```bash
+# Add security headers to Nginx
+sudo nano /etc/nginx/snippets/security-headers.conf
+```
+
+```nginx
+add_header X-Frame-Options "SAMEORIGIN" always;
+add_header X-XSS-Protection "1; mode=block" always;
+add_header X-Content-Type-Options "nosniff" always;
+add_header Referrer-Policy "no-referrer-when-downgrade" always;
+add_header Content-Security-Policy "default-src 'self' http: https: data: blob: 'unsafe-inline'" always;
+```
+
+## Monitoring and Logging
+
+### Application Logging
+```bash
+# Configure logging
+sudo nano /var/www/repo-forum/logging.conf
+```
+
+```ini
+[loggers]
+keys=root,forum
+
+[handlers]
+keys=consoleHandler,fileHandler
+
+[formatters]
+keys=simpleFormatter
+
+[logger_root]
+level=INFO
+handlers=consoleHandler,fileHandler
+
+[logger_forum]
+level=INFO
+handlers=consoleHandler,fileHandler
+qualname=forum
+propagate=0
+
+[handler_consoleHandler]
+class=StreamHandler
+level=INFO
+formatter=simpleFormatter
+args=(sys.stdout,)
+
+[handler_fileHandler]
+class=FileHandler
+level=INFO
+formatter=simpleFormatter
+args=('/var/log/forum/app.log',)
+
+[formatter_simpleFormatter]
+format=%(asctime)s - %(name)s - %(levelname)s - %(message)s
+```
+
+### Log Rotation
+```bash
+sudo nano /etc/logrotate.d/forum
+```
+
+```
+/var/log/forum/*.log {
+    daily
+    missingok
+    rotate 52
+    compress
+    delaycompress
+    notifempty
+    create 644 appuser appuser
+    postrotate
+        systemctl reload forum
+    endscript
+}
+```
+
+## Backup Strategy
+
+### Database Backup
+```bash
+# Create backup script
+sudo nano /usr/local/bin/backup-forum.sh
+```
+
+```bash
+#!/bin/bash
+BACKUP_DIR="/var/backups/forum"
+DATE=$(date +%Y%m%d_%H%M%S)
+DB_NAME="forum_db"
+
+# Create backup directory
+mkdir -p $BACKUP_DIR
+
+# Database backup
+pg_dump $DB_NAME > $BACKUP_DIR/db_backup_$DATE.sql
+
+# Application files backup
+tar -czf $BACKUP_DIR/app_backup_$DATE.tar.gz /var/www/repo-forum
+
+# Clean old backups (keep 30 days)
+find $BACKUP_DIR -name "*.sql" -mtime +30 -delete
+find $BACKUP_DIR -name "*.tar.gz" -mtime +30 -delete
+```
+
+```bash
+# Make executable and schedule
+sudo chmod +x /usr/local/bin/backup-forum.sh
+sudo crontab -e
+# Add: 0 2 * * * /usr/local/bin/backup-forum.sh
+```
+
+## Testing Deployment
+
+### Pre-deployment Checklist
+- [ ] All environment variables configured
+- [ ] Database connection working
+- [ ] Redis connection working
+- [ ] Email sending tested
+- [ ] 2FA functionality tested
+- [ ] SSL certificate installed
+- [ ] Security headers configured
+- [ ] Logging configured
+- [ ] Backup script tested
+
+### Post-deployment Verification
+```bash
+# Test application
+curl -I https://your-domain.com
+
+# Test database connection
+python -c "
+from app import create_app
+app = create_app()
+with app.app_context():
+    from app.models import User
+    print(f'Database connected: {User.query.count()} users')
+"
+
+# Test Redis connection
+redis-cli ping
+
+# Test email sending
+python -c "
+from app import create_app
+from app.email.queue import EmailQueueManager
+app = create_app()
+with app.app_context():
+    stats = EmailQueueManager.get_queue_statistics()
+    print(f'Email queue status: {stats}')
+"
+
+# Test 2FA functionality
+python -c "
+from app import create_app
+from app.auth.two_factor import two_fa_service
+app = create_app()
+with app.app_context():
+    secret = two_fa_service.generate_totp_secret()
+    print(f'2FA working: secret generated')
+"
+```
+
+## Troubleshooting
+
+### Common Issues
+
+#### Application Won't Start
+```bash
+# Check logs
+sudo journalctl -u forum -f
+
+# Check permissions
+sudo -u appuser ls -la /var/www/repo-forum
+
+# Check environment
+sudo -u appuser cat .env
+```
+
+#### Email Not Working
+```bash
+# Test SMTP connection
+python -c "
+import smtplib
+server = smtplib.SMTP('smtp.gmail.com', 587)
+server.starttls()
+server.login('your-email@gmail.com', 'your-password')
+print('SMTP connection successful')
+"
+
+# Check Redis
+redis-cli ping
+```
+
+#### 2FA Not Working
+```bash
+# Check 2FA configuration
+python -c "
+from app import create_app
+app = create_app()
+with app.app_context():
+    print(f'2FA enabled: {app.config.get(\"TWO_FA_ENABLED\")}')
+    print(f'Encryption key configured: {bool(app.config.get(\"TWO_FA_ENCRYPTION_KEY\"))}')
+"
+```
+
+### Performance Monitoring
+```bash
+# Monitor system resources
+htop
+iotop
+df -h
+
+# Monitor application
+sudo journalctl -u forum -f
+tail -f /var/log/forum/app.log
+
+# Monitor Redis
+redis-cli info stats
+```
    - Add 5 initial categories
    - Add 5 initial badges
 

@@ -1,0 +1,22 @@
+Email Verification - Auto Bot Solutions Forum
+===============================================
+
+Hello {{ user.username }},
+
+Thank you for registering at Auto Bot Solutions Forum! To complete your registration and activate your account, please verify your email address.
+
+Please visit the following link to verify your email:
+{{ verification_url }}
+
+Alternatively, you can use this verification code:
+{{ user.verification_token }}
+
+Important Notes:
+- This verification link will expire in 24 hours for security reasons
+- If you didn't register for an account at Auto Bot Solutions Forum, you can safely ignore this email
+
+If you have any questions, please contact our support team.
+
+Thank you,
+Auto Bot Solutions Forum Team
+© 2026 Auto Bot Solutions. All rights reserved.

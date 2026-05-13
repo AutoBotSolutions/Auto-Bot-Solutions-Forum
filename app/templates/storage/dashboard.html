@@ -1,0 +1,174 @@
+{% extends "base.html" %}
+
+{% block title %}File Management Dashboard{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="mb-4">
+                <i class="fas fa-folder-open"></i>
+                File Management Dashboard
+            </h1>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Total Files</h5>
+                    <h2 class="display-4">{{ total_files }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Storage Used</h5>
+                    <h2 class="display-4">{{ "%.1f"|format(total_size / 1024 / 1024) }} MB</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Public Files</h5>
+                    <h2 class="display-4">{{ public_files }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Shared Files</h5>
+                    <h2 class="display-4">{{ shared_files }}</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Quick Actions</h5>
+                </div>
+                <div class="card-body">
+                    <a href="{{ url_for('storage.upload_file') }}" class="btn btn-primary me-2">
+                        <i class="fas fa-upload"></i> Upload File
+                    </a>
+                    <a href="{{ url_for('storage.files') }}" class="btn btn-outline-primary me-2">
+                        <i class="fas fa-list"></i> Browse Files
+                    </a>
+                    <a href="{{ url_for('storage.analytics') }}" class="btn btn-outline-success me-2">
+                        <i class="fas fa-chart-bar"></i> Analytics
+                    </a>
+                    <a href="{{ url_for('storage.upload_file') }}" class="btn btn-outline-info">
+                        <i class="fas fa-link"></i> Share Files
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Recent Uploads</h5>
+                </div>
+                <div class="card-body">
+                    {% if recent_files %}
+                        <div class="list-group list-group-flush">
+                            {% for file in recent_files %}
+                            <div class="list-group-item">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h6 class="mb-1">
+                                        <a href="{{ url_for('storage.file_detail', file_id=file.id) }}">{{ file.original_filename }}</a>
+                                    </h6>
+                                    <small>{{ file.upload_date.strftime('%Y-%m-%d %H:%M') }}</small>
+                                </div>
+                                <div class="d-flex align-items-center">
+                                    <span class="badge bg-{{ 'primary' if file.is_public else 'secondary' }} me-2">
+                                        {{ 'Public' if file.is_public else 'Private' }}
+                                    </span>
+                                    <span class="badge bg-info me-2">{{ file.file_type.title() }}</span>
+                                    <small class="text-muted">{{ "%.1f"|format(file.file_size / 1024) }} KB</small>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted">No recent uploads found.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Storage Usage by Type</h5>
+                </div>
+                <div class="card-body">
+                    {% if storage_by_type %}
+                        <div class="list-group list-group-flush">
+                            {% for type_data in storage_by_type %}
+                            <div class="list-group-item">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-1">{{ type_data.file_type.title() }}</h6>
+                                        <small class="text-muted">{{ type_data.count }} files</small>
+                                    </div>
+                                    <div class="text-end">
+                                        <span class="badge bg-primary">{{ "%.1f"|format(type_data.size / 1024 / 1024) }} MB</span>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted">No storage data available.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Popular Files -->
+    {% if popular_files %}
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Popular Files</h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group list-group-flush">
+                        {% for file in popular_files %}
+                        <div class="list-group-item">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-1">
+                                        <a href="{{ url_for('storage.file_detail', file_id=file.id) }}">{{ file.original_filename }}</a>
+                                    </h6>
+                                    <small class="text-muted">Uploaded {{ file.upload_date.strftime('%Y-%m-%d') }}</small>
+                                </div>
+                                <div class="text-end">
+                                    <span class="badge bg-success">{{ file.download_count }} downloads</span>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

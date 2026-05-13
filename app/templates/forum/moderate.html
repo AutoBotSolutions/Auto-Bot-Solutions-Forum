@@ -1,0 +1,232 @@
+{% extends "base.html" %}
+
+{% block title %}Moderate Posts{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0">
+                        <i class="fas fa-shield-alt me-2"></i>Moderate Posts
+                    </h4>
+                    <span class="badge bg-warning">{{ posts|length }} posts flagged</span>
+                </div>
+                <div class="card-body">
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+
+                    {% if posts %}
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Title</th>
+                                        <th>Author</th>
+                                        <th>Created</th>
+                                        <th>Flagged</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for post in posts %}
+                                    <tr>
+                                        <td>
+                                            <a href="{{ url_for('forum.post', post_id=post.id) }}" class="text-decoration-none">
+                                                {{ post.title }}
+                                            </a>
+                                            {% if post.attachment %}
+                                                <i class="fas fa-paperclip text-muted ms-1"></i>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <a href="{{ url_for('main.profile', username=post.user.username) }}" class="text-decoration-none">
+                                                {{ post.user.username }}
+                                            </a>
+                                        </td>
+                                        <td>
+                                            <small>{{ post.created_at.strftime('%Y-%m-%d %H:%M') }}</small>
+                                        </td>
+                                        <td>
+                                            {% if post.flagged_at %}
+                                                <small>{{ post.flagged_at.strftime('%Y-%m-%d %H:%M') }}</small>
+                                            {% else %}
+                                                <small>N/A</small>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-{{ 'danger' if post.is_flagged else 'success' }}">
+                                                {{ post.moderation_status|title }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <div class="btn-group" role="group">
+                                                <button type="button" class="btn btn-sm btn-outline-primary" 
+                                                        data-bs-toggle="modal" 
+                                                        data-bs-target="#viewModal{{ post.id }}">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                                
+                                                {% if post.is_flagged %}
+                                                <form method="POST" action="{{ url_for('forum.moderate_post', post_id=post.id, action='approve') }}" 
+                                                      class="d-inline">
+                                                    <button type="submit" class="btn btn-sm btn-outline-success" 
+                                                            onclick="return confirm('Are you sure you want to approve this post?')">
+                                                        <i class="fas fa-check"></i>
+                                                    </button>
+                                                </form>
+                                                {% endif %}
+                                                
+                                                <form method="POST" action="{{ url_for('forum.moderate_post', post_id=post.id, action='delete') }}" 
+                                                      class="d-inline">
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger" 
+                                                            onclick="return confirm('Are you sure you want to delete this post? This action cannot be undone.')">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
+                            <h5>No posts to moderate</h5>
+                            <p class="text-muted">All posts are currently approved and don't require moderation.</p>
+                            <a href="{{ url_for('forum.index') }}" class="btn btn-primary">
+                                <i class="fas fa-arrow-left me-1"></i>Back to Forum
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modals for viewing post details -->
+{% for post in posts %}
+<div class="modal fade" id="viewModal{{ post.id }}" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">{{ post.title }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <strong>Author:</strong>
+                        <a href="{{ url_for('main.profile', username=post.user.username) }}" class="text-decoration-none">
+                            {{ post.user.username }}
+                        </a>
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Created:</strong> {{ post.created_at.strftime('%Y-%m-%d %H:%M') }}
+                    </div>
+                </div>
+                
+                {% if post.moderation_reason %}
+                <div class="alert alert-warning">
+                    <strong>Moderation Reason:</strong> {{ post.moderation_reason }}
+                </div>
+                {% endif %}
+                
+                <div class="mb-3">
+                    <strong>Content:</strong>
+                    <div class="border rounded p-3 mt-2">
+                        {{ post.content|nl2br }}
+                    </div>
+                </div>
+                
+                {% if post.attachment %}
+                <div class="mb-3">
+                    <strong>Attachment:</strong>
+                    <div class="mt-2">
+                        <a href="{{ url_for('static', filename='uploads/' + post.attachment) }}" 
+                           target="_blank" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-download me-1"></i>{{ post.attachment }}
+                        </a>
+                    </div>
+                </div>
+                {% endif %}
+                
+                <div class="row">
+                    <div class="col-md-4">
+                        <strong>Comments:</strong> {{ post.comments.count() }}
+                    </div>
+                    <div class="col-md-4">
+                        <strong>Upvotes:</strong> {{ post.upvotes }}
+                    </div>
+                    <div class="col-md-4">
+                        <strong>Downvotes:</strong> {{ post.downvotes }}
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <a href="{{ url_for('forum.post', post_id=post.id) }}" class="btn btn-primary">
+                    <i class="fas fa-external-link-alt me-1"></i>View Post
+                </a>
+                {% if post.is_flagged %}
+                <form method="POST" action="{{ url_for('forum.moderate_post', post_id=post.id, action='approve') }}" 
+                      class="d-inline">
+                    <button type="submit" class="btn btn-success" 
+                            onclick="return confirm('Are you sure you want to approve this post?')">
+                        <i class="fas fa-check me-1"></i>Approve Post
+                    </button>
+                </form>
+                {% endif %}
+                <form method="POST" action="{{ url_for('forum.moderate_post', post_id=post.id, action='delete') }}" 
+                      class="d-inline">
+                    <button type="submit" class="btn btn-danger" 
+                            onclick="return confirm('Are you sure you want to delete this post? This action cannot be undone.')">
+                        <i class="fas fa-trash me-1"></i>Delete Post
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Auto-refresh moderation queue every 30 seconds
+let refreshInterval = setInterval(function() {
+    location.reload();
+}, 30000);
+
+// Clear interval when user interacts with the page
+document.addEventListener('click', function() {
+    clearInterval(refreshInterval);
+});
+
+document.addEventListener('keydown', function() {
+    clearInterval(refreshInterval);
+});
+
+// Keyboard shortcuts
+document.addEventListener('keydown', function(e) {
+    // Ctrl+R to refresh
+    if (e.ctrlKey && e.key === 'r') {
+        e.preventDefault();
+        location.reload();
+    }
+});
+</script>
+{% endblock %}
