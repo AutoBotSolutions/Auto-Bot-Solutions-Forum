@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Messaging System | AutoBot Solutions Forum Wiki</title>
+    <meta name="description" content="AutoBot Solutions Forum - Messaging System">
+    <link rel="stylesheet" href="../style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Wiki-specific styles that complement the main theme */
+        .wiki-content {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 2rem;
+            margin-top: 6rem;
+            margin-bottom: 2rem;
+            position: relative;
+            z-index: 10;
+        }
+        
+        .wiki-header {
+            grid-column: 1 / -1;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        
+        .wiki-breadcrumb {
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+        
+        .breadcrumb-link {
+            color: var(--neon-green);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        .breadcrumb-link:hover {
+            color: var(--neon-cyan);
+        }
+        
+        .breadcrumb-separator {
+            margin: 0 0.5rem;
+            color: var(--text-secondary);
+        }
+        
+        .breadcrumb-current {
+            color: var(--text-secondary);
+        }
+        
+        .wiki-title {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            font-family: 'Orbitron', monospace;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 0 0 20px var(--neon-green);
+        }
+        
+        .wiki-sidebar {
+            position: sticky;
+            top: 6rem;
+            height: fit-content;
+        }
+        
+        .sidebar-section {
+            background: var(--dark-card);
+            border: 1px solid var(--dark-border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .sidebar-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--neon-green), var(--neon-cyan));
+        }
+        
+        .sidebar-section h3 {
+            color: var(--neon-green);
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+            font-family: 'Orbitron', monospace;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .nav-category h4 {
+            color: var(--neon-cyan);
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            font-family: 'Orbitron', monospace;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .nav-list {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 1rem 0;
+        }
+        
+        .nav-list li {
+            margin-bottom: 0.3rem;
+        }
+        
+        .nav-list a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.85rem;
+            display: block;
+            padding: 0.5rem;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            border-left: 2px solid transparent;
+        }
+        
+        .nav-list a:hover {
+            color: var(--neon-green);
+            background: rgba(0, 255, 136, 0.1);
+            border-left-color: var(--neon-green);
+            transform: translateX(4px);
+        }
+        
+        .quick-links {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .quick-links li {
+            margin-bottom: 0.3rem;
+        }
+        
+        .quick-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.85rem;
+            display: block;
+            padding: 0.5rem;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            border-left: 2px solid transparent;
+        }
+        
+        .quick-links a:hover {
+            color: var(--neon-cyan);
+            background: rgba(0, 245, 255, 0.1);
+            border-left-color: var(--neon-cyan);
+            transform: translateX(4px);
+        }
+        
+        .wiki-main {
+            background: var(--dark-card);
+            border: 1px solid var(--dark-border);
+            border-radius: 12px;
+            padding: 2.5rem;
+            line-height: 1.7;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        
+        .wiki-main::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--neon-cyan), var(--neon-green), var(--neon-magenta));
+        }
+        
+        .wiki-main h1 {
+            color: var(--neon-green);
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid var(--border-glow);
+            padding-bottom: 0.5rem;
+            font-family: 'Orbitron', monospace;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .wiki-main h2 {
+            color: var(--neon-cyan);
+            font-size: 1.8rem;
+            margin-top: 2.5rem;
+            margin-bottom: 1.2rem;
+            font-family: 'Orbitron', monospace;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .wiki-main h3 {
+            color: var(--neon-magenta);
+            font-size: 1.4rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            font-family: 'Orbitron', monospace;
+        }
+        
+        .wiki-main h4 {
+            color: var(--neon-orange);
+            font-size: 1.2rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.8rem;
+            font-family: 'Orbitron', monospace;
+        }
+        
+        .wiki-main p {
+            color: var(--text-primary);
+            margin-bottom: 1.2rem;
+        }
+        
+        .wiki-main ul {
+            margin-bottom: 1.2rem;
+            padding-left: 2rem;
+        }
+        
+        .wiki-main li {
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .wiki-main a {
+            color: var(--neon-green);
+            text-decoration: none;
+            border-bottom: 1px solid transparent;
+            transition: all 0.3s ease;
+        }
+        
+        .wiki-main a:hover {
+            color: var(--neon-cyan);
+            border-bottom-color: var(--neon-cyan);
+        }
+        
+        .wiki-main pre {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--border-glow);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            color: var(--neon-green);
+            position: relative;
+        }
+        
+        .wiki-main pre::before {
+            content: 'CODE';
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            font-family: 'Orbitron', monospace;
+            letter-spacing: 1px;
+        }
+        
+        .wiki-main code {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border-glow);
+            border-radius: 4px;
+            padding: 0.3rem 0.6rem;
+            font-family: 'Courier New', monospace;
+            color: var(--neon-cyan);
+            font-size: 0.9rem;
+        }
+        
+        .wiki-main blockquote {
+            border-left: 4px solid var(--neon-green);
+            padding-left: 1.5rem;
+            margin: 1.5rem 0;
+            color: var(--text-secondary);
+            font-style: italic;
+            background: rgba(0, 255, 136, 0.05);
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .wiki-main table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            background: rgba(0, 0, 0, 0.3);
+        }
+        
+        .wiki-main th {
+            background: var(--dark-border);
+            color: var(--neon-green);
+            padding: 1rem;
+            text-align: left;
+            font-family: 'Orbitron', monospace;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .wiki-main td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--dark-border);
+            color: var(--text-primary);
+        }
+        
+        .footer {
+            margin-top: 4rem;
+            padding: 3rem 0;
+            border-top: 1px solid var(--dark-border);
+            position: relative;
+            z-index: 10;
+        }
+        
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .footer-section h4 {
+            color: var(--neon-green);
+            margin-bottom: 1rem;
+            font-family: 'Orbitron', monospace;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .footer-section ul {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .footer-section li {
+            margin-bottom: 0.5rem;
+        }
+        
+        .footer-section a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        .footer-section a:hover {
+            color: var(--neon-cyan);
+        }
+        
+        .footer-bottom {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid var(--dark-border);
+            color: var(--text-secondary);
+        }
+        
+        @media (max-width: 768px) {
+            .wiki-content {
+                grid-template-columns: 1fr;
+                margin-top: 5rem;
+            }
+            
+            .wiki-sidebar {
+                position: static;
+                order: 2;
+            }
+            
+            .wiki-main {
+                order: 1;
+            }
+            
+            .wiki-title {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="grid-overlay"></div>
+    <div class="scanlines"></div>
+    <div class="particles"></div>
+    
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <span class="logo-text">AUTOBOT</span>
+                <span class="logo-sub">FORUM</span>
+            </div>
+            <div class="nav-links">
+                <a href="../index.html" class="nav-link">Home</a>
+                <a href="Wiki-Index.html" class="nav-link">Wiki Index</a>
+                <a href="https://github.com/AutoBotSolutions/Auto-Bot-Solutions-Forum" class="nav-link btn-glow" target="_blank">GitHub</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="wiki-content">
+            <div class="wiki-header">
+                <div class="wiki-breadcrumb">
+                    <a href="../index.html" class="breadcrumb-link">Home</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <a href="Wiki-Index.html" class="breadcrumb-link">Wiki</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-current">Messaging System</span>
+                </div>
+                <h1 class="wiki-title">Messaging System</h1>
+            </div>
+            
+            <div class="wiki-sidebar">
+                <div class="sidebar-section">
+                    <h3>Navigation</h3>
+                    <div class="nav-category">
+<h4>Getting Started</h4>
+<ul class="nav-list">
+<li><a href="README.html" title="Project overview and features">README</a></li>
+<li><a href="Quick-Start-Guide.html" title="Get started quickly">Quick Start Guide</a></li>
+<li><a href="Installation-Guide.html" title="Detailed installation instructions">Installation Guide</a></li>
+<li><a href="User-Guide.html" title="Complete user manual">User Guide</a></li>
+<li><a href="FAQ.html" title="Frequently asked questions">FAQ</a></li>
+</ul>
+</div>
+<div class="nav-category">
+<h4>Core Systems</h4>
+<ul class="nav-list">
+<li><a href="Authentication-System.html" title="Login and security">Authentication System</a></li>
+<li><a href="Forum-System.html" title="Main forum functionality">Forum System</a></li>
+<li><a href="User-System.html" title="User accounts and profiles">User System</a></li>
+<li><a href="Admin-System.html" title="Administrative control panel">Admin System</a></li>
+<li><a href="Database-System.html" title="Database design and models">Database System</a></li>
+</ul>
+</div>
+<div class="nav-category">
+<h4>Advanced Features</h4>
+<ul class="nav-list">
+<li><a href="Enhanced-Content-Management.html" title="Advanced content features">Enhanced Content Management</a></li>
+<li><a href="Advanced-Search-System.html" title="Comprehensive search functionality">Advanced Search System</a></li>
+<li><a href="Realtime-Features.html" title="Live updates and interactions">Realtime Features</a></li>
+<li><a href="Advanced-Notification-Features.html" title="Enhanced notifications">Advanced Notification Features</a></li>
+<li><a href="Advanced-Security.html" title="Comprehensive security features">Advanced Security</a></li>
+</ul>
+</div>
+<div class="nav-category">
+<h4>Communication</h4>
+<ul class="nav-list">
+<li><a href="Notification-System.html" title="User notifications">Notification System</a></li>
+<li><a href="Messaging-System.html" title="Private messages">Messaging System</a></li>
+<li><a href="Email-System.html" title="Email notifications">Email System</a></li>
+</ul>
+</div>
+<div class="nav-category">
+<h4>Technical</h4>
+<ul class="nav-list">
+<li><a href="API-System.html" title="REST API documentation">API System</a></li>
+<li><a href="Security-System.html" title="Security overview">Security System</a></li>
+<li><a href="Rate-Limiting.html" title="API and request limiting">Rate Limiting</a></li>
+<li><a href="Developer-Guide.html" title="Development documentation">Developer Guide</a></li>
+</ul>
+</div>
+
+                </div>
+                <div class="sidebar-section">
+                    <h3>Quick Links</h3>
+                    <ul class="quick-links">
+                        <li><a href="README.html">Overview</a></li>
+                        <li><a href="Installation-Guide.html">Installation</a></li>
+                        <li><a href="User-Guide.html">User Guide</a></li>
+                        <li><a href="Administrator-Guide.html">Admin Guide</a></li>
+                        <li><a href="Developer-Guide.html">Developer Guide</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="wiki-main">
+                <h1>Messaging System</h1><h2>Overview</h2><p>The messaging system provides private communication between users through direct messages. It includes inbox management, sent messages, and message composition with read status tracking.</p><h2>Components</h2><h3>Models</h3><p><strong>Message Model</strong> (<code>app/models.py</code>)
+<pre><code>python
+class Message(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    sender_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    receiver_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    content = db.Column(db.Text, nullable=False)
+    is_read = db.Column(db.Boolean, default=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    sender = db.relationship('User', foreign_keys=[sender_id], backref='sent_messages')
+    receiver = db.relationship('User', foreign_keys=[receiver_id], backref='received_messages')
+</code></pre></p><h3>Forms</h3><p><strong>MessageForm</strong> (<code>app/message/forms.py</code>)
+<ul><li>Receiver selection (dropdown)</li>
+<li>Content field</li>
+<li>Submit button</li></p><h3>Routes</h3><p><strong>Inbox Route</strong> (<code>/messages</code>)
+<li>Requires authentication</li>
+<li>Lists received messages</li>
+<li>Shows unread count</li>
+<li>Displays sender information</li>
+<li>Message preview</li>
+<li>Read/unread styling</li>
+<li>Actions: Read, Delete</li></p><p><strong>Sent Route</strong> (<code>/messages/sent</code>)
+<li>Requires authentication</li>
+<li>Lists sent messages</li>
+<li>Shows recipient information</li>
+<li>Message preview</li>
+<li>Actions: Delete</li></p><p><strong>New Message Route</strong> (<code>/messages/new</code>)
+<li>Requires authentication</li>
+<li>Method: GET, POST</li>
+<li>Receiver selection dropdown</li>
+<li>Message composition</li>
+<li>Creates message</li>
+<li>Flash confirmation</li></p><p><strong>Read Message Route</strong> (<code>/messages/<message_id>/read</code>)
+<li>Requires authentication</li>
+<li>Marks message as read</li>
+<li>Redirects to inbox</li>
+<li>Only receiver can mark as read</li></p><p><strong>Delete Message Route</strong> (<code>/messages/<message_id>/delete</code>)
+<li>Requires authentication</li>
+<li>Deletes message</li>
+<li>Sender or receiver can delete</li>
+<li>Flash confirmation</li>
+<li>Redirects to inbox</li></p><h2>Message Features</h2><h3>Inbox</h3>
+<li>Lists all received messages</li>
+<li>Shows unread count</li>
+<li>Sender information with profile link</li>
+<li>Message preview (200 characters)</li>
+<li>Timestamp</li>
+<li>Read/unread visual distinction</li>
+<li>Actions: Read, Delete</li></p><h3>Sent Messages</h3>
+<li>Lists all sent messages</li>
+<li>Shows recipient information</li>
+<li>Message preview</li>
+<li>Timestamp</li>
+<li>Actions: Delete</li></p><h3>Message Composition</h3>
+<li>Select recipient from dropdown</li>
+<li>All users except self</li>
+<li>Message content</li>
+<li>No character limit</li>
+<li>Instant delivery</li></p><h3>Read Status</h3>
+<li>Boolean flag</li>
+<li>Default: false (unread)</li>
+<li>Set to true when opened</li>
+<li>Used for unread count</li>
+<li>Only receiver can mark as read</li></p><h2>Message Metadata</h2><h3>Sender</h3>
+<li>Foreign key to User</li>
+<li>Relationship: sent_messages</li>
+<li>Cannot send to self</li>
+<li>Profile link displayed</li></p><h3>Receiver</h3>
+<li>Foreign key to User</li>
+<li>Relationship: received_messages</li>
+<li>Can receive from anyone</li>
+<li>Profile link displayed</li></p><h3>Content</h3>
+<li>Plain text content</li>
+<li>No Markdown processing</li>
+<li>No character limit</li>
+<li>No HTML allowed</li></p><h3>Timestamp</h3>
+<li>Creation time</li>
+<li>Displayed in notifications</li>
+<li>Used for sorting</li></p><h2>Unread Count</h2><h3>Calculation</h3>
+<pre><code>python
+unread_count = current_user.received_messages.filter_by(is_read=False).count()
+</code></pre></p><h3>Display</h3>
+<li>Shown in navbar</li>
+<li>Envelope icon</li>
+<li>Magenta color badge</li>
+<li>Glowing effect</li>
+<li>Hidden when zero unread</li></p><h2>Templates</h2><h3>Inbox Template (<code>message/inbox.html</code>)</h3>
+<li>Hero section with unread count</li>
+<li>New message button</li>
+<li>Sent messages button</li>
+<li>Message list</li>
+<li>Read/unread styling</li>
+<li>Action links</li></p><h3>Sent Template (<code>message/sent.html</code>)</h3>
+<li>Hero section</li>
+<li>Inbox button</li>
+<li>New message button</li>
+<li>Message list</li>
+<li>Message metadata</li>
+<li>Delete action</li></p><h3>New Message Template (<code>message/new_message.html</code>)</h3>
+<li>Message composition form</li>
+<li>Receiver dropdown</li>
+<li>Content textarea</li>
+<li>Submit button</li>
+<li>Cancel link</li></p><h2>CSS Styling</h2><h3>Message Item</h3>
+<li>Dark card background</li>
+<li>Border glow</li>
+<li>Unread: Cyan border with glow</li>
+<li>Hover effects</li>
+<li>Smooth transitions</li></p><h3>Message Sender</h3>
+<li>Magenta color</li>
+<li>Profile link</li>
+<li>Hover effect to cyan</li>
+<li>Text shadow on hover</li></p><h3>Message Content</h3>
+<li>Primary text color</li>
+<li>Preview (200 chars)</li>
+<li>Truncation indicator</li>
+<li>Readable font</li></p><h3>Message Actions</h3>
+<li>Cyan color for read</li>
+<li>Red color for delete</li>
+<li>Hover effects</li>
+<li>Transition animations</li></p><h2>Security Considerations</h2><h3>Access Control</h3>
+<li>Authentication required</li>
+<li>Users can only see their own messages</li>
+<li>Cannot send to self</li>
+<li>Sender/receiver validation</li></p><h3>Privacy</h3>
+<li>Private between sender and receiver</li>
+<li>No public visibility</li>
+<li>Admin can view all messages (future audit)</li>
+<li>Message deletion is permanent</li></p><h3>Abuse Prevention</h3>
+<li>Rate limiting (future)</li>
+<li>Spam detection (future)</li>
+<li>Block user feature (future)</li>
+<li>Report message feature (future)</li></p><h2>Integration Points</h2><h3>Notification System (Future)</h3>
+<li>New message notification</li>
+<li>Unread message count in notifications</li>
+<li>Push notifications</li></p><h3>User System</h3>
+<li>Sender profile links</li>
+<li>Receiver profile links</li>
+<li>User dropdown for composition</li></p><h2>Performance Considerations</h2><h3>Database Queries</h3>
+<li>Filter by user_id (sent or received)</li>
+<li>Filter by is_read</li>
+<li>Order by created_at DESC</li>
+<li>Lazy loading for efficiency</li></p><h3>Future Optimizations</h3>
+<li>Pagination for large lists</li>
+<li>Message archiving</li>
+<li>Indexed fields (sender_id, receiver_id, is_read)</li>
+<li>Message search</li>
+<li>Conversation threading</li></p><h2>Best Practices</h2><h3>Message Content</h3>
+<li>Be respectful and professional</li>
+<li>Keep messages concise</li>
+<li>Use clear subject lines (future)</li>
+<li>Avoid spam</li></p><h3>Message Management</h3>
+<li>Regularly check inbox</li>
+<li>Delete old messages</li>
+<li>Mark important messages as unread (future)</li>
+<li>Archive important conversations (future)</li></p><h3>Privacy</h3>
+<li>Don't share sensitive information</li>
+<li>Remember messages can be deleted</li>
+<li>Admin may audit messages (future)</li>
+<li>Report inappropriate messages (future)</li></p><h2>Future Enhancements</h2><h3>Message Features</h3>
+<li>Message threads/conversations</li>
+<li>Message search</li>
+<li>Message archiving</li>
+<li>Star/favorite messages</li>
+<li>Message drafts</li>
+<li>Rich text editing</li>
+<li>File attachments</li>
+<li>Message forwarding</li>
+<li>Reply quoting</li>
+<li>Message encryption</li>
+<li>Message expiration</li>
+<li>Message scheduling</li></p><h3>Communication Features</h3>
+<li>Block user</li>
+<li>Mute user</li>
+<li>Report message</li>
+<li>Spam detection</li>
+<li>Auto-moderation</li>
+<li>Message analytics</li>
+<li>Typing indicators</li>
+<li>Read receipts</li>
+<li>Message delivery status</li>
+<li>Group messaging</li>
+<li>Broadcast messages (admin)</li></p><h3>Integration</h3>
+<li>Email notifications</li>
+<li>Push notifications</li>
+<li>SMS notifications</li>
+<li>Desktop notifications</li>
+<li>Mobile app integration</li></ul>
+</p>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>AutoBot Solutions Forum</h4>
+                    <p>A futuristic discussion platform for GitHub repositories</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Resources</h4>
+                    <ul>
+                        <li><a href="https://github.com/AutoBotSolutions/Auto-Bot-Solutions-Forum">GitHub Repository</a></li>
+                        <li><a href="https://github.com/AutoBotSolutions/Auto-Bot-Solutions-Forum/wiki">Wiki Documentation</a></li>
+                        <li><a href="https://github.com/AutoBotSolutions/Auto-Bot-Solutions-Forum/issues">Report Issues</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Community</h4>
+                    <ul>
+                        <li><a href="https://github.com/AutoBotSolutions/Auto-Bot-Solutions-Forum/discussions">Discussions</a></li>
+                        <li><a href="https://github.com/AutoBotSolutions/Auto-Bot-Solutions-Forum/releases">Releases</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 AutoBot Solutions. Built with Flask and ❤️</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add particles dynamically
+            const particlesContainer = document.querySelector('.particles');
+            for (let i = 0; i < 50; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 15 + 's';
+                particle.style.animationDuration = (15 + Math.random() * 10) + 's';
+                particlesContainer.appendChild(particle);
+            }
+            
+            // Smooth scrolling for anchor links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({ behavior: 'smooth' });
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

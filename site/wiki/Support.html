@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Support | AutoBot Solutions Forum Wiki</title>
+    <meta name="description" content="AutoBot Solutions Forum - Support">
+    <link rel="stylesheet" href="../style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Wiki-specific styles that complement the main theme */
+        .wiki-content {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 2rem;
+            margin-top: 6rem;
+            margin-bottom: 2rem;
+            position: relative;
+            z-index: 10;
+        }
+        
+        .wiki-header {
+            grid-column: 1 / -1;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        
+        .wiki-breadcrumb {
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+        
+        .breadcrumb-link {
+            color: var(--neon-green);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        .breadcrumb-link:hover {
+            color: var(--neon-cyan);
+        }
+        
+        .breadcrumb-separator {
+            margin: 0 0.5rem;
+            color: var(--text-secondary);
+        }
+        
+        .breadcrumb-current {
+            color: var(--text-secondary);
+        }
+        
+        .wiki-title {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            font-family: 'Orbitron', monospace;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 0 0 20px var(--neon-green);
+        }
+        
+        .wiki-sidebar {
+            position: sticky;
+            top: 6rem;
+            height: fit-content;
+        }
+        
+        .sidebar-section {
+            background: var(--dark-card);
+            border: 1px solid var(--dark-border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .sidebar-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--neon-green), var(--neon-cyan));
+        }
+        
+        .sidebar-section h3 {
+            color: var(--neon-green);
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+            font-family: 'Orbitron', monospace;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .nav-category h4 {
+            color: var(--neon-cyan);
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            font-family: 'Orbitron', monospace;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .nav-list {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 1rem 0;
+        }
+        
+        .nav-list li {
+            margin-bottom: 0.3rem;
+        }
+        
+        .nav-list a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.85rem;
+            display: block;
+            padding: 0.5rem;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            border-left: 2px solid transparent;
+        }
+        
+        .nav-list a:hover {
+            color: var(--neon-green);
+            background: rgba(0, 255, 136, 0.1);
+            border-left-color: var(--neon-green);
+            transform: translateX(4px);
+        }
+        
+        .quick-links {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .quick-links li {
+            margin-bottom: 0.3rem;
+        }
+        
+        .quick-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.85rem;
+            display: block;
+            padding: 0.5rem;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            border-left: 2px solid transparent;
+        }
+        
+        .quick-links a:hover {
+            color: var(--neon-cyan);
+            background: rgba(0, 245, 255, 0.1);
+            border-left-color: var(--neon-cyan);
+            transform: translateX(4px);
+        }
+        
+        .wiki-main {
+            background: var(--dark-card);
+            border: 1px solid var(--dark-border);
+            border-radius: 12px;
+            padding: 2.5rem;
+            line-height: 1.7;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        
+        .wiki-main::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--neon-cyan), var(--neon-green), var(--neon-magenta));
+        }
+        
+        .wiki-main h1 {
+            color: var(--neon-green);
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid var(--border-glow);
+            padding-bottom: 0.5rem;
+            font-family: 'Orbitron', monospace;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .wiki-main h2 {
+            color: var(--neon-cyan);
+            font-size: 1.8rem;
+            margin-top: 2.5rem;
+            margin-bottom: 1.2rem;
+            font-family: 'Orbitron', monospace;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .wiki-main h3 {
+            color: var(--neon-magenta);
+            font-size: 1.4rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            font-family: 'Orbitron', monospace;
+        }
+        
+        .wiki-main h4 {
+            color: var(--neon-orange);
+            font-size: 1.2rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.8rem;
+            font-family: 'Orbitron', monospace;
+        }
+        
+        .wiki-main p {
+            color: var(--text-primary);
+            margin-bottom: 1.2rem;
+        }
+        
+        .wiki-main ul {
+            margin-bottom: 1.2rem;
+            padding-left: 2rem;
+        }
+        
+        .wiki-main li {
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .wiki-main a {
+            color: var(--neon-green);
+            text-decoration: none;
+            border-bottom: 1px solid transparent;
+            transition: all 0.3s ease;
+        }
+        
+        .wiki-main a:hover {
+            color: var(--neon-cyan);
+            border-bottom-color: var(--neon-cyan);
+        }
+        
+        .wiki-main pre {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--border-glow);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            color: var(--neon-green);
+            position: relative;
+        }
+        
+        .wiki-main pre::before {
+            content: 'CODE';
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            font-family: 'Orbitron', monospace;
+            letter-spacing: 1px;
+        }
+        
+        .wiki-main code {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border-glow);
+            border-radius: 4px;
+            padding: 0.3rem 0.6rem;
+            font-family: 'Courier New', monospace;
+            color: var(--neon-cyan);
+            font-size: 0.9rem;
+        }
+        
+        .wiki-main blockquote {
+            border-left: 4px solid var(--neon-green);
+            padding-left: 1.5rem;
+            margin: 1.5rem 0;
+            color: var(--text-secondary);
+            font-style: italic;
+            background: rgba(0, 255, 136, 0.05);
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .wiki-main table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            background: rgba(0, 0, 0, 0.3);
+        }
+        
+        .wiki-main th {
+            background: var(--dark-border);
+            color: var(--neon-green);
+            padding: 1rem;
+            text-align: left;
+            font-family: 'Orbitron', monospace;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .wiki-main td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--dark-border);
+            color: var(--text-primary);
+        }
+        
+        .footer {
+            margin-top: 4rem;
+            padding: 3rem 0;
+            border-top: 1px solid var(--dark-border);
+            position: relative;
+            z-index: 10;
+        }
+        
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .footer-section h4 {
+            color: var(--neon-green);
+            margin-bottom: 1rem;
+            font-family: 'Orbitron', monospace;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .footer-section ul {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .footer-section li {
+            margin-bottom: 0.5rem;
+        }
+        
+        .footer-section a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        .footer-section a:hover {
+            color: var(--neon-cyan);
+        }
+        
+        .footer-bottom {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid var(--dark-border);
+            color: var(--text-secondary);
+        }
+        
+        @media (max-width: 768px) {
+            .wiki-content {
+                grid-template-columns: 1fr;
+                margin-top: 5rem;
+            }
+            
+            .wiki-sidebar {
+                position: static;
+                order: 2;
+            }
+            
+            .wiki-main {
+                order: 1;
+            }
+            
+            .wiki-title {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="grid-overlay"></div>
+    <div class="scanlines"></div>
+    <div class="particles"></div>
+    
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <span class="logo-text">AUTOBOT</span>
+                <span class="logo-sub">FORUM</span>
+            </div>
+            <div class="nav-links">
+                <a href="../index.html" class="nav-link">Home</a>
+                <a href="Wiki-Index.html" class="nav-link">Wiki Index</a>
+                <a href="https://github.com/AutoBotSolutions/Auto-Bot-Solutions-Forum" class="nav-link btn-glow" target="_blank">GitHub</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="wiki-content">
+            <div class="wiki-header">
+                <div class="wiki-breadcrumb">
+                    <a href="../index.html" class="breadcrumb-link">Home</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <a href="Wiki-Index.html" class="breadcrumb-link">Wiki</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-current">Support</span>
+                </div>
+                <h1 class="wiki-title">Support</h1>
+            </div>
+            
+            <div class="wiki-sidebar">
+                <div class="sidebar-section">
+                    <h3>Navigation</h3>
+                    <div class="nav-category">
+<h4>Getting Started</h4>
+<ul class="nav-list">
+<li><a href="README.html" title="Project overview and features">README</a></li>
+<li><a href="Quick-Start-Guide.html" title="Get started quickly">Quick Start Guide</a></li>
+<li><a href="Installation-Guide.html" title="Detailed installation instructions">Installation Guide</a></li>
+<li><a href="User-Guide.html" title="Complete user manual">User Guide</a></li>
+<li><a href="FAQ.html" title="Frequently asked questions">FAQ</a></li>
+</ul>
+</div>
+<div class="nav-category">
+<h4>Core Systems</h4>
+<ul class="nav-list">
+<li><a href="Authentication-System.html" title="Login and security">Authentication System</a></li>
+<li><a href="Forum-System.html" title="Main forum functionality">Forum System</a></li>
+<li><a href="User-System.html" title="User accounts and profiles">User System</a></li>
+<li><a href="Admin-System.html" title="Administrative control panel">Admin System</a></li>
+<li><a href="Database-System.html" title="Database design and models">Database System</a></li>
+</ul>
+</div>
+<div class="nav-category">
+<h4>Advanced Features</h4>
+<ul class="nav-list">
+<li><a href="Enhanced-Content-Management.html" title="Advanced content features">Enhanced Content Management</a></li>
+<li><a href="Advanced-Search-System.html" title="Comprehensive search functionality">Advanced Search System</a></li>
+<li><a href="Realtime-Features.html" title="Live updates and interactions">Realtime Features</a></li>
+<li><a href="Advanced-Notification-Features.html" title="Enhanced notifications">Advanced Notification Features</a></li>
+<li><a href="Advanced-Security.html" title="Comprehensive security features">Advanced Security</a></li>
+</ul>
+</div>
+<div class="nav-category">
+<h4>Communication</h4>
+<ul class="nav-list">
+<li><a href="Notification-System.html" title="User notifications">Notification System</a></li>
+<li><a href="Messaging-System.html" title="Private messages">Messaging System</a></li>
+<li><a href="Email-System.html" title="Email notifications">Email System</a></li>
+</ul>
+</div>
+<div class="nav-category">
+<h4>Technical</h4>
+<ul class="nav-list">
+<li><a href="API-System.html" title="REST API documentation">API System</a></li>
+<li><a href="Security-System.html" title="Security overview">Security System</a></li>
+<li><a href="Rate-Limiting.html" title="API and request limiting">Rate Limiting</a></li>
+<li><a href="Developer-Guide.html" title="Development documentation">Developer Guide</a></li>
+</ul>
+</div>
+
+                </div>
+                <div class="sidebar-section">
+                    <h3>Quick Links</h3>
+                    <ul class="quick-links">
+                        <li><a href="README.html">Overview</a></li>
+                        <li><a href="Installation-Guide.html">Installation</a></li>
+                        <li><a href="User-Guide.html">User Guide</a></li>
+                        <li><a href="Administrator-Guide.html">Admin Guide</a></li>
+                        <li><a href="Developer-Guide.html">Developer Guide</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="wiki-main">
+                <h1>Support</h1><h2>Getting Help</h2><h3>Documentation</h3>
+<ul><li><a href="Home.md">Home</a> - Wiki index</li>
+<li><a href="Quick-Start-Guide.md">Quick Start</a> - Get started quickly</li>
+<li><a href="FAQ.md">FAQ</a> - Frequently asked questions</li></p><h3>Community Support</h3>
+<li>Discord server: [Join here]</li>
+<li>GitHub Discussions</li>
+<li>GitHub Issues</li></p><h3>Email Support</h3>
+<li>General: support@autobotsolutions.com</li>
+<li>Security: security@autobotsolutions.com</li>
+<li>Development: dev@autobotsolutions.com</li></p><h2>Common Issues</h2><h3>Installation Problems</h3>
+<li>Check Python version (3.8+)</li>
+<li>Verify PostgreSQL is running</li>
+<li>Check DATABASE_URL in .env</li>
+<li>Review <a href="Installation-Guide.md">Installation Guide</a></li></p><h3>Database Issues</h3>
+<li>PostgreSQL must be running</li>
+<li>Database must exist</li>
+<li>Check connection string</li>
+<li>See <a href="Database-System.md">Database System</a></li></p><h3>CSS Not Loading</h3>
+<li>Clear browser cache</li>
+<li>Verify static folder configuration</li>
+<li>Check file permissions</li>
+<li>This was fixed in latest version</li></p><h3>Authentication Issues</h3>
+<li>Verify email is verified</li>
+<li>Check password reset token</li>
+<li>Ensure session is valid</li>
+<li>See <a href="Authentication-System.md">Authentication System</a></li></p><h2>Reporting Bugs</h2><h3>Before Reporting</h3>
+<li>Search existing issues</li>
+<li>Check documentation</li>
+<li>Try to reproduce</li>
+<li>Gather error details</li></p><h3>Bug Report Template</h3>
+1. Description
+2. Steps to reproduce
+3. Expected behavior
+4. Actual behavior
+5. Environment details
+6. Error messages/logs</p><h3>Where to Report</h3>
+<li>GitHub Issues: [Create issue]</li>
+<li>Email: support@autobotsolutions.com</li>
+<li>Discord: #bugs channel</li></p><h2>Feature Requests</h2><h3>Submitting Requests</h3>
+<li>Use GitHub Issues</li>
+<li>Label as "enhancement"</li>
+<li>Describe the feature clearly</li>
+<li>Explain use case</li></p><h3>Feature Request Template</h3>
+1. Feature description
+2. Why it's needed
+3. Use cases
+4. Possible implementation</p><h2>Professional Support</h2><h3>Enterprise Support</h3>
+<li>SLA guarantees</li>
+<li>Priority support</li>
+<li>Custom development</li>
+<li>Training sessions</li>
+<li>Contact: enterprise@autobotsolutions.com</li></p><h3>Consulting Services</h3>
+<li>Custom integrations</li>
+<li>Performance optimization</li>
+<li>Security audits</li>
+<li>Migration assistance</li>
+<li>Contact: consulting@autobotsolutions.com</li></p><h2>Documentation</h2><h3>Developer Documentation</h3>
+<li><a href="Developer-Guide.md">Developer Guide</a></li>
+<li><a href="Architecture-System.md">Architecture System</a></li>
+<li><a href="API-System.md">API System</a></li>
+<li><a href="Database-System.md">Database System</a></li></p><h3>User Documentation</h3>
+<li><a href="User-Guide.md">User Guide</a></li>
+<li><a href="Quick-Start-Guide.md">Quick Start Guide</a></li>
+<li><a href="FAQ.md">FAQ</a></li></p><h3>Admin Documentation</h3>
+<li><a href="Administrator-Guide.md">Administrator Guide</a></li>
+<li><a href="Security-System.md">Security System</a></li></p><h2>Training</h2><h3>Available Training</h3>
+<li>User training sessions</li>
+<li>Admin training</li>
+<li>Developer workshops</li>
+<li>Custom training programs</li></p><h3>Request Training</h3>
+<li>Email training@autobotsolutions.com</li>
+<li>Specify audience</li>
+<li>Describe training needs</li>
+<li>Schedule availability</li></p><h2>Community</h2><h3>Join the Community</h3>
+<li>Discord server</li>
+<li>GitHub Discussions</li>
+<li>Twitter/X: @AutoBotForum</li>
+<li>Subreddit: r/AutoBotForum</li></p><h3>Contributing</h3>
+<li>See <a href="../CONTRIBUTING.md">CONTRIBUTING.md</a></li>
+<li>Code of Conduct</li>
+<li>Development workflow</li>
+<li>Pull request process</li></p><h2>Additional Resources</h2><h3>Official Documentation</h3>
+<li><a href="../README.md">README.md</a></li>
+<li><a href="../DEPLOYMENT.md">DEPLOYMENT.md</a></li>
+<li><a href="../API.md">API.md</a></li>
+<li><a href="../SECURITY.md">SECURITY.md</a></li></p><h3>Third-Party Resources</h3>
+<li>Flask documentation</li>
+<li>SQLAlchemy documentation</li>
+<li>PostgreSQL documentation</li>
+<li>Docker documentation</li></p><h2>Contact Information</h2><h3>General Inquiries</h3>
+support@autobotsolutions.com</p><h3>Security Issues</h3>
+security@autobotsolutions.com
+(Do not use public issue tracker)</p><h3>Business Inquiries</h3>
+business@autobotsolutions.com</p><h3>Press & Media</h3>
+press@autobotsolutions.com</p><h2>Response Times</h2><h3>Community Support</h3>
+<li>Discord: Usually within hours</li>
+<li>GitHub Issues: Days to weeks</li>
+<li>Email: 1-3 business days</li></p><h3>Professional Support</h3>
+<li>Enterprise: Within 4 hours</li>
+<li>Consulting: Within 1 business day</li>
+<li>Training: As scheduled</li></p><h2>Escalation</h2><h3>Not Getting Help?</h3>
+1. Check documentation thoroughly
+2. Search existing issues
+3. Post in Discord
+4. Create GitHub issue
+5. Email support with details</p><h3>Urgent Issues</h3>
+<li>Mark as urgent in email subject</li>
+<li>Contact multiple channels</li>
+<li>Provide detailed information</li>
+<li>Include screenshots if applicable</li></ul>
+</p>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>AutoBot Solutions Forum</h4>
+                    <p>A futuristic discussion platform for GitHub repositories</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Resources</h4>
+                    <ul>
+                        <li><a href="https://github.com/AutoBotSolutions/Auto-Bot-Solutions-Forum">GitHub Repository</a></li>
+                        <li><a href="https://github.com/AutoBotSolutions/Auto-Bot-Solutions-Forum/wiki">Wiki Documentation</a></li>
+                        <li><a href="https://github.com/AutoBotSolutions/Auto-Bot-Solutions-Forum/issues">Report Issues</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Community</h4>
+                    <ul>
+                        <li><a href="https://github.com/AutoBotSolutions/Auto-Bot-Solutions-Forum/discussions">Discussions</a></li>
+                        <li><a href="https://github.com/AutoBotSolutions/Auto-Bot-Solutions-Forum/releases">Releases</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 AutoBot Solutions. Built with Flask and ❤️</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add particles dynamically
+            const particlesContainer = document.querySelector('.particles');
+            for (let i = 0; i < 50; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 15 + 's';
+                particle.style.animationDuration = (15 + Math.random() * 10) + 's';
+                particlesContainer.appendChild(particle);
+            }
+            
+            // Smooth scrolling for anchor links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({ behavior: 'smooth' });
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

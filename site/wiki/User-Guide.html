@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Guide | AutoBot Solutions Forum Wiki</title>
+    <meta name="description" content="AutoBot Solutions Forum - User Guide">
+    <link rel="stylesheet" href="../style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Wiki-specific styles that complement the main theme */
+        .wiki-content {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 2rem;
+            margin-top: 6rem;
+            margin-bottom: 2rem;
+            position: relative;
+            z-index: 10;
+        }
+        
+        .wiki-header {
+            grid-column: 1 / -1;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        
+        .wiki-breadcrumb {
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+        
+        .breadcrumb-link {
+            color: var(--neon-green);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        .breadcrumb-link:hover {
+            color: var(--neon-cyan);
+        }
+        
+        .breadcrumb-separator {
+            margin: 0 0.5rem;
+            color: var(--text-secondary);
+        }
+        
+        .breadcrumb-current {
+            color: var(--text-secondary);
+        }
+        
+        .wiki-title {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            font-family: 'Orbitron', monospace;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 0 0 20px var(--neon-green);
+        }
+        
+        .wiki-sidebar {
+            position: sticky;
+            top: 6rem;
+            height: fit-content;
+        }
+        
+        .sidebar-section {
+            background: var(--dark-card);
+            border: 1px solid var(--dark-border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .sidebar-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--neon-green), var(--neon-cyan));
+        }
+        
+        .sidebar-section h3 {
+            color: var(--neon-green);
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+            font-family: 'Orbitron', monospace;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .nav-category h4 {
+            color: var(--neon-cyan);
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            font-family: 'Orbitron', monospace;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .nav-list {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 1rem 0;
+        }
+        
+        .nav-list li {
+            margin-bottom: 0.3rem;
+        }
+        
+        .nav-list a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.85rem;
+            display: block;
+            padding: 0.5rem;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            border-left: 2px solid transparent;
+        }
+        
+        .nav-list a:hover {
+            color: var(--neon-green);
+            background: rgba(0, 255, 136, 0.1);
+            border-left-color: var(--neon-green);
+            transform: translateX(4px);
+        }
+        
+        .quick-links {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .quick-links li {
+            margin-bottom: 0.3rem;
+        }
+        
+        .quick-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.85rem;
+            display: block;
+            padding: 0.5rem;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            border-left: 2px solid transparent;
+        }
+        
+        .quick-links a:hover {
+            color: var(--neon-cyan);
+            background: rgba(0, 245, 255, 0.1);
+            border-left-color: var(--neon-cyan);
+            transform: translateX(4px);
+        }
+        
+        .wiki-main {
+            background: var(--dark-card);
+            border: 1px solid var(--dark-border);
+            border-radius: 12px;
+            padding: 2.5rem;
+            line-height: 1.7;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        
+        .wiki-main::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--neon-cyan), var(--neon-green), var(--neon-magenta));
+        }
+        
+        .wiki-main h1 {
+            color: var(--neon-green);
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid var(--border-glow);
+            padding-bottom: 0.5rem;
+            font-family: 'Orbitron', monospace;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .wiki-main h2 {
+            color: var(--neon-cyan);
+            font-size: 1.8rem;
+            margin-top: 2.5rem;
+            margin-bottom: 1.2rem;
+            font-family: 'Orbitron', monospace;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .wiki-main h3 {
+            color: var(--neon-magenta);
+            font-size: 1.4rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            font-family: 'Orbitron', monospace;
+        }
+        
+        .wiki-main h4 {
+            color: var(--neon-orange);
+            font-size: 1.2rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.8rem;
+            font-family: 'Orbitron', monospace;
+        }
+        
+        .wiki-main p {
+            color: var(--text-primary);
+            margin-bottom: 1.2rem;
+        }
+        
+        .wiki-main ul {
+            margin-bottom: 1.2rem;
+            padding-left: 2rem;
+        }
+        
+        .wiki-main li {
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .wiki-main a {
+            color: var(--neon-green);
+            text-decoration: none;
+            border-bottom: 1px solid transparent;
+            transition: all 0.3s ease;
+        }
+        
+        .wiki-main a:hover {
+            color: var(--neon-cyan);
+            border-bottom-color: var(--neon-cyan);
+        }
+        
+        .wiki-main pre {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--border-glow);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            color: var(--neon-green);
+            position: relative;
+        }
+        
+        .wiki-main pre::before {
+            content: 'CODE';
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            font-family: 'Orbitron', monospace;
+            letter-spacing: 1px;
+        }
+        
+        .wiki-main code {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border-glow);
+            border-radius: 4px;
+            padding: 0.3rem 0.6rem;
+            font-family: 'Courier New', monospace;
+            color: var(--neon-cyan);
+            font-size: 0.9rem;
+        }
+        
+        .wiki-main blockquote {
+            border-left: 4px solid var(--neon-green);
+            padding-left: 1.5rem;
+            margin: 1.5rem 0;
+            color: var(--text-secondary);
+            font-style: italic;
+            background: rgba(0, 255, 136, 0.05);
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .wiki-main table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            background: rgba(0, 0, 0, 0.3);
+        }
+        
+        .wiki-main th {
+            background: var(--dark-border);
+            color: var(--neon-green);
+            padding: 1rem;
+            text-align: left;
+            font-family: 'Orbitron', monospace;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .wiki-main td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--dark-border);
+            color: var(--text-primary);
+        }
+        
+        .footer {
+            margin-top: 4rem;
+            padding: 3rem 0;
+            border-top: 1px solid var(--dark-border);
+            position: relative;
+            z-index: 10;
+        }
+        
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .footer-section h4 {
+            color: var(--neon-green);
+            margin-bottom: 1rem;
+            font-family: 'Orbitron', monospace;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .footer-section ul {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .footer-section li {
+            margin-bottom: 0.5rem;
+        }
+        
+        .footer-section a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        .footer-section a:hover {
+            color: var(--neon-cyan);
+        }
+        
+        .footer-bottom {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid var(--dark-border);
+            color: var(--text-secondary);
+        }
+        
+        @media (max-width: 768px) {
+            .wiki-content {
+                grid-template-columns: 1fr;
+                margin-top: 5rem;
+            }
+            
+            .wiki-sidebar {
+                position: static;
+                order: 2;
+            }
+            
+            .wiki-main {
+                order: 1;
+            }
+            
+            .wiki-title {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="grid-overlay"></div>
+    <div class="scanlines"></div>
+    <div class="particles"></div>
+    
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <span class="logo-text">AUTOBOT</span>
+                <span class="logo-sub">FORUM</span>
+            </div>
+            <div class="nav-links">
+                <a href="../index.html" class="nav-link">Home</a>
+                <a href="Wiki-Index.html" class="nav-link">Wiki Index</a>
+                <a href="https://github.com/AutoBotSolutions/Auto-Bot-Solutions-Forum" class="nav-link btn-glow" target="_blank">GitHub</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="wiki-content">
+            <div class="wiki-header">
+                <div class="wiki-breadcrumb">
+                    <a href="../index.html" class="breadcrumb-link">Home</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <a href="Wiki-Index.html" class="breadcrumb-link">Wiki</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-current">User Guide</span>
+                </div>
+                <h1 class="wiki-title">User Guide</h1>
+            </div>
+            
+            <div class="wiki-sidebar">
+                <div class="sidebar-section">
+                    <h3>Navigation</h3>
+                    <div class="nav-category">
+<h4>Getting Started</h4>
+<ul class="nav-list">
+<li><a href="README.html" title="Project overview and features">README</a></li>
+<li><a href="Quick-Start-Guide.html" title="Get started quickly">Quick Start Guide</a></li>
+<li><a href="Installation-Guide.html" title="Detailed installation instructions">Installation Guide</a></li>
+<li><a href="User-Guide.html" title="Complete user manual">User Guide</a></li>
+<li><a href="FAQ.html" title="Frequently asked questions">FAQ</a></li>
+</ul>
+</div>
+<div class="nav-category">
+<h4>Core Systems</h4>
+<ul class="nav-list">
+<li><a href="Authentication-System.html" title="Login and security">Authentication System</a></li>
+<li><a href="Forum-System.html" title="Main forum functionality">Forum System</a></li>
+<li><a href="User-System.html" title="User accounts and profiles">User System</a></li>
+<li><a href="Admin-System.html" title="Administrative control panel">Admin System</a></li>
+<li><a href="Database-System.html" title="Database design and models">Database System</a></li>
+</ul>
+</div>
+<div class="nav-category">
+<h4>Advanced Features</h4>
+<ul class="nav-list">
+<li><a href="Enhanced-Content-Management.html" title="Advanced content features">Enhanced Content Management</a></li>
+<li><a href="Advanced-Search-System.html" title="Comprehensive search functionality">Advanced Search System</a></li>
+<li><a href="Realtime-Features.html" title="Live updates and interactions">Realtime Features</a></li>
+<li><a href="Advanced-Notification-Features.html" title="Enhanced notifications">Advanced Notification Features</a></li>
+<li><a href="Advanced-Security.html" title="Comprehensive security features">Advanced Security</a></li>
+</ul>
+</div>
+<div class="nav-category">
+<h4>Communication</h4>
+<ul class="nav-list">
+<li><a href="Notification-System.html" title="User notifications">Notification System</a></li>
+<li><a href="Messaging-System.html" title="Private messages">Messaging System</a></li>
+<li><a href="Email-System.html" title="Email notifications">Email System</a></li>
+</ul>
+</div>
+<div class="nav-category">
+<h4>Technical</h4>
+<ul class="nav-list">
+<li><a href="API-System.html" title="REST API documentation">API System</a></li>
+<li><a href="Security-System.html" title="Security overview">Security System</a></li>
+<li><a href="Rate-Limiting.html" title="API and request limiting">Rate Limiting</a></li>
+<li><a href="Developer-Guide.html" title="Development documentation">Developer Guide</a></li>
+</ul>
+</div>
+
+                </div>
+                <div class="sidebar-section">
+                    <h3>Quick Links</h3>
+                    <ul class="quick-links">
+                        <li><a href="README.html">Overview</a></li>
+                        <li><a href="Installation-Guide.html">Installation</a></li>
+                        <li><a href="User-Guide.html">User Guide</a></li>
+                        <li><a href="Administrator-Guide.html">Admin Guide</a></li>
+                        <li><a href="Developer-Guide.html">Developer Guide</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="wiki-main">
+                <h1>User Guide</h1><h2>Overview</h2><p>Complete guide for using the AutoBot Solutions Forum as a user.</p><h2>Account Management</h2><h3>Registration</h3>
+<ul><li>Choose a unique username (4-64 characters)</li>
+<li>Provide a valid email address</li>
+<li>Create a strong password (8+ characters)</li>
+<li>Email verification required</li></p><h3>Profile Settings</h3>
+<li>View your profile by clicking your username</li>
+<li>Edit your profile to change username or email</li>
+<li>View your activity history</li>
+<li>See your badges and achievements</li></p><h3>Password Reset</h3>
+1. Click "Forgot Password" on login page
+2. Enter your email address
+3. Check email for reset link
+4. Create new password
+5. Link expires in 1 hour</p><h2>Creating Content</h2><h3>Creating a Post</h3>
+1. Click "New Post" in navbar
+2. Enter a descriptive title (5+ characters)
+3. Write your content using Markdown
+4. Optionally select a category
+5. Optionally link to a repository
+6. Optionally attach a file
+7. Click "Create Post"</p><h3>Markdown Formatting</h3>
+<li><strong>Bold text</strong>: <code><strong>text</strong></code></li>
+<li><em>Italic text</em>: <code><em>text</em></code></li>
+<li>Code: <code>code</code> or <pre><code>code</code></pre></li>
+<li>Links: <code><a href="url">text</a></code></li>
+<li>Images: <code>!<a href="url">alt</a></code></li>
+<li>Tables: See Markdown documentation</li></p><h3>Editing Posts</h3>
+<li>Currently not supported (planned feature)</li>
+<li>Contact admin to edit if needed</li></p><h3>Deleting Content</h3>
+<li>Delete your own posts and comments</li>
+<li>Cannot delete posts with comments (contact admin)</li></p><h2>Interacting with Content</h2><h3>Voting</h3>
+<li>Click ▲ to upvote</li>
+<li>Click ▼ to downvote</li>
+<li>Vote again to change your vote</li>
+<li>Vote same value to remove vote</li>
+<li>Rate limited to 30 votes per minute</li></p><h3>Commenting</h3>
+1. Navigate to a post
+2. Scroll to comment section
+3. Write your comment
+4. Click "Post Comment"
+<li>Comments support Markdown</li>
+<li>Rate limited to 20 comments per hour</li></p><h3>Bookmarking</h3>
+<li>Click "★ Bookmark" on any post</li>
+<li>Toggle to remove bookmark</li>
+<li>View all bookmarks via navbar</li>
+<li>Bookmarks are private</li></p><h2>Categories</h2><h3>Using Categories</h3>
+<li>Categories organize posts by topic</li>
+<li>Filter posts by category on forum index</li>
+<li>Categories have custom colors</li>
+<li>View category statistics in admin panel</li></p><h3>Category Colors</h3>
+<li>Visual identification</li>
+<li>Consistent across the forum</li>
+<li>Customizable by admin</li></p><h2>Search</h2><h3>Searching Content</h3>
+1. Click search icon in navbar
+2. Enter search query
+3. View matching posts and comments
+<li>Case-insensitive search</li>
+<li>Searches titles and content</li></p><h2>Notifications</h2><h3>Notification Types</h3>
+<li>Comments on your posts</li>
+<li>Future: Likes, mentions, messages</li></p><h3>Managing Notifications</h3>
+<li>Bell icon shows unread count</li>
+<li>Click to view notifications</li>
+<li>Click "View" to navigate to content</li>
+<li>Click "Mark All Read" to clear</li></p><h2>Private Messaging</h2><h3>Sending Messages</h3>
+1. Click envelope icon in navbar
+2. Click "New Message"
+3. Select recipient from dropdown
+4. Write your message
+5. Click "Send Message"</p><h3>Managing Messages</h3>
+<li>View inbox for received messages</li>
+<li>View sent messages</li>
+<li>Mark messages as read</li>
+<li>Delete messages</li>
+<li>Messages are private</li></p><h2>User Profiles</h2><h3>Viewing Profiles</h3>
+<li>Click any username to view their profile</li>
+<li>See their activity history</li>
+<li>View their badges</li>
+<li>See their recent posts and comments</li></p><h3>Your Profile</h3>
+<li>View your own activity</li>
+<li>Edit your profile</li>
+<li>See your badges</li>
+<li>View your statistics</li></p><h2>Badges and Achievements</h2><h3>Earning Badges</h3>
+<li>Badges are assigned by admins</li>
+<li>Recognize contributions</li>
+<li>Displayed on your profile</li>
+<li>Color-coded icons</li></p><h3>Badge Types</h3>
+<li>Community badges</li>
+<li>Contribution badges</li>
+<li>Special achievements</li>
+<li>Custom badges</li></p><h2>GitHub Integration</h2><h3>Repository-Linked Posts</h3>
+<li>Link posts to GitHub repositories</li>
+<li>Repository metadata displayed</li>
+<li>Organize discussions by repository</li>
+<li>Sync repositories via admin panel</li></p><h3>Viewing Repository Posts</h3>
+<li>Filter posts by repository</li>
+<li>View repository metadata</li>
+<li>Link to GitHub repository</li></p><h2>Best Practices</h2><h3>Posting</h3>
+<li>Use descriptive titles</li>
+<li>Format content with Markdown</li>
+<li>Choose appropriate categories</li>
+<li>Be respectful and professional</li>
+<li>Search before posting</li></p><h3>Commenting</h3>
+<li>Stay on topic</li>
+<li>Be constructive</li>
+<li>Use proper formatting</li>
+<li>Reply to specific points</li>
+<li>Report inappropriate content</li></p><h3>Voting</h3>
+<li>Vote based on quality</li>
+<li>Don't vote spam</li>
+<li>Respect others' opinions</li>
+<li>Use voting for moderation</li></p><h2>Troubleshooting</h2><h3>Can't Login</h3>
+<li>Check username and password</li>
+<li>Verify email is verified</li>
+<li>Use password reset if needed</li></p><h3>Can't Post</h3>
+<li>Ensure you're logged in</li>
+<li>Check rate limits</li>
+<li>Verify form validation</li>
+<li>Contact admin if issue persists</li></p><h3>Notifications Not Working</h3>
+<li>Check if notifications are enabled</li>
+<li>Refresh the page</li>
+<li>Clear browser cache</li></p><h2>Getting Help</h2><p><li>Check <a href="FAQ.md">FAQ</a></li>
+<li>Visit <a href="Support.md">Support</a></li>
+<li>Contact admin for account issues</li>
+<li>Report bugs via GitHub issues</li></ul>
+</p>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>AutoBot Solutions Forum</h4>
+                    <p>A futuristic discussion platform for GitHub repositories</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Resources</h4>
+                    <ul>
+                        <li><a href="https://github.com/AutoBotSolutions/Auto-Bot-Solutions-Forum">GitHub Repository</a></li>
+                        <li><a href="https://github.com/AutoBotSolutions/Auto-Bot-Solutions-Forum/wiki">Wiki Documentation</a></li>
+                        <li><a href="https://github.com/AutoBotSolutions/Auto-Bot-Solutions-Forum/issues">Report Issues</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Community</h4>
+                    <ul>
+                        <li><a href="https://github.com/AutoBotSolutions/Auto-Bot-Solutions-Forum/discussions">Discussions</a></li>
+                        <li><a href="https://github.com/AutoBotSolutions/Auto-Bot-Solutions-Forum/releases">Releases</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 AutoBot Solutions. Built with Flask and ❤️</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add particles dynamically
+            const particlesContainer = document.querySelector('.particles');
+            for (let i = 0; i < 50; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 15 + 's';
+                particle.style.animationDuration = (15 + Math.random() * 10) + 's';
+                particlesContainer.appendChild(particle);
+            }
+            
+            // Smooth scrolling for anchor links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({ behavior: 'smooth' });
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
